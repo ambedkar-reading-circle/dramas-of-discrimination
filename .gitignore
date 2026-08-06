@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.vite/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Cloudflare / Workers
+.wrangler/
+.dev.vars
+
+# Convex
+.convex/
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Wayfinder research (local findings, not tracked unless needed)
+wayfinder/research/
