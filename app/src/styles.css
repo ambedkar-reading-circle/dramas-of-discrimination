@@ -1,0 +1,347 @@
+@import url('https://fonts.googleapis.com/css2?family=Italianno&family=Miriam+Libre&display=swap');
+@import '@fontsource/cascadia-mono';
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: 'Miriam Libre', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Miriam Libre', ui-sans-serif, system-ui, sans-serif;
+  --font-title: 'Cascadia Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-of: 'Italianno', cursive;
+}
+
+/*
+ * Dramas of Discrimination — navy/cream theme.
+ * Two brand colors drive everything:
+ *   --primary-blue   #131857  (ink, borders, accent fills)
+ *   --primary-white  #ffffee  (paper, inverted ink)
+ * Dark mode is the brand inversion: deep navy surfaces, cream ink.
+ * Legacy sea-theme variable names are kept as aliases so existing
+ * markup (text-[var(--sea-ink)] etc.) keeps working.
+ */
+
+:root {
+  --primary-blue: #131857;
+  --primary-white: #ffffee;
+
+  --sea-ink: var(--primary-blue);
+  --sea-ink-soft: rgba(19, 24, 87, 0.72);
+  --lagoon-deep: var(--primary-blue);
+  --lagoon-hover: #2a2f7a;
+  --link-underline: rgba(19, 24, 87, 0.4);
+  --kicker: var(--primary-blue);
+
+  --line: var(--primary-blue);
+  --bg-base: var(--primary-white);
+  --header-bg: var(--primary-white);
+  --surface: var(--primary-white);
+  --surface-strong: var(--primary-white);
+  --chip-bg: var(--primary-white);
+  --chip-line: var(--primary-blue);
+  --link-bg-hover: rgba(19, 24, 87, 0.08);
+
+  --hl-bg: var(--primary-blue);
+  --hl-text: var(--primary-white);
+  --btn-edge: transparent;
+  --scrollbar-thumb: var(--primary-blue);
+}
+
+:root[data-theme='dark'] {
+  --sea-ink: var(--primary-white);
+  --sea-ink-soft: rgba(255, 254, 238, 0.72);
+  --lagoon-deep: var(--primary-white);
+  --lagoon-hover: #ffffff;
+  --link-underline: rgba(255, 254, 238, 0.4);
+  --kicker: rgba(255, 254, 238, 0.85);
+
+  --line: rgba(255, 254, 238, 0.35);
+  --bg-base: #0e1236;
+  --header-bg: #10154a;
+  --surface: #151a63;
+  --surface-strong: #151a63;
+  --chip-bg: #1a2070;
+  --chip-line: rgba(255, 254, 238, 0.35);
+  --link-bg-hover: rgba(255, 254, 238, 0.1);
+
+  --hl-bg: var(--primary-white);
+  --hl-text: var(--primary-blue);
+  --btn-edge: rgba(255, 254, 238, 0.45);
+  --scrollbar-thumb: rgba(255, 254, 238, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --sea-ink: var(--primary-white);
+    --sea-ink-soft: rgba(255, 254, 238, 0.72);
+    --lagoon-deep: var(--primary-white);
+    --lagoon-hover: #ffffff;
+    --link-underline: rgba(255, 254, 238, 0.4);
+    --kicker: rgba(255, 254, 238, 0.85);
+
+    --line: rgba(255, 254, 238, 0.35);
+    --bg-base: #0e1236;
+    --header-bg: #10154a;
+    --surface: #151a63;
+    --surface-strong: #151a63;
+    --chip-bg: #1a2070;
+    --chip-line: rgba(255, 254, 238, 0.35);
+    --link-bg-hover: rgba(255, 254, 238, 0.1);
+
+    --hl-bg: var(--primary-white);
+    --hl-text: var(--primary-blue);
+    --btn-edge: rgba(255, 254, 238, 0.45);
+    --scrollbar-thumb: rgba(255, 254, 238, 0.5);
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    color: var(--sea-ink);
+    font-family: var(--font-sans);
+    background-color: var(--bg-base);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: var(--lagoon-deep);
+    text-decoration-color: var(--link-underline);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  a:hover {
+    color: var(--lagoon-hover);
+  }
+
+  code {
+    font-size: 0.9em;
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+    border-radius: 7px;
+    padding: 2px 7px;
+  }
+
+  pre code {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  button,
+  a {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease;
+  }
+}
+
+@layer components {
+  .page-wrap {
+    width: min(1080px, calc(100% - 2rem));
+    margin-inline: auto;
+  }
+
+  .display-title {
+    font-family: var(--font-title);
+    font-weight: 400;
+    letter-spacing: normal;
+  }
+
+  .island-shell {
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+    border-radius: 0.375rem;
+  }
+
+  .feature-card {
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+    border-radius: 0.375rem;
+  }
+
+  .feature-card:hover {
+    border-color: var(--lagoon-hover);
+  }
+
+  .island-kicker {
+    font-family: var(--font-title);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 0.69rem;
+    color: var(--kicker);
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--sea-ink-soft);
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    background: var(--sea-ink);
+    transition: transform 170ms ease;
+  }
+
+  .nav-link:hover,
+  .nav-link.is-active {
+    color: var(--sea-ink);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.is-active::after {
+    transform: scaleX(1);
+  }
+
+  @media (max-width: 640px) {
+    .nav-link::after {
+      bottom: -4px;
+    }
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--line);
+  }
+
+  .window {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem;
+    color: var(--sea-ink);
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 0.375rem;
+  }
+
+  .text-highlighter {
+    display: inline-block;
+    padding: 0 0.25rem;
+    border-radius: 0.375rem;
+    color: var(--hl-text);
+    background: var(--hl-bg);
+  }
+
+  .nav-btn {
+    align-self: center;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    color: var(--hl-text);
+    background: var(--hl-bg);
+    border: 1px solid var(--btn-edge);
+    transition:
+      background-color 300ms ease,
+      color 300ms ease,
+      border-color 300ms ease;
+  }
+
+  .nav-btn:hover,
+  .nav-btn:focus-visible {
+    color: var(--hl-bg);
+    background: var(--hl-text);
+    border-color: var(--line);
+  }
+
+  .page-container {
+    max-width: 80ch;
+    padding-inline: 0.75rem;
+    overflow-y: auto;
+  }
+
+  .sub-container {
+    text-align: left;
+    padding: 0.5rem 1rem;
+  }
+
+  .sub-container h5 {
+    font-weight: 700;
+    padding: 0.25rem 0;
+  }
+
+  .sub-container p {
+    padding: 0.25rem 0 0.25rem 1rem;
+  }
+
+  .about {
+    border: 1px dashed var(--line);
+    border-radius: 0.5rem;
+  }
+
+  .about h5 {
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px dashed var(--line);
+    padding: 0.5rem;
+  }
+
+  .about p {
+    padding: 0.5rem;
+  }
+
+  .dod-logo-wrapper {
+    text-align: left;
+    width: 100%;
+    font-size: clamp(1rem, 5vw, 5rem);
+  }
+}
+
+.rise-in {
+  animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
