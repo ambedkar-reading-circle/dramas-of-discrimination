@@ -1,5 +1,6 @@
 ---
 id: D1
+gh: 5
 title: "How live does collaborative editing need to be? (LOAD-BEARING / first ticket)"
 type: grilling
 status: open
@@ -21,3 +22,6 @@ This is **load-bearing**: it determines the entire editing experience and the te
 
 ### What resolving this decides
 The collaboration model; unblocks D2, F1, and graduates D4 (conflict/merge UX).
+
+### Candidate framing (not yet decided)
+Regardless of which liveness option (a)/(b)/(c) is chosen, under the working decomposition (fog [A3](../MAP.md)) the **realtime/Yjs path bypasses Workers entirely** — it goes client↔Convex. So this ticket's choice is unconstrained by Worker-CPU concerns; the load-bearing constraint is Convex's realtime/Yjs free-tier caps (see [H1](H1-free-tier-research.md)), not Worker budgets.

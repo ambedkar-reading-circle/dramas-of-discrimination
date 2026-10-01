@@ -1,5 +1,6 @@
 ---
 id: D5
+gh: 8
 title: "Play-script graph: rendering + script↔graph data model"
 type: grilling
 status: open

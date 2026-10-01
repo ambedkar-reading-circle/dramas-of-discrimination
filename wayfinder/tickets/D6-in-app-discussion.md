@@ -17,3 +17,6 @@ In-app discussion materially expands the collab surface (presence, threads, pers
 
 ### What resolving this decides
 Whether to scope a discussion/comments feature at all.
+
+### Candidate framing (not yet decided)
+If in-app discussion is scoped in, under the working decomposition (fog [A3](../MAP.md)) it is **Convex data + realtime** (comments/threads persisted in Convex, live via the realtime path) — **no Worker** in that path. This keeps any discussion feature aligned with the client↔Convex data model rather than introducing a new compute seam.

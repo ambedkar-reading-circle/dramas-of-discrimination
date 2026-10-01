@@ -24,3 +24,10 @@ Blocked by [Free-tier research](H1-free-tier-research.md) so the choice rests on
 
 ### What resolving this decides
 The LLM provider and the free-tier envelope it imposes.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)), the provider is invoked from a candidate **LLM Generation Worker** seam:
+
+- **Workers AI** = already on-platform (no external hop); a natural fit for a Worker seam.
+- **Gemini / Groq / OpenRouter** = an **external `fetch`** from that Worker. Such a call burns wall-clock (network) time, not CPU budget — so the 10 ms Worker-CPU cap is not the constraint; the provider's own free-tier rate/context limits are.
+- **Provider free-tier limits ⇒ Worker-level throttling/back-off.** The envelope researched in [H1](H1-free-tier-research.md) shapes how the Generation Worker must rate-limit itself.

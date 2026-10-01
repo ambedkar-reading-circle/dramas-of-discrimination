@@ -21,3 +21,6 @@ The editing model should be consistent with the table-collab decision where sens
 
 ### What resolving this decides
 The post-generation editing workflow and permissions.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)): manifesto editing rides the **realtime path (Convex/Yjs)**, consistent with [D1](D1-how-live.md) — client↔Convex directly, **no Worker** in the editing path. (The generation Worker, [E1](E1-llm-provider.md), and the publish Worker, [G2](G2-publish-bridge.md), bracket editing but are not part of it.)

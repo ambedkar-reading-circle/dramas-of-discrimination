@@ -21,3 +21,6 @@ Depends on the [table data model](D3-form-table-model.md). Feeds the E4 fog (pro
 
 ### What resolving this decides
 The trigger condition, the input scope, and the table→prompt boundary.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)), the candidate trigger **fires an LLM Generation Worker** (see [E1](E1-llm-provider.md)) with the assembled tables. So "what triggers generation" also answers *who invokes that Worker seam and with what serialized payload*. The trigger is a private-app/admin action; it is distinct from the publish/Syndicate step ([G2](G2-publish-bridge.md)).

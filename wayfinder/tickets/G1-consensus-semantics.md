@@ -22,3 +22,6 @@ This is the **fuzziest product decision** and it gates publishing. It drives [Pu
 
 ### What resolving this decides
 The consensus model and the exact condition that unlocks publishing.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)): **consensus is Convex state** — reaching it **enables** (does *not* trigger) the candidate Syndicate Worker ([G2](G2-publish-bridge.md)). Publishing still requires a separate **admin trigger**; consensus alone never auto-publishes. So G1 defines the Convex state condition, and G2 defines the human-gated step that consumes it.

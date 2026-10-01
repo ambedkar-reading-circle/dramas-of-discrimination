@@ -1,5 +1,6 @@
 ---
 id: D3
+gh: 7
 title: "Data model for the two fixed-schema tables"
 type: grilling
 status: open
@@ -23,3 +24,6 @@ Cross-references [Play-script graph model & rendering](D5-graph-script-model.md)
 
 ### What resolving this decides
 The Convex schema for both tables; unblocks E2.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)): both tables **live in Convex** — authored via the realtime path ([D2](D2-collab-tech.md), client↔Convex directly) and read via Convex queries. No Worker sits in the table read/write path.

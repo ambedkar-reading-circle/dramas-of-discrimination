@@ -1,5 +1,6 @@
 ---
 id: C1
+gh: 4
 title: "Per-group data isolation in Convex"
 type: grilling
 status: open
@@ -17,3 +18,6 @@ How is **per-group data isolation** enforced in Convex so group A can *never* re
 
 ### What resolving this decides
 The Convex schema/access-rule pattern that guarantees group isolation.
+
+### Candidate framing (not yet decided)
+Under the working decomposition (fog [A3](../MAP.md)), the data path is **client↔Convex directly** (realtime/Yjs bypasses any Worker, and public reads come from Convex too). So isolation **must live in Convex access rules** — a Worker gateway cannot be relied on to enforce it, because in several paths there is no Worker in the data path at all. This reinforces that the answer here is a **Convex-native** access-rule/membership-keyed model, not a proxy-enforced one.
