@@ -15,6 +15,7 @@ A buildable, opinionated, **architecture-level design spec** for the "Dramas of 
 - **Working hypothesis (candidate, *not* decided — revisit after [B1](tickets/B1-auth-and-group-provisioning.md)):** Convex is the **backend-of-record** (owns the data API, access rules, realtime, and identity); the **public surface has no Worker** (Static Assets + CSR); realtime/Yjs goes **client↔Convex directly**, bypassing any Worker; Workers are limited to **glue seams only** — a candidate **LLM Generation** Worker and a candidate **Syndicate/Publish** Worker, plus an **optional 3rd Private-API Worker only if** B1 chooses Better-Auth. See fog **A3** below.
 - **Free-tier Worker discipline (validated by external evidence, see A1):** no SSR on Workers — the 10 ms cap is a *soft, burst-triggered circuit-breaker*, and SSR frameworks sit ~8–12 ms at baseline (a mid-2026 1102 regression broke in-budget projects). Public surface = static assets + CSR (0 Worker CPU); realtime/Yjs bypasses the Worker (goes to Convex); keep the private Worker CPU-light (push compute to Convex/client). `$5/mo` is the escape hatch only if SSR is ever genuinely required.
 - **Tracker convention:** see the blockquote at the top of this file.
+- **Brand:** the public surface needs a mark; see [Brand mark](tickets/I1-brand-mark.md) — scope is the symbol only, ARC lockup out, not time-bound, claimed so it stays off the frontier.
 
 ## Decisions so far
 
@@ -37,6 +38,7 @@ Local tickets mirror GitHub issues by an `gh:` frontmatter field. **Sync is part
 - E2→#14 (area:llm, blocked — Blocked by #7)
 - F1→#15 (area:manifesto, blocked — Blocked by #5)
 - G2→#16 (area:publish, blocked — Blocked by #11, #2)
+- I1→#17 (area:brand, ready, claimed)
 
 **Also pending on GitHub:** close **#2** (A1 is resolved locally) with the decision comment. To resume, re-auth (`gh auth refresh`) / resolve the suspension, create the 8 issues above, close #2, then add the matching `gh:` field to those 8 local tickets.
 
