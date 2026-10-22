@@ -1,4 +1,15 @@
-export const workshopActivities = [
+export interface WorkshopActivity {
+  name: string
+  title: string
+  duration: number
+  preview: string
+  summary: string
+  steps: string[]
+  prompt: string
+  takeaway: string
+}
+
+export const workshopActivities: WorkshopActivity[] = [
   {
     name: 'IntroTime',
     title: 'Greetings, introductions & check-in',

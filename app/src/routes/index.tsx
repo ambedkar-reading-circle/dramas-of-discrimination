@@ -4,7 +4,7 @@ import CommunityInvitation from '#/pages/home/CommunityInvitation'
 import HomeHero from '#/pages/home/HomeHero'
 import ManualFlipbookSection from '#/pages/home/ManualFlipbookSection'
 import TabletVideoSection from '#/pages/home/TabletVideoSection'
-import WorkshopMethod from '#/pages/home/WorkshopMethod'
+import WorkshopMethod from '#/pages/home/workshop-method'
 
 export const Route = createFileRoute('/')({ component: Home })
 

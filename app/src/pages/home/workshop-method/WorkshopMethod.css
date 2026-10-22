@@ -28,24 +28,6 @@
   --activity-ink: #2b448e;
   margin-block: var(--notebook-row) 0;
 }
-.method-collection-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-block: 20px 24px;
-  font: 10px/1.5 var(--font-logo);
-  letter-spacing: 0.1em;
-  border-top: 1px solid var(--ink-faint);
-}
-.method-invitation {
-  font: 18px/1.5 var(--font-body);
-  letter-spacing: 0;
-}
-.method-invitation > span {
-  margin-left: 10px;
-}
 .method-deck {
   position: relative;
   margin-top: 0;
@@ -364,10 +346,6 @@
   opacity: 0.75;
 }
 @media (max-width: 700px) {
-  .method-collection-heading {
-    align-items: start;
-    flex-direction: column;
-  }
   .method-sheet--open {
     padding: 26px 22px 70px;
   }
