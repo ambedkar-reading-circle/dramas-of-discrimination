@@ -1,0 +1,100 @@
+@layer components {
+  .theme-toggle {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--sea-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .theme-toggle:hover {
+    background: var(--link-bg-hover);
+  }
+  .theme-toggle-eclipse {
+    display: block;
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    border-radius: 50%;
+  }
+  .theme-toggle-window {
+    display: block;
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--bg-base);
+  }
+  /* Keep the recessed edge above the moving circles so the opening stays still. */
+  .theme-toggle-window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 1px 2px 3px rgb(0 0 0 / 0.45),
+      inset -1px -1px 1px
+        color-mix(in srgb, var(--primary-white) 25%, transparent);
+  }
+  .theme-toggle-orbit {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .theme-toggle-circle {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    transition: transform 550ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  :root[data-theme='dark'] .theme-toggle-circle-blue {
+    transform: translateX(-4px);
+  }
+  :root[data-theme='light'] .theme-toggle-circle-white {
+    transform: translateX(20px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle-circle {
+      transition: none;
+    }
+  }
+  .theme-toggle-circle-blue {
+    background: conic-gradient(
+      at 42% 44%,
+      color-mix(in srgb, var(--primary-blue) 68%, var(--primary-white)) 0deg
+        90deg,
+      var(--primary-blue) 90deg 180deg,
+      color-mix(in srgb, var(--primary-blue) 84%, var(--primary-white)) 180deg
+        270deg,
+      color-mix(in srgb, var(--primary-blue) 54%, var(--primary-white)) 270deg
+        360deg
+    );
+  }
+  .theme-toggle-circle-white {
+    background: conic-gradient(
+      at 42% 44%,
+      var(--primary-white) 0deg 90deg,
+      color-mix(in srgb, var(--primary-white) 82%, var(--primary-blue)) 90deg
+        180deg,
+      color-mix(in srgb, var(--primary-white) 92%, var(--primary-blue)) 180deg
+        270deg,
+      white 270deg 360deg
+    );
+  }
+}
+
+@media (forced-colors: active) {
+  .theme-toggle:not(:focus-visible) {
+    outline: 1px solid ButtonText;
+    outline-offset: -1px;
+  }
+}

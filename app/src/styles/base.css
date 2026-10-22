@@ -1,0 +1,120 @@
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scrollbar-color: var(--scrollbar-thumb) var(--bg-base);
+  }
+  body {
+    margin: 0;
+    color: var(--sea-ink);
+    font-family: var(--font-body);
+    background: var(--bg-base);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure {
+    margin: 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 400;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-title);
+  }
+  h2 {
+    font-size: 2rem;
+    line-height: calc(2 * var(--notebook-row));
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 1.375rem;
+    line-height: var(--notebook-row);
+    letter-spacing: -0.035em;
+  }
+  p {
+    line-height: var(--notebook-row);
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--stage-red);
+    outline-offset: 5px;
+  }
+  ::selection {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+}
+
+/* A flat colour wash controls texture strength without covering any content. */
+@layer components {
+  body,
+  .paper-tear,
+  .worksheet-preview {
+    --paper-color: var(--bg-base);
+  }
+  body,
+  .paper-tear,
+  .paper-tear__surface::before,
+  .worksheet-preview {
+    --paper-wash: color-mix(
+      in srgb,
+      var(--paper-color) calc(100% - var(--paper-strength)),
+      transparent
+    );
+    background-color: var(--paper-color);
+    background-image:
+      linear-gradient(var(--paper-wash), var(--paper-wash)), var(--paper-grain);
+    background-size: var(--paper-size);
+    background-repeat: repeat;
+    background-blend-mode: normal, var(--paper-blend);
+  }
+}
+
+@media print, (forced-colors: active) {
+  .paper-tear > .paper-tear__surface {
+    display: none;
+  }
+  .paper-tear--bottom {
+    border-bottom: 1px solid var(--ink-faint);
+  }
+  .paper-tear--top {
+    border-top: 1px solid var(--ink-faint);
+  }
+  body,
+  .paper-tear,
+  .worksheet-preview {
+    background-image: none !important;
+  }
+  .printed-ink {
+    mask-image: none !important;
+  }
+}
