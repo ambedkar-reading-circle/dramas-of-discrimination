@@ -1,12 +1,12 @@
 import { Component, createRef, lazy, Suspense, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
-import { ManualReading } from '#/components/manual-flipbook'
+import { ManualReading } from '#/pages/home/manual-flipbook'
 import NotebookSurface from '#/components/NotebookSurface'
 import { useMediaQuery } from '#/lib/useMediaQuery'
 import './ManualFlipbookSection.css'
 
-const ManualBook = lazy(() => import('#/components/manual-flipbook/ManualBook'))
+const ManualBook = lazy(() => import('#/pages/home/manual-flipbook/ManualBook'))
 const desktopQuery = '(min-width: 1001px) and (min-height: 800px)'
 const reducedQuery = '(prefers-reduced-motion: reduce)'
 

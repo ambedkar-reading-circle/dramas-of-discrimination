@@ -2,7 +2,7 @@
  * Styles for the elements ManualFlipbookSection.tsx renders itself: the
  * runway section, sticky stage, grid, transcript wrapper, motion host,
  * scroll nudge, and the lazy-book loading fallback. The book, pages, and
- * reading surfaces live in components/manual-flipbook/ManualFlipbook.css.
+ * reading surfaces live in pages/home/manual-flipbook/ManualFlipbook.css.
  * The --manual-* custom properties defined here cascade into the module.
  */
 .manual-section {

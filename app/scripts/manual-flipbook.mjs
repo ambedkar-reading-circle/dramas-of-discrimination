@@ -5,8 +5,8 @@ import {
   manual,
   manualPages,
   manualBackCover,
-} from '../src/components/manual-flipbook/content/manualContent.ts'
-import { planFor } from '../src/components/manual-flipbook/engine/spreadPlan.ts'
+} from '../src/pages/home/manual-flipbook/content/manualContent.ts'
+import { planFor } from '../src/pages/home/manual-flipbook/engine/spreadPlan.ts'
 
 const browser = await chromium.launch({
   channel: process.env.PLAYWRIGHT_CHANNEL || undefined,

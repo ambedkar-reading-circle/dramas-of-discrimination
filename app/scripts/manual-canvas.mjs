@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { chromium } from 'playwright'
 import { createServer } from 'vite'
-import { asciiVariants } from '../src/components/manual-flipbook/engine/asciiPatterns.ts'
+import { asciiVariants } from '../src/pages/home/manual-flipbook/engine/asciiPatterns.ts'
 
 const output = resolve(
   process.env.MANUAL_CAPTURE_DIR || 'node_modules/.cache/manual-visual',
