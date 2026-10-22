@@ -66,7 +66,7 @@ function OverTime() {
   )
 }
 
-const drawings: Record<string, () => ReactElement> = {
+const drawings: Partial<Record<string, () => ReactElement>> = {
   IntroTime,
   PartTime,
   StoryTime,
