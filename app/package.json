@@ -9,6 +9,7 @@
     "test:scroll": "node scripts/smooth-scroll.mjs",
     "postinstall": "node scripts/patch-flipbook.mjs",
     "test:spread": "node --test src/components/manual-flipbook/engine/spreadPlan.test.ts src/components/manual-flipbook/engine/asciiField.test.ts",
+    "test:align": "node --test src/lib/notebook-align/alignment.test.ts",
     "test:flipbook-engine": "node scripts/flipbook-engine.mjs",
     "test:flipbook-react": "node scripts/flipbook-react.mjs",
     "test:manual-visual": "node scripts/manual-flipbook-visual.mjs",

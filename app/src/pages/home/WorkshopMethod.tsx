@@ -1,9 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { workshopActivities } from './workshopActivities'
 import './WorkshopMethod.css'
 import NotebookSurface from '#/components/NotebookSurface'
 import { useMediaQuery } from '#/lib/useMediaQuery'
+import { snapBaselineToRule, useNotebookRuleAlign } from '#/lib/notebook-align'
 
 const rotations = [-13, -6, 2, 9, 15]
 const offsets = [65, 22, 0, 30, 78]
@@ -78,41 +79,35 @@ export default function WorkshopMethod() {
   const triggers = useRef<Array<HTMLButtonElement | null>>([])
   const reduceMotion = useMediaQuery(reducedMotionQuery)
 
-  useLayoutEffect(() => {
+  // Align controls as complete boxes so their labels retain even padding.
+  // Relative offsets preserve document flow and the existing paper rules.
+  const alignText = useCallback(() => {
     const element = surface.current
     if (!element) return
-
-    // Align controls as complete boxes so their labels retain even padding.
-    // Relative offsets preserve document flow and the existing paper rules.
-    const alignText = () => {
-      const origin = element.getBoundingClientRect().top
-      const row = parseFloat(getComputedStyle(element).lineHeight)
-      for (const text of element.querySelectorAll<HTMLElement>('.section-lede .eyebrow, .method-index-button .notebook-text, .method-deck-hint')) {
-        const target = text.closest<HTMLElement>('.method-index-button') ?? text
-        const marker = document.createElement('span')
-        marker.setAttribute('aria-hidden', 'true')
-        marker.style.cssText = 'display:inline-block;width:0;height:0;padding:0;margin:0;border:0;vertical-align:baseline'
-        text.prepend(marker)
-        const previousOffset = parseFloat(getComputedStyle(target).top) || 0
-        const baseline = marker.getBoundingClientRect().top - origin - previousOffset
-        marker.remove()
-        const rule = Math.round((baseline - row / 2) / row) * row + row / 2
-        target.style.setProperty('--method-baseline-offset', `${rule - baseline}px`)
-      }
-    }
-
-    alignText()
-    const observer = new ResizeObserver(alignText)
-    observer.observe(element)
-    // The section can keep its viewport minimum while the deck changes size.
-    if (deck.current) observer.observe(deck.current)
-    for (const control of element.querySelectorAll('.method-index, .method-deck-hint')) observer.observe(control)
-    document.fonts.addEventListener('loadingdone', alignText)
-    return () => {
-      observer.disconnect()
-      document.fonts.removeEventListener('loadingdone', alignText)
+    const origin = element.getBoundingClientRect().top
+    const row = parseFloat(getComputedStyle(element).lineHeight)
+    for (const text of element.querySelectorAll<HTMLElement>('.section-lede .eyebrow, .method-index-button .notebook-text, .method-deck-hint')) {
+      const target = text.closest<HTMLElement>('.method-index-button') ?? text
+      const marker = document.createElement('span')
+      marker.setAttribute('aria-hidden', 'true')
+      marker.style.cssText = 'display:inline-block;width:0;height:0;padding:0;margin:0;border:0;vertical-align:baseline'
+      text.prepend(marker)
+      const previousOffset = parseFloat(getComputedStyle(target).top) || 0
+      const baseline = marker.getBoundingClientRect().top - origin - previousOffset
+      marker.remove()
+      const rule = snapBaselineToRule(baseline, row)
+      target.style.setProperty('--method-baseline-offset', `${rule - baseline}px`)
     }
   }, [])
+
+  const observeAlignment = useCallback(() => {
+    const element = surface.current
+    if (!element) return []
+    // The section can keep its viewport minimum while the deck changes size.
+    return [element, deck.current, ...element.querySelectorAll('.method-index, .method-deck-hint')]
+  }, [])
+
+  useNotebookRuleAlign(observeAlignment, alignText)
 
   useEffect(() => {
     const element = deck.current
