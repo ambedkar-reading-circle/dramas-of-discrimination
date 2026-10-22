@@ -1,13 +1,13 @@
-import { Component, createRef, lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { Component, createRef, lazy, Suspense, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { ManualReading } from '#/components/manual-flipbook'
 import NotebookSurface from '#/components/NotebookSurface'
+import { useMediaQuery } from '#/lib/useMediaQuery'
 
 const ManualBook = lazy(() => import('#/components/manual-flipbook/ManualBook'))
 const desktopQuery = '(min-width: 1001px) and (min-height: 800px)'
 const reducedQuery = '(prefers-reduced-motion: reduce)'
-const matches = (query: string) => typeof window !== 'undefined' && window.matchMedia(query).matches
 
 class BookFallback extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
   state = { failed: false }
@@ -23,8 +23,8 @@ class BookFallback extends Component<{ children: ReactNode; onFailure: () => voi
 }
 
 export default function ManualFlipbookSection() {
-  const [reducedMotion, setReducedMotion] = useState(() => matches(reducedQuery))
-  const [desktop, setDesktop] = useState(() => matches(desktopQuery))
+  const reducedMotion = useMediaQuery(reducedQuery)
+  const desktop = useMediaQuery(desktopQuery)
   const [failed, setFailed] = useState(false)
   const textMode = reducedMotion || failed
   // Switching between the runway and a reading surface replaces the host.
@@ -39,21 +39,6 @@ export default function ManualFlipbookSection() {
   const x = useTransform(() => `${110 * travel.get()}vw`)
   const rotate = useTransform(() => 6 * travel.get())
   const rotateY = useTransform(() => 60 * travel.get())
-  useEffect(() => {
-    const media = window.matchMedia(desktopQuery)
-    const reduced = window.matchMedia(reducedQuery)
-    const update = () => {
-      setDesktop(media.matches)
-      setReducedMotion(reduced.matches)
-    }
-    update()
-    media.addEventListener('change', update)
-    reduced.addEventListener('change', update)
-    return () => {
-      media.removeEventListener('change', update)
-      reduced.removeEventListener('change', update)
-    }
-  }, [])
   const animated = !textMode
   const Stage = animated ? NotebookSurface : 'div'
   const stage = (

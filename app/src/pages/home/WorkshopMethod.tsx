@@ -1,12 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import { workshopActivities } from './workshopActivities'
 import './WorkshopMethod.css'
 import NotebookSurface from '#/components/NotebookSurface'
+import { useMediaQuery } from '#/lib/useMediaQuery'
 
 const rotations = [-13, -6, 2, 9, 15]
 const offsets = [65, 22, 0, 30, 78]
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28 }
+const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
 /** Printed diagrams share the ink and paper of the activity sheet. */
 function ActivityDrawing({ index }: { index: number }) {
@@ -74,7 +76,7 @@ export default function WorkshopMethod() {
   const surface = useRef<HTMLElement>(null)
   const deck = useRef<HTMLDivElement>(null)
   const triggers = useRef<Array<HTMLButtonElement | null>>([])
-  const reduceMotion = useReducedMotion()
+  const reduceMotion = useMediaQuery(reducedMotionQuery)
 
   useLayoutEffect(() => {
     const element = surface.current
