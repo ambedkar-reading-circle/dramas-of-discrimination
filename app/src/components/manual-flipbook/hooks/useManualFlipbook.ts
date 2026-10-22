@@ -2,7 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMotionValue, useMotionValueEvent } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import type { BookDriver, TurnProgressEvent } from '../types/flipbook-types'
-import { nextHead, restoredHead, shapeForPage, turnTarget } from '../engine/spreadPlan'
+import {
+  nextHead,
+  restoredHead,
+  shapeForPage,
+  turnTarget,
+} from '../engine/spreadPlan'
 
 /** A single desired page survives rapid scroll reversals; turns never queue up. */
 export function useManualFlipbook(

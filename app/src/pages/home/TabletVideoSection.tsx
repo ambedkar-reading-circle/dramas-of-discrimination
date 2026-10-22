@@ -38,34 +38,17 @@ export default function TabletVideoSection() {
   }, [])
 
   return (
-    <NotebookSurface
-      as="section"
-      tone="inverse"
-      ref={section}
-      className="tablet-video-section notebook-section"
-      aria-label="Project video"
-      data-reduced-motion={reducedMotion}
-    >
+    <NotebookSurface as="section" tone="inverse" ref={section} className="tablet-video-section notebook-section" aria-label="Project video" data-reduced-motion={reducedMotion}>
       <div className="tablet-video-stage">
         <div className="tablet-video-perspective page-wrap">
-          <motion.div
-            className="tablet-video-motion"
-            style={reducedMotion ? undefined : { y, rotateX, rotateY, rotate, scale }}
-          >
+          <motion.div className="tablet-video-motion" style={reducedMotion ? undefined : { y, rotateX, rotateY, rotate, scale }}>
             <div className="tablet-video-frame">
               <span className="tablet-video-camera" aria-hidden="true" />
               <span className="tablet-video-button tablet-video-button--volume-one" aria-hidden="true" />
               <span className="tablet-video-button tablet-video-button--volume-two" aria-hidden="true" />
               <span className="tablet-video-button tablet-video-button--power" aria-hidden="true" />
               <div className="tablet-video-screen">
-                <iframe
-                  src="https://www.youtube-nocookie.com/embed/_H9tByQyBv8"
-                  title="Dramas of Discrimination video"
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
+                <iframe src="https://www.youtube-nocookie.com/embed/_H9tByQyBv8" title="Dramas of Discrimination video" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
               </div>
             </div>
           </motion.div>

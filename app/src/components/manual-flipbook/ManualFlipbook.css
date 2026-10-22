@@ -386,7 +386,8 @@
   transition: opacity 1000ms ease-out;
   pointer-events: none;
 }
-.manual-ascii-art:has(.manual-ascii-canvas[data-ascii-failed]) .manual-ascii-fallback {
+.manual-ascii-art:has(.manual-ascii-canvas[data-ascii-failed])
+  .manual-ascii-fallback {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {

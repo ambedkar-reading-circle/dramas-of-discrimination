@@ -15,7 +15,7 @@ export default function CommunityInvitation() {
     const alignPadding = () => {
       const row = parseFloat(getComputedStyle(section).lineHeight)
       const start = section.getBoundingClientRect().top - paper.getBoundingClientRect().top
-      const offset = (row - ((start % row) + row) % row) % row
+      const offset = (row - (((start % row) + row) % row)) % row
       section.style.setProperty('--community-rule-offset', `${offset}px`)
     }
 
