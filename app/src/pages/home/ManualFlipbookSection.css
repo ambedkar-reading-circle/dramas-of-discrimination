@@ -1,0 +1,135 @@
+/*
+ * Styles for the elements ManualFlipbookSection.tsx renders itself: the
+ * runway section, sticky stage, grid, transcript wrapper, motion host,
+ * scroll nudge, and the lazy-book loading fallback. The book, pages, and
+ * reading surfaces live in components/manual-flipbook/ManualFlipbook.css.
+ * The --manual-* custom properties defined here cascade into the module.
+ */
+.manual-section {
+  --manual-blue: #2b448e;
+  --manual-paper: #f8f3e7;
+  --manual-grain: url('/manual-cotton-paper.svg');
+  position: relative;
+  overflow: clip;
+  scroll-margin-top: calc(3 * var(--notebook-row));
+}
+.manual-stage-grid {
+  display: grid;
+  gap: var(--notebook-row);
+  perspective: 1600px;
+}
+/* Only the sticky stage owns paper while animated; the runway is transparent. */
+.manual-animated {
+  height: round(up, 900svh, var(--notebook-row));
+  padding-block: 0;
+}
+.manual-animated.manual-desktop {
+  height: round(up, 540svh, var(--notebook-row));
+}
+.manual-animated .manual-stage {
+  position: sticky;
+  top: 0;
+  /* Sheet covers exactly the viewport: the band pins for the whole
+     runway and hands off to the method section at 100% progress, so
+     no empty ruled tail ever scrolls through view. */
+  height: round(up, 100svh, var(--notebook-row));
+  /* Own block formatting context, else the grid's top margin collapses
+     out of the sticky sheet and the heading rides under the navbar
+     while pinned; contained, the grid centres below it instead. */
+  display: flow-root;
+}
+.manual-animated .manual-stage-grid {
+  margin-top: calc(3 * var(--notebook-row));
+  min-height: calc(100svh - 3 * var(--notebook-row));
+  align-content: center;
+}
+.manual-motion {
+  min-width: 0;
+  transform-origin: 50% 50%;
+}
+/* The engine paints the moving curl. A second gradient on each printed face
+   would travel with the page and create a detached/doubled spine mid-turn. */
+.manual-scroll-nudge {
+  display: grid;
+  justify-items: center;
+  grid-template-rows: repeat(2, var(--notebook-row));
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  line-height: var(--notebook-row);
+}
+.manual-scroll-line {
+  width: 1px;
+  height: var(--notebook-row);
+  background: linear-gradient(to bottom, currentColor, transparent);
+}
+.manual-loading {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.manual-transcript {
+  /* A linear copy for assistive technology and print, without reader chrome. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .manual-animated .manual-stage-grid {
+    margin-top: calc(4 * var(--notebook-row));
+    min-height: calc(100svh - 4 * var(--notebook-row));
+  }
+}
+@media (max-width: 700px) and (max-height: 700px) {
+  .manual-animated .manual-stage-grid {
+    gap: calc(var(--notebook-row) / 2);
+  }
+  .manual-scroll-nudge {
+    grid-template-rows: repeat(2, calc(var(--notebook-row) / 2));
+    line-height: calc(var(--notebook-row) / 2);
+  }
+  .manual-scroll-line {
+    height: calc(var(--notebook-row) / 2);
+  }
+}
+@media print {
+  .manual-section {
+    background: white;
+    color: black;
+    height: auto !important;
+  }
+  .manual-stage {
+    background: none !important;
+    position: static !important;
+    height: auto !important;
+  }
+  .manual-stage-grid {
+    display: block;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+  }
+  .manual-stage-grid > :not(.manual-transcript, .manual-reading) {
+    display: none !important;
+  }
+  .manual-transcript {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+}
+@media (forced-colors: active) {
+  .manual-section,
+  .manual-stage {
+    background: Canvas;
+    color: CanvasText;
+  }
+}

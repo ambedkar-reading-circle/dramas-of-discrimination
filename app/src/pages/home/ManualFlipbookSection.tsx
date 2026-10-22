@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'motion/react'
 import { ManualReading } from '#/components/manual-flipbook'
 import NotebookSurface from '#/components/NotebookSurface'
 import { useMediaQuery } from '#/lib/useMediaQuery'
+import './ManualFlipbookSection.css'
 
 const ManualBook = lazy(() => import('#/components/manual-flipbook/ManualBook'))
 const desktopQuery = '(min-width: 1001px) and (min-height: 800px)'
