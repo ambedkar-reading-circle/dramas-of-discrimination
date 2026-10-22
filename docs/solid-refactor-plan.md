@@ -6,6 +6,10 @@ Date: 2026-10-06
 
 Completed all six core tasks on 2026-10-06. Optional follow-ups remain deferred.
 
+### Lineage: 2026-10-22 app-wide SOLID refactor
+
+A successor refactor aligned the rest of the app with the manual-flipbook module standard; plan at `.kilo/plans/app-wide-solid-refactor.md`. Summary: a shared `useMediaQuery` hook replaced bespoke `matchMedia` blocks, notebook rule alignment moved to a unit-tested `lib/notebook-align/` module, `WorkshopMethod` became a flipbook-style folder module under `pages/home/workshop-method/`, the flipbook section took ownership of the styles for elements it renders, and both feature modules now live under `pages/home/` (relocation recorded in `docs/manual-flipbook-plan.md`). The stylesheet-ownership risk was again controlled by computed-style comparison: identical values across 22 production-build states, and style-dump parity against the pre-refactor baseline at five widths in both themes.
+
 - [x] Record the visual and behavioral baseline.
 - [x] Extract the worksheet collection into `features/home/worksheets.ts` and `WorksheetGallery.tsx`.
 - [x] Extract `WorkshopMethod.tsx`, including its process-step content.
