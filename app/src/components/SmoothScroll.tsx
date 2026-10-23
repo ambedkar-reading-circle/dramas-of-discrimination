@@ -11,6 +11,9 @@ export default function SmoothScroll() {
 
   useEffect(() => {
     if (reducedMotion) return
+    // Marks this run's instance as destroyed so an anchor navigation that is
+    // still in flight when the preference flips falls back to native scroll.
+    let disposed = false
     const lenis = new Lenis({
       autoRaf: true,
       anchors: false,
@@ -59,12 +62,18 @@ export default function SmoothScroll() {
             target.focus({ preventScroll: true })
             if (needsTabIndex) target.removeAttribute('tabindex')
           }
-          lenis.scrollTo(target, { onComplete: focusTarget })
+          if (disposed) {
+            target.scrollIntoView({ behavior: 'instant' })
+            focusTarget()
+          } else {
+            lenis.scrollTo(target, { onComplete: focusTarget })
+          }
         })
     }
     window.addEventListener('click', onAnchorClick)
 
     return () => {
+      disposed = true
       window.removeEventListener('click', onAnchorClick)
       unsubscribe()
       lenis.destroy()

@@ -70,13 +70,29 @@ export default function ManualBook({ desktop, progress }: { desktop: boolean; pr
   useEffect(() => {
     const element = host.current
     if (!element) return
+    // Remounting the engine rebuilds every page and WebGL context, so resize
+    // measurements settle first; only the first measurement renders at once.
+    let settle: ReturnType<typeof setTimeout> | undefined
+    let lastWidth = 0
     const observer = new ResizeObserver(([entry]) => {
       const nextWidth = Math.floor(entry.contentRect.width / (desktop ? 2 : 1))
       returnToReading()
-      setWidth(nextWidth)
+      clearTimeout(settle)
+      if (lastWidth === 0) {
+        lastWidth = nextWidth
+        setWidth(nextWidth)
+        return
+      }
+      settle = setTimeout(() => {
+        lastWidth = nextWidth
+        setWidth(nextWidth)
+      }, 120)
     })
     observer.observe(element)
-    return () => observer.disconnect()
+    return () => {
+      clearTimeout(settle)
+      observer.disconnect()
+    }
   }, [desktop, returnToReading])
 
   useEffect(() => {
