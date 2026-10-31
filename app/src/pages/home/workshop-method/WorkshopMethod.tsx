@@ -29,6 +29,13 @@ export default function WorkshopMethod() {
     // Keep the new sheet visible when switching from the lower index.
     requestAnimationFrame(() => deck.current?.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'instant' : 'smooth' }))
   }
+  // Index buttons sit below the deck, so the details they open land behind the
+  // button in tab order. Move focus into the opened sheet so keyboard and
+  // screen-reader users reach it; the sheet trigger keeps its own focus.
+  const selectFromIndex = (index: number) => {
+    select(index)
+    requestAnimationFrame(() => deck.current?.querySelector<HTMLElement>('.method-sheet--open .method-sheet-content')?.focus({ preventScroll: true }))
+  }
 
   return (
     <NotebookSurface
@@ -56,7 +63,7 @@ export default function WorkshopMethod() {
               ))}
             </ol>
           </div>
-          <MethodIndex activities={workshopActivities} active={active} onSelect={select} />
+          <MethodIndex activities={workshopActivities} active={active} onSelect={selectFromIndex} />
         </div>
       </div>
     </NotebookSurface>
