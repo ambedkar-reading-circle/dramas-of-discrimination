@@ -1,0 +1,153 @@
+@layer components {
+  .site-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+  .site-foreground {
+    z-index: var(--layer-site-foreground);
+  }
+  .page-wrap {
+    width: min(1200px, calc(100% - clamp(2rem, 8vw, 8rem)));
+    margin-inline: auto;
+  }
+  /* Button-style action links; ActionButton.tsx applies these class names. */
+  .action-link {
+    max-width: 100%;
+    display: inline-flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--notebook-row);
+    min-height: calc(2 * var(--notebook-row));
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--line);
+    border-radius: 0.125rem;
+    padding: var(--notebook-row) 1rem 0;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+  .action-link:hover {
+    background: var(--link-bg-hover);
+    color: var(--sea-ink);
+  }
+  .action-link-primary {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+  .action-link-quiet {
+    color: var(--sea-ink);
+  }
+  .action-link [aria-hidden] {
+    font-size: 1.125rem;
+  }
+  .eyebrow {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 0.875rem;
+    line-height: var(--notebook-row);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .eyebrow > span {
+    color: var(--stage-red);
+    margin-right: 0.75rem;
+  }
+  /* Add one edge modifier and an aria-hidden .paper-tear__surface child.
+     Keep overflow visible so the tear and its shadow can extend outside. */
+  .paper-tear {
+    position: relative;
+    isolation: isolate;
+  }
+  .paper-tear > .paper-tear__surface {
+    --paper-tear-shadow-direction: 1;
+    position: absolute;
+    inset: 0 0 -6px;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 1px rgb(255 255 238 / 0.25))
+      drop-shadow(
+        0
+          calc(
+            var(--paper-tear-shadow-offset) * var(--paper-tear-shadow-direction)
+          )
+          var(--paper-tear-shadow-blur) var(--paper-tear-shadow-color)
+      );
+  }
+  .paper-tear > .paper-tear__surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Overlap the solid sheet and torn strip by 1px to avoid a hairline seam. */
+    mask-image: linear-gradient(#000, #000), url('/paper-tear.svg');
+    mask-size:
+      100% calc(100% - 5px),
+      768px 6px;
+    mask-position:
+      top left,
+      bottom left;
+    mask-repeat: no-repeat, repeat-x;
+  }
+  .paper-tear--top > .paper-tear__surface {
+    --paper-tear-shadow-direction: -1;
+    inset: -6px 0 0;
+  }
+  .paper-tear--top > .paper-tear__surface::before {
+    /* Flip the paper shape; the wrapper casts its shadow upward explicitly. */
+    transform: scaleY(-1);
+  }
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 1rem;
+    transform: translateY(-200%);
+    padding: 0.75rem 1rem;
+    background: var(--hl-bg);
+    color: var(--hl-text);
+    z-index: 60;
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+  .printed-ink {
+    display: inline-block;
+    mask-image: var(--print-ink-mask);
+    mask-mode: alpha;
+    mask-size: var(--print-ink-size);
+    mask-repeat: repeat;
+  }
+  .section-lede {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--notebook-gutter);
+    margin-bottom: var(--notebook-row);
+    align-items: start;
+  }
+  .section-lede h2 {
+    max-width: 25ch;
+  }
+  .step-number {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 1rem;
+    color: var(--stage-red);
+  }
+  .checkbox {
+    border: 1px solid red;
+  }
+  @media (max-width: 700px) {
+    .printed-ink {
+      mask-image: var(--print-ink-mask-small);
+    }
+    .section-lede {
+      grid-template-columns: 1fr;
+      gap: var(--notebook-row);
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .action-link-primary:not(:focus-visible) {
+    outline: 1px solid ButtonText;
+    outline-offset: -1px;
+  }
+}

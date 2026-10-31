@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 384 384">
+  <defs>
+    <!-- Long, fine fibres and open pulp clouds, distinct from the site's dense grain. -->
+    <filter id="pulp" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".023 .038" numOctaves="3" seed="62" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope=".14"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="fibre" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".16 .7" numOctaves="2" seed="31" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .42 0 0 0 0 .38 0 0 0 0 .3 1 0 0 0 0"/>
+      <feComponentTransfer>
+        <feFuncA type="discrete" tableValues=".5 .22 0 0 0 0 0 .18 .4"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <path filter="url(#pulp)" d="M0 0h384v384H0z"/>
+  <path filter="url(#fibre)" d="M0 0h384v384H0z"/>
+  <g fill="none" stroke="#8b816b" stroke-width=".65" stroke-linecap="round" opacity=".35">
+    <path d="m24 31 2 5m43 41-1 7m61-62 2 4m59 37-2 6m71-28 1 5m79 44-2 8"/>
+    <path d="m42 139 1 7m64-21-2 4m52 39 2 8m57-48-1 5m62 28 2 6m70-33-1 4"/>
+    <path d="m18 242 2 5m64-42-1 7m47 44 1 4m73-25-2 6m51 40 1 5m83-50-2 7"/>
+    <path d="m49 329-1 5m58 24 2 6m56-47-1 7m59 38 2 4m64-33-2 5m65 34 1 6"/>
+  </g>
+  <g fill="#786d55" opacity=".3">
+    <ellipse cx="51" cy="53" rx=".7" ry="1"/>
+    <ellipse cx="233" cy="91" rx="1" ry=".6"/>
+    <ellipse cx="142" cy="209" rx=".6" ry="1.2"/>
+    <ellipse cx="316" cy="174" rx=".8" ry=".5"/>
+    <ellipse cx="73" cy="287" rx=".5" ry=".8"/>
+    <ellipse cx="272" cy="341" rx=".7" ry="1"/>
+  </g>
+</svg>

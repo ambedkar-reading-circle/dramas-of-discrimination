@@ -1,8 +1,10 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import Footer from '../components/Footer'
-import Header from '../components/Header'
+import Footer from '#/components/Footer'
+import Header from '#/components/Header'
+import SmoothScroll from '#/components/SmoothScroll'
+import { NotebookProvider } from '#/components/NotebookMargins'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -19,8 +21,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'description',
-        content:
-          'Turning discrimination scenarios into collaboratively-built policy manifestos for fairer communities.',
+        content: 'An anti-caste, open-source project of the Ambedkar Reading Circle. Communities rehearse equality and fraternity and write manifestos of inclusion.',
       },
     ],
   }),
@@ -29,21 +30,24 @@ export const Route = createRootRoute({
 
 function RootDocument() {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header />
-      <Outlet />
-      <Footer />
-      <TanStackDevtools
-        config={{
-          position: 'bottom-right',
-        }}
-        plugins={[
-          {
-            name: 'Tanstack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-        ]}
-      />
-    </div>
+    <NotebookProvider>
+      <SmoothScroll />
+      <div className="site-shell">
+        <Header />
+        <Outlet />
+        <Footer />
+        <TanStackDevtools
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+          ]}
+        />
+      </div>
+    </NotebookProvider>
   )
 }
