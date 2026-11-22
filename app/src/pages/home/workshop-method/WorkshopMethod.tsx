@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import './WorkshopMethod.css'
 import NotebookSurface from '#/components/NotebookSurface'
-import { useMediaQuery } from '#/lib/useMediaQuery'
+import { useMediaQuery } from '#/lib/use-media-query'
 import { workshopActivities } from './content/workshopActivities'
 import { spring } from './content/deckChoreography'
 import { useDeckMetrics } from './hooks/useDeckMetrics'

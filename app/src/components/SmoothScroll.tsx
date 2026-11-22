@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import Lenis from 'lenis'
 import 'lenis/dist/lenis.css'
-import { useMediaQuery } from '#/lib/useMediaQuery'
+import { useMediaQuery } from '#/lib/use-media-query'
 
 /** Enhance the window scroll so sticky layout and Motion keep using native positions. */
 export default function SmoothScroll() {

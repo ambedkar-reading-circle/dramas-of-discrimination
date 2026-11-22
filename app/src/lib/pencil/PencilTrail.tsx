@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { useRouterState } from '@tanstack/react-router'
-import { useMediaQuery } from '#/lib/useMediaQuery'
+import { useMediaQuery } from '#/lib/use-media-query'
 import { createInkResolver } from './ink.ts'
 import { createPencilRenderer } from './createPencilRenderer.ts'
 import { usePointerTrace } from './usePointerTrace.ts'

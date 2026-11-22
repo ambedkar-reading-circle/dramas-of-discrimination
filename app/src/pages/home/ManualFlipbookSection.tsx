@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { ManualReading } from '#/pages/home/manual-flipbook'
 import NotebookSurface from '#/components/NotebookSurface'
-import { useMediaQuery } from '#/lib/useMediaQuery'
+import { useMediaQuery } from '#/lib/use-media-query'
 import './ManualFlipbookSection.css'
 
 const ManualBook = lazy(() => import('#/pages/home/manual-flipbook/ManualBook'))

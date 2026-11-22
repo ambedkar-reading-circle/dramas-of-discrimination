@@ -1,4 +1,4 @@
-import { parseColorChannels } from '#/lib/parseColor.ts'
+import { parseColorChannels } from '#/lib/parse-color'
 import type { Ink, InkResolver, Point } from './types.ts'
 import { toViewport } from './viewport.ts'
 

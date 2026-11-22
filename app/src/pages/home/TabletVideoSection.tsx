@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import NotebookSurface from '#/components/NotebookSurface'
-import { useMediaQuery } from '#/lib/useMediaQuery'
+import { useMediaQuery } from '#/lib/use-media-query'
 import './TabletVideoSection.css'
 
 const compactQuery = '(max-width: 480px)'

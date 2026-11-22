@@ -3,7 +3,7 @@ import type { AsciiInput } from './asciiField'
 import { asciiVariants } from './asciiPatterns'
 import type { AsciiVariant } from './asciiPatterns'
 import { asciiFragmentShader, asciiVertexShader } from './asciiShader'
-import { parseColorChannels } from '#/lib/parseColor'
+import { parseColorChannels } from '#/lib/parse-color'
 
 export interface AsciiRenderer {
   kind: 'webgl' | '2d'
