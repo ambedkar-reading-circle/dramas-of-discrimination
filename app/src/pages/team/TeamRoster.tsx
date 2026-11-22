@@ -1,4 +1,8 @@
+import type { CSSProperties } from 'react'
+
 import { teamMembers } from './content/teamMembers'
+
+const photoTilts = new Map(teamMembers.map((member) => [member.id, Math.random() * 20 - 10]))
 
 function memberInitials(name: string) {
   return name
@@ -15,7 +19,7 @@ export default function TeamRoster() {
           <article key={member.id} className="notebook-stack">
             <div className="flex items-center gap-gutter">
               {member.photo ? (
-                <img src={member.photo} alt={member.name} width={96} height={96} className="block h-[calc(3*var(--notebook-row))] w-[calc(3*var(--notebook-row))] object-cover shadow-[inset_0_0_0_1px_var(--line)]" />
+                <img src={member.photo} alt={member.name} width={96} height={96} style={{ '--tilt': `${photoTilts.get(member.id) ?? 0}deg` } as CSSProperties} className="block h-[calc(3*var(--notebook-row))] w-[calc(3*var(--notebook-row))] object-cover opacity-75 rounded-sm shadow-[inset_0_0_0_1px_var(--line)] transition-transform duration-300 ease-out rotate-(--tilt) hover:rotate-0" />
               ) : (
                 <span aria-hidden="true" className="flex h-[calc(3*var(--notebook-row))] w-[calc(3*var(--notebook-row))] items-center justify-center font-[family-name:var(--font-title)] text-[1rem] text-ink-soft shadow-[inset_0_0_0_1px_var(--line)]">
                   {memberInitials(member.name)}
