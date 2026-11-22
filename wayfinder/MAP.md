@@ -39,8 +39,9 @@ Local tickets mirror GitHub issues by an `gh:` frontmatter field. **Sync is part
 - F1→#15 (area:manifesto, blocked — Blocked by #5)
 - G2→#16 (area:publish, blocked — Blocked by #11, #2)
 - I1→#17 (area:brand, ready, claimed)
+- A4→#18 (area:public, ready — added after the sync ran)
 
-**Also pending on GitHub:** close **#2** (A1 is resolved locally) with the decision comment. To resume, re-auth (`gh auth refresh`) / resolve the suspension, create the 8 issues above, close #2, then add the matching `gh:` field to those 8 local tickets.
+**Also pending on GitHub:** close **#2** (A1 is resolved locally) with the decision comment. To resume, re-auth (`gh auth refresh`) / resolve the suspension, create the 10 issues above, close #2, then add the matching `gh:` field to those 10 local tickets.
 
 ## Not yet specified
 
