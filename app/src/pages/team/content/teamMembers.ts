@@ -17,7 +17,7 @@ const members: ReadonlyArray<TeamMember> = [
     name: 'Sumit Sute',
     photo: '/team/Sumit Sute.png',
     intro:
-      'Engineer; built the DoD open-source web platform; facilitates workshops.',
+      'Engineer; convenor at ARC; built the DoD open-source web platform; facilitates workshops.',
     links: [
       { label: 'Website', href: 'https://sumitsute.com' },
       { label: 'GitHub', href: 'https://github.com/sutesumit' },
@@ -28,7 +28,7 @@ const members: ReadonlyArray<TeamMember> = [
     name: 'Pratham',
     photo: '/team/Pratham.png',
     intro:
-      'Facilitator of the DoD workshops; MSc Applied Psychology student at MAHE, Bangalore.',
+      'Convenor at ARC; facilitates DoD workshops; MSc Applied Psychology student at MAHE, Bangalore.',
   },
   {
     id: 'roy-anto',
@@ -42,13 +42,14 @@ const members: ReadonlyArray<TeamMember> = [
     name: 'Shradha Raj',
     photo: '/team/Shradha Raj.png',
     intro:
-      "Theatre maker, filmmaker, and convener at ARC; leads DoD's facilitation, training, and film production.",
+      'Theatre maker, filmmaker, and convenor at ARC; leads DoD\u2019s facilitation, training, and film production.',
   },
   {
     id: 'vignesh-shiva-subramaniam',
     name: 'Vignesh Shiva Subramaniam',
     photo: '/team/Vignesh S.png',
-    intro: 'Co-founder and convenor at ARC.',
+    intro:
+      'Co-founder and convenor at ARC; facilitates DoD workshops; National Coordinator at the Alliance of Indian Waste Pickers, working on waste governance and informal labour rights.',
   },
 ]
 
