@@ -31,3 +31,9 @@ Thumbs.db
 
 # Wayfinder research (local findings, not tracked unless needed)
 wayfinder/research/
+
+# Local scratch images (root-level screenshots)
+/*.png
+
+# Kilo local plans
+.kilo/plans/
