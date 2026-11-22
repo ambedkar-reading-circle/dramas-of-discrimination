@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import type { ComponentPropsWithRef } from 'react'
-import { PencilSheet } from '#/components/pencil/PencilTrail'
+import { PencilSheet } from '#/lib/pencil'
 import { NotebookDecoration } from './NotebookMargins'
 import './NotebookSurface.css'
 

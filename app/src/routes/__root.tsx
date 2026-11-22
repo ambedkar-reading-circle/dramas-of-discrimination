@@ -5,7 +5,7 @@ import Footer from '#/components/Footer'
 import Header from '#/components/Header'
 import SmoothScroll from '#/components/SmoothScroll'
 import { NotebookProvider } from '#/components/NotebookMargins'
-import { PencilTraceProvider } from '#/components/pencil/PencilTrail'
+import { PencilTraceProvider } from '#/lib/pencil'
 
 export const Route = createRootRoute({
   head: () => ({
