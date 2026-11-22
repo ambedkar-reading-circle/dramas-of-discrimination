@@ -1,0 +1,114 @@
+@layer components {
+  .notebook-surface {
+    --paper-color: var(--bg-base);
+    --surface-paper-strength: var(--paper-strength);
+    --surface-paper-blend: var(--paper-blend);
+    --notebook-rule-color: color-mix(in srgb, var(--sea-ink) 13%, transparent);
+    --paper-wash: color-mix(
+      in srgb,
+      var(--paper-color) calc(100% - var(--surface-paper-strength)),
+      transparent
+    );
+    --notebook-ruling: repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--notebook-baseline) - var(--notebook-rule-width)),
+      var(--notebook-rule-color)
+        calc(var(--notebook-baseline) - var(--notebook-rule-width))
+        var(--notebook-baseline),
+      transparent var(--notebook-baseline) var(--notebook-row)
+    );
+    position: relative;
+    isolation: isolate;
+    color: var(--sea-ink);
+    background-color: var(--paper-color);
+    background-image:
+      linear-gradient(var(--paper-wash), var(--paper-wash)), var(--paper-grain);
+    background-size: var(--paper-size);
+    background-blend-mode: normal, var(--surface-paper-blend);
+  }
+
+  .notebook-surface[data-tone='inverse'] {
+    --paper-color: var(--hl-bg);
+    --surface-paper-strength: var(--paper-inverse-strength);
+    --surface-paper-blend: var(--paper-inverse-blend);
+    --notebook-rule-color: color-mix(in srgb, var(--hl-text) 16%, transparent);
+    color: var(--hl-text);
+  }
+
+  .notebook-surface[data-paper='notebook'] {
+    background-image:
+      var(--notebook-ruling),
+      linear-gradient(var(--paper-wash), var(--paper-wash)), var(--paper-grain);
+    background-size: auto, var(--paper-size), var(--paper-size);
+    background-blend-mode: normal, normal, var(--surface-paper-blend);
+  }
+
+  .notebook-decoration {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    /* Like inset(0), but follows the inherited corner radii as well. Only
+       decoration is clipped; the host's content and shadows may overflow. */
+    clip-path: border-box;
+    pointer-events: none;
+    display: none;
+  }
+
+  .notebook-decoration[data-margin-guides] {
+    display: block;
+  }
+
+  .notebook-margin-vertical {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--margin-x, -9999) * 1px - var(--margin-gap) / 2);
+    width: var(--margin-gap);
+    border-inline: 1px solid var(--margin-red);
+  }
+
+  .notebook-margin-horizontal {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: calc(var(--margin-y, -9999) * 1px - var(--margin-gap) / 2);
+    height: var(--margin-gap);
+    border-block: 1px solid var(--margin-red);
+  }
+
+  .margin-guide-labels {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: calc(var(--margin-y, -9999) * 1px - var(--margin-gap) / 2 - 1lh - 2px);
+    font-family: var(--font-logo);
+    font-size: 0.6875rem;
+    line-height: 1;
+    color: var(--hl-text);
+  }
+
+  .margin-guide-labels span {
+    position: absolute;
+    top: 0;
+    white-space: nowrap;
+    background-color: var(--margin-red);
+  }
+
+  .margin-guide-labels span:first-of-type {
+    left: 0.375rem;
+  }
+
+  .margin-guide-labels span:last-of-type {
+    right: 0.375rem;
+  }
+}
+
+@media print, (forced-colors: active) {
+  .notebook-surface {
+    background-image: none !important;
+  }
+  .notebook-decoration {
+    display: none !important;
+  }
+}

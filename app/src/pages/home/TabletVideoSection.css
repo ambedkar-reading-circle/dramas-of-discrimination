@@ -1,0 +1,110 @@
+@layer components {
+  .tablet-video-section.notebook-section {
+    position: relative;
+    overflow: clip;
+    height: auto;
+    min-height: round(
+      up,
+      max(0px, calc(100svh - 2 * var(--notebook-row))),
+      var(--notebook-row)
+    );
+    margin-block-start: 0;
+    padding-block: 0;
+  }
+
+  .tablet-video-stage {
+    position: relative;
+    display: grid;
+    height: 100svh;
+    place-items: center;
+  }
+
+  .tablet-video-perspective {
+    width: min(100%, calc((100svh - 6 * var(--notebook-row)) * 16 / 9));
+    perspective: 1400px;
+    perspective-origin: center center;
+  }
+
+  .tablet-video-motion {
+    transform-origin: center center;
+  }
+
+  .tablet-video-frame {
+    position: relative;
+    transform-origin: center top;
+    transform-style: preserve-3d;
+    padding: clamp(0.375rem, 0.7vw, 0.5rem);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: clamp(1rem, 3vw, 2rem);
+    background: #1a1a1a;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.24),
+      0 5px 10px rgb(0 0 0 / 0.2),
+      0 14px 28px rgb(0 0 0 / 0.22);
+    backface-visibility: hidden;
+  }
+
+  .tablet-video-camera {
+    display: block;
+    width: 0.375rem;
+    height: 0.375rem;
+    margin: 0 auto 0.375rem;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 50%;
+    background: #2e2e30;
+  }
+
+  .tablet-video-button {
+    position: absolute;
+    z-index: 1;
+    width: 4px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 3px;
+    background: #3c3c40;
+  }
+
+  .tablet-video-button--volume-one,
+  .tablet-video-button--volume-two {
+    left: -4px;
+    height: 1.125rem;
+  }
+
+  .tablet-video-button--volume-one {
+    top: 31%;
+  }
+
+  .tablet-video-button--volume-two {
+    top: 38%;
+  }
+
+  .tablet-video-button--power {
+    top: 27%;
+    right: -4px;
+    height: 1.75rem;
+  }
+
+  .tablet-video-screen {
+    overflow: hidden;
+    min-height: 200px;
+    aspect-ratio: 16 / 9;
+    /* Inner rim tracks the outer radius minus the frame padding, keeping the rims parallel. */
+    border-radius: calc(
+      clamp(1rem, 3vw, 2rem) - clamp(0.375rem, 0.7vw, 0.5rem)
+    );
+    background: #0a0a0a;
+  }
+
+  .tablet-video-screen iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    border: 0;
+  }
+
+  @media print {
+    .tablet-video-section {
+      display: none;
+    }
+  }
+}

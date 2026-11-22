@@ -1,67 +1,104 @@
-import { Link } from '@tanstack/react-router'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Link, useRouterState } from '@tanstack/react-router'
 import DodLogo from './DodLogo'
 import ThemeToggle from './ThemeToggle'
+import { useRoughAnnotation } from '#/lib/rough-notation/useRoughAnnotation'
+import type { RoughAnnotationConfig } from '#/lib/rough-notation'
+
+const navLinks = [
+  { to: '/', label: 'Home', exact: true },
+  { to: '/about', label: 'About', exact: false },
+] as const
+
+type NavEntry = (typeof navLinks)[number]
+
+const annotationConfig: RoughAnnotationConfig = {
+  type: 'box',
+  brackets: ['left', 'right'],
+  color: 'currentColor',
+  strokeWidth: 1,
+  padding: 6,
+  animationDuration: 350,
+  hideDuration: 200,
+}
+
+function NavLink({ link }: { link: NavEntry }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const active = link.exact ? pathname === link.to : pathname.startsWith(link.to)
+  const labelRef = useRef<HTMLSpanElement>(null)
+  const { show, hide } = useRoughAnnotation(labelRef, annotationConfig)
+
+  // The active route keeps its brackets drawn; routes losing active retract.
+  useEffect(() => {
+    if (active) {
+      show()
+    } else {
+      hide()
+    }
+  }, [active, show, hide])
+
+  const linkClassName = `inline-flex items-center justify-center min-h-11 min-w-11 text-[0.9375rem] no-underline relative hover:text-ink ${active ? 'text-ink' : 'text-ink-soft'}`
+
+  return (
+    <Link
+      to={link.to}
+      activeOptions={link.exact ? { exact: true } : undefined}
+      className={linkClassName}
+      onPointerEnter={() => show()}
+      onPointerLeave={() => {
+        if (!active) hide()
+      }}
+      onFocus={(e) => {
+        if (e.currentTarget.matches(':focus-visible')) show()
+      }}
+      onBlur={() => {
+        if (!active) hide()
+      }}
+    >
+      <span ref={labelRef} className="notebook-text top-0">
+        {link.label}
+      </span>
+    </Link>
+  )
+}
 
 export default function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4">
-      <nav className="page-wrap flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-4">
-        {/*<h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-2 py-2 text-sm text-[var(--sea-ink)] no-underline"
-          >
-            <DodLogo variant="inline" />
-          </Link>
-        </h2>*/}
+  const header = useRef<HTMLElement>(null)
 
-        <div className="order-3 flex w-full flex-wrap items-center gap-x-4 gap-y-1 pb-1 text-sm font-semibold sm:order-none sm:w-auto sm:flex-nowrap sm:pb-0">
-          <Link
-            to="/"
-            className="nav-link"
-            activeProps={{ className: 'nav-link is-active' }}
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            className="nav-link"
-            activeProps={{ className: 'nav-link is-active' }}
-          >
-            About
+  useLayoutEffect(() => {
+    const element = header.current
+    if (!element) return
+    const root = document.documentElement
+    const measure = () => root.style.setProperty('--site-header-height', `${element.getBoundingClientRect().height}px`)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty('--site-header-height')
+    }
+  }, [])
+
+  return (
+    <header ref={header} className="site-foreground sticky top-0 paper-tear paper-tear--bottom">
+      <div className="paper-tear__surface" aria-hidden="true" />
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <nav className="page-wrap grid items-stretch grid-cols-[minmax(0,1fr)_auto] gap-x-row pt-[calc(var(--notebook-row)/4)] md:grid-cols-3 md:gap-x-gutter" aria-label="Primary navigation">
+        <div className="col-start-1 row-start-1 min-w-0 max-md:wrap-anywhere">
+          <Link to="/" className="flex items-center h-full min-h-11 max-w-full no-underline" aria-label="Dramas of Discrimination home">
+            <DodLogo variant="inline" />
           </Link>
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          {/* <a
-            href="https://x.com/tan_stack"
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
-          >
-            <span className="sr-only">Follow TanStack on X</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M12.6 1h2.2L10 6.48 15.64 15h-4.41L7.78 9.82 3.23 15H1l5.14-5.84L.72 1h4.52l3.12 4.73L12.6 1zm-.77 12.67h1.22L4.57 2.26H3.26l8.57 11.41z"
-              />
-            </svg>
-          </a>*/}
-          {/* <a
-            href="https://github.com/TanStack"
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
-          >
-            <span className="sr-only">Go to TanStack GitHub</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-              />
-            </svg>
-          </a>*/}
+        <div className="col-span-2 row-start-2 flex min-w-0 flex-wrap items-center justify-center gap-x-row md:col-start-2 md:row-start-1 md:col-span-1 max-md:gap-x-[min(var(--notebook-row),4vw)]">
+          {navLinks.map((link) => (
+            <NavLink key={link.to} link={link} />
+          ))}
+        </div>
 
+        <div className="col-start-2 row-start-1 flex items-center self-stretch justify-self-end md:col-start-3">
           <ThemeToggle />
         </div>
       </nav>

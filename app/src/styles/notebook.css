@@ -1,0 +1,121 @@
+/* One row is shared by typography, layout, media frames and the paper ruling. */
+:root {
+  --notebook-row: 2rem;
+  --notebook-baseline: calc(var(--notebook-row) / 2);
+  --notebook-rule-width: 1px;
+  --notebook-rule-color: color-mix(in srgb, var(--sea-ink) 13%, transparent);
+  --notebook-gutter: var(--notebook-row);
+  --notebook-section-space: calc(3 * var(--notebook-row));
+  --site-header-height: calc(3 * var(--notebook-row));
+  /* Half the ascent minus descent for each current font, in em. */
+  --notebook-font-body: 0.27em;
+  --notebook-font-title: 0.36em;
+  --notebook-font-mono: 0.34375em;
+  --margin-red: color-mix(in srgb, var(--stage-red) 40%, transparent);
+  --margin-gap: 7px;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --notebook-row: 1.75rem;
+    --notebook-section-space: calc(2 * var(--notebook-row));
+    --site-header-height: calc(5 * var(--notebook-row));
+  }
+}
+
+@media (min-width: 1001px) {
+  :root {
+    --notebook-gutter: calc(2 * var(--notebook-row));
+    --notebook-section-space: calc(4 * var(--notebook-row));
+  }
+}
+
+@layer base {
+  html {
+    scroll-padding-top: var(--site-header-height);
+  }
+  body {
+    line-height: var(--notebook-row);
+  }
+
+  /* Half the ascent-minus-descent, calibrated with the site's rendered fonts.
+     Relative positioning changes the ink position, never its row allocation. */
+  :where(p, h1, h2, h3, h4, .notebook-text, .eyebrow, .step-number) {
+    --font-baseline: var(--notebook-font-body);
+    --notebook-text-offset: calc(
+      0.5lh - var(--notebook-row) + var(--notebook-baseline) -
+        var(--font-baseline)
+    );
+    position: relative;
+    top: var(--notebook-text-offset);
+    line-height: var(--notebook-row);
+  }
+
+  :where(h1, h2, h3, .eyebrow, .step-number) {
+    --font-baseline: var(--notebook-font-title);
+  }
+
+  @media (min-width: 701px) {
+    h2 {
+      font-size: 2.875rem;
+    }
+  }
+}
+
+@layer components {
+  /* Shared layout vocabulary. Keep geometry here, visual treatment in features. */
+  :where(.notebook-section) {
+    display: flow-root;
+  }
+  .notebook-section {
+    padding-block: var(--notebook-section-space);
+  }
+  .notebook-section--compact {
+    --notebook-section-space: calc(2 * var(--notebook-row));
+  }
+  .notebook-stack {
+    display: grid;
+    align-content: start;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--notebook-stack-gap, var(--notebook-row));
+  }
+  .notebook-stack > * {
+    margin-block: 0;
+    min-width: 0;
+  }
+  /* A frame's content height must be a known length, e.g. width / aspect ratio.
+     Never force text into a fixed frame: let its line boxes grow naturally. */
+  .notebook-frame {
+    display: block;
+    height: round(
+      up,
+      calc(
+        var(--notebook-frame-content-height) + 2 *
+          var(--notebook-frame-padding, 0px)
+      ),
+      var(--notebook-row)
+    );
+    padding: var(--notebook-frame-padding, 0px);
+  }
+
+  .landing-page,
+  .content-page {
+    display: flow-root;
+    flex: none;
+    /* Enlarged text must be able to shrink grid tracks and wrap long words. */
+    overflow-wrap: anywhere;
+  }
+  .site-footer {
+    flex-grow: 1;
+  }
+
+  .notebook-text {
+    display: block;
+  }
+}
+
+@media print, (forced-colors: active) {
+  .rough-annotation {
+    display: none !important;
+  }
+}

@@ -1,0 +1,144 @@
+@theme {
+  --font-sans: 'Handlee', cursive;
+  --font-body: 'Handlee', cursive;
+  --font-title: 'Fredericka the Great', cursive;
+  --font-of: 'Italianno', cursive;
+  --font-logo: 'Cascadia Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Breakpoints mirror the notebook media-query boundaries exactly:
+     max-sm: is width < 481px, max-md: is width < 701px, max-lg: is width < 1001px. */
+  --breakpoint-sm: 481px;
+  --breakpoint-md: 701px;
+  --breakpoint-lg: 1001px;
+
+  /* Whole-row spacing vocabulary; values follow --notebook-* across widths. */
+  --spacing-row: var(--notebook-row);
+  --spacing-section: var(--notebook-section-space);
+  --spacing-gutter: var(--notebook-gutter);
+
+  /* Color aliases over theme custom properties so dark mode keeps flipping
+     without dark: variants. */
+  --color-ink: var(--sea-ink);
+  --color-ink-soft: var(--sea-ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-stage-red: var(--stage-red);
+  --color-line: var(--line);
+  --color-surface-warm: var(--surface-warm);
+  --color-bg-base: var(--bg-base);
+  --color-hl-bg: var(--hl-bg);
+  --color-hl-text: var(--hl-text);
+  --color-link-bg-hover: var(--link-bg-hover);
+}
+
+/*
+ * Dramas of Discrimination — navy/cream theme.
+ * Two brand colors drive everything:
+ *   --primary-blue   #131857  (ink, borders, accent fills)
+ *   --primary-white  #ffffee  (sheet edges, inverted ink)
+ * Dark mode is the brand inversion: deep navy surfaces, cream ink.
+ */
+
+:root {
+  --layer-site-foreground: 50;
+  --primary-blue: #131857;
+  --primary-white: #ffffee;
+  --paper-tear-shadow-offset: 1px;
+  --paper-tear-shadow-blur: 1px;
+  --paper-tear-shadow-color: rgb(0 0 0 / 0.22);
+  --paper-stock: #f4efdf;
+  --paper-grain: url('/paper-grain.svg');
+  --paper-size: 512px 512px;
+  --paper-strength: 72%;
+  --paper-blend: multiply;
+  --paper-inverse-strength: 42%;
+  --paper-inverse-blend: screen;
+  --paper-backing-strength: 60%;
+  --paper-backing: #e7e1d3;
+  /* Alpha stays mostly opaque: only sparse pockets of ink reveal the stock. */
+  --print-ink-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='ink' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='3' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='.82 .88 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cpath fill='white' filter='url(%23ink)' d='M0 0h256v256H0z'/%3E%3C/svg%3E");
+  --print-ink-mask-small: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='ink' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='3' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='.94 .97 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cpath fill='white' filter='url(%23ink)' d='M0 0h256v256H0z'/%3E%3C/svg%3E");
+  --print-ink-size: 256px 256px;
+  --sheet-edge: rgba(19, 24, 87, 0.18);
+  --sheet-shadow:
+    0 1px 2px rgba(19, 24, 87, 0.12), 0 5px 12px -5px rgba(19, 24, 87, 0.2);
+  --ink-faint: rgba(19, 24, 87, 0.13);
+  --ink-scrim: rgba(19, 24, 87, 0.06);
+  --stage-red: #9d2f2f;
+  --paper-warm: #ebe4d2;
+
+  --sea-ink: var(--primary-blue);
+  --sea-ink-soft: rgba(19, 24, 87, 0.85);
+
+  --line: var(--primary-blue);
+  --bg-base: var(--paper-stock);
+  --surface-warm: var(--paper-warm);
+  --link-bg-hover: rgba(19, 24, 87, 0.08);
+
+  --hl-bg: var(--primary-blue);
+  --hl-text: var(--primary-white);
+  --scrollbar-thumb: var(--primary-blue);
+}
+
+:root[data-theme='dark'] {
+  --paper-tear-shadow-offset: 3px;
+  --paper-tear-shadow-blur: 4px;
+  --paper-tear-shadow-color: rgb(0 0 0 / 0.65);
+  --paper-strength: 42%;
+  --paper-blend: screen;
+  --paper-inverse-strength: 72%;
+  --paper-inverse-blend: multiply;
+  --paper-backing-strength: 36%;
+  --paper-backing: #1d2143;
+  --sheet-edge: rgba(255, 255, 238, 0.24);
+  --sheet-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3), 0 5px 12px -5px rgba(0, 0, 0, 0.5);
+  --ink-faint: rgba(255, 254, 238, 0.16);
+  --ink-scrim: rgba(255, 254, 238, 0.07);
+  --stage-red: #ffb3a9;
+  --paper-warm: #1a2070;
+
+  --sea-ink: var(--primary-white);
+  --sea-ink-soft: rgba(255, 254, 238, 0.85);
+
+  --line: rgba(255, 254, 238, 0.35);
+  --bg-base: #0e1236;
+  --surface-warm: #11164f;
+  --link-bg-hover: rgba(255, 254, 238, 0.1);
+
+  --hl-bg: var(--primary-white);
+  --hl-text: var(--primary-blue);
+  --scrollbar-thumb: rgba(255, 254, 238, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper-tear-shadow-offset: 3px;
+    --paper-tear-shadow-blur: 4px;
+    --paper-tear-shadow-color: rgb(0 0 0 / 0.65);
+    --paper-strength: 42%;
+    --paper-blend: screen;
+    --paper-inverse-strength: 72%;
+    --paper-inverse-blend: multiply;
+    --paper-backing-strength: 36%;
+    --paper-backing: #1d2143;
+    --sheet-edge: rgba(255, 255, 238, 0.24);
+    --sheet-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3), 0 5px 12px -5px rgba(0, 0, 0, 0.5);
+    --ink-faint: rgba(255, 254, 238, 0.16);
+    --ink-scrim: rgba(255, 254, 238, 0.07);
+    --stage-red: #ffb3a9;
+    --paper-warm: #1a2070;
+
+    --sea-ink: var(--primary-white);
+    --sea-ink-soft: rgba(255, 254, 238, 0.85);
+
+    --line: rgba(255, 254, 238, 0.35);
+    --bg-base: #0e1236;
+    --surface-warm: #11164f;
+    --link-bg-hover: rgba(255, 254, 238, 0.1);
+
+    --hl-bg: var(--primary-white);
+    --hl-text: var(--primary-blue);
+    --scrollbar-thumb: rgba(255, 254, 238, 0.5);
+  }
+}

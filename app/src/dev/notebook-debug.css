@@ -1,0 +1,27 @@
+:root[data-notebook-debug] [data-notebook-drift] {
+  outline: 1px dashed #168273;
+  outline-offset: -1px;
+}
+:root[data-notebook-debug] [data-notebook-drift='true'] {
+  outline: 2px solid #dc2626;
+}
+.notebook-debug-panel {
+  position: fixed;
+  inset: auto auto 1rem 1rem;
+  z-index: 100;
+  max-width: calc(100vw - 2rem);
+  padding: 0.75rem;
+  background: #131857;
+  color: #ffffee;
+  font: 12px/1.5 monospace;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+@media print {
+  .notebook-debug-panel {
+    display: none;
+  }
+  :root[data-notebook-debug] [data-notebook-drift] {
+    outline: none;
+  }
+}

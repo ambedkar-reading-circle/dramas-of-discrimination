@@ -4,7 +4,15 @@
 const config = {
   semi: false,
   singleQuote: true,
-  trailingComma: "all",
-};
+  trailingComma: 'all',
+  overrides: [
+    {
+      files: ['**/*.tsx', '**/*.jsx'],
+      options: {
+        printWidth: 1000,
+      },
+    },
+  ],
+}
 
-export default config;
+export default config

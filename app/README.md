@@ -17,7 +17,21 @@ To build this application for production:
 npm run build
 ```
 
+## Notebook surfaces
+
+See [the notebook surface guide](../docs/notebook-surfaces.md) for page and component paper, nested inverse sheets, plain cards, overlap ordering, and browser checks.
+
 ## Styling
+
+### Smooth scrolling
+
+`src/components/SmoothScroll.tsx` mounts one Lenis instance for the application.
+It smooths wheel input and section links, retains native touch scrolling, and
+disables itself when reduced motion is preferred (including preference changes).
+Navigation cancels pending inertia before the router restores the scroll position.
+Lenis reads the existing responsive scroll padding for the sticky header.
+Run `npm run test:scroll` for browser checks and `npm run test:manual` for flipbook
+compatibility. Wheel-based checks wait for inertia to finish before measuring.
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
@@ -30,8 +44,43 @@ If you prefer not to use Tailwind CSS:
 3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
 4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
 
-## Linting & Formatting
+## Rough Notation
 
+`src/lib/rough-notation/` is an in-repo annotation library that draws
+hand-drawn marks (underline, box, circle, highlight, strike-through,
+crossed-off, bracket) around any element, powered by
+[Rough.js](https://roughjs.com). The header navlinks use it to draw animated
+square brackets around the active/hovered label.
+
+```ts
+import { annotate } from '#/lib/rough-notation'
+
+const a = annotate(el, {
+  type: 'bracket', // 'underline' | 'box' | 'circle' | 'highlight' | ...
+  brackets: ['left', 'right'], // for type: 'bracket'
+  color: 'currentColor',
+  strokeWidth: 2,
+  padding: 3,
+  animationDuration: 350, // draw duration, ms
+  hideDuration: 200, // retract duration, ms (extension)
+})
+a.show() // draws (animated, WAAPI; instant under prefers-reduced-motion)
+a.hide() // retracts (extension — the original hides instantly)
+a.remove() // detaches the svg and listeners
+
+// React glue — lifecycle-managed annotate():
+const { show, hide } = useRoughAnnotation(ref, config)
+```
+
+The mechanics are a clean-room re-implementation of
+[rough-notation](https://github.com/rough-stuff/rough-notation) © Preet Shihn /
+rough-stuff (MIT), which is the source of the approach and the source of its
+MIT-attributed headers. Local deviations: stroke animation uses WAAPI instead
+of injected CSS keyframes (survives global reduced-motion `animation: none`
+and supports the retract), an explicit `prefers-reduced-motion` gate makes
+show/hide instant, and `hide()` animates the retract.
+
+## Linting & Formatting
 
 This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
 
@@ -40,7 +89,6 @@ npm run lint
 npm run format
 npm run check
 ```
-
 
 ## Deploy to Cloudflare Workers
 
@@ -53,8 +101,6 @@ This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) an
 For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
 
 KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
-
-
 
 ## Routing
 
@@ -73,7 +119,7 @@ Now that you have two routes you can use a `Link` component to navigate between 
 To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
 
 ```tsx
-import { Link } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router'
 ```
 
 Then anywhere in your JSX you can use it like so:
@@ -141,11 +187,11 @@ const getServerTime = createServerFn({
 // Use in a component
 function MyComponent() {
   const [time, setTime] = useState('')
-  
+
   useEffect(() => {
     getServerTime().then(setTime)
   }, [])
-  
+
   return <div>Server time: {time}</div>
 }
 ```
@@ -198,11 +244,9 @@ function PeopleComponent() {
 
 Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
 
-
 # Demo files
 
 Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
 
 # Learn More
 
