@@ -10,6 +10,7 @@
     "postinstall": "node scripts/patch-flipbook.mjs",
     "test:spread": "node --test src/pages/home/manual-flipbook/engine/spreadPlan.test.ts src/pages/home/manual-flipbook/engine/asciiField.test.ts",
     "test:align": "node --test src/lib/notebook-align/alignment.test.ts",
+    "test:pencil": "node --test src/lib/parseColor.test.ts",
     "test:flipbook-engine": "node scripts/flipbook-engine.mjs",
     "test:flipbook-react": "node scripts/flipbook-react.mjs",
     "test:manual-visual": "node scripts/manual-flipbook-visual.mjs",

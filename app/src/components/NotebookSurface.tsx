@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import type { ComponentPropsWithRef } from 'react'
+import { PencilSheet } from '#/components/pencil/PencilTrail'
 import { NotebookDecoration } from './NotebookMargins'
 import './NotebookSurface.css'
 
@@ -10,5 +11,17 @@ export type NotebookSurfaceProps = {
 
 /** Keep surface hosts untransformed; animate their content instead. */
 export default function NotebookSurface({ as = 'div', tone = 'default', paper = 'notebook', className = '', children, ...attributes }: NotebookSurfaceProps) {
-  return createElement(as, { ...attributes, className: `notebook-surface ${className}`.trim(), 'data-tone': tone, 'data-paper': paper }, paper === 'notebook' ? <NotebookDecoration /> : null, children)
+  return createElement(
+    as,
+    {
+      ...attributes,
+      className: `notebook-surface ${className}`.trim(),
+      'data-tone': tone,
+      'data-paper': paper,
+      'data-pencil-surface': '',
+    },
+    paper === 'notebook' ? <NotebookDecoration /> : null,
+    <PencilSheet />,
+    children,
+  )
 }

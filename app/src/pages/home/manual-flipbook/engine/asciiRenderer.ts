@@ -3,6 +3,7 @@ import type { AsciiInput } from './asciiField'
 import { asciiVariants } from './asciiPatterns'
 import type { AsciiVariant } from './asciiPatterns'
 import { asciiFragmentShader, asciiVertexShader } from './asciiShader'
+import { parseColorChannels } from '#/lib/parseColor'
 
 export interface AsciiRenderer {
   kind: 'webgl' | '2d'
@@ -11,10 +12,12 @@ export interface AsciiRenderer {
   dispose: () => void
 }
 
-const rgb = (color: string) =>
-  (color.match(/[\d.]+/g) ?? ['0', '0', '0'])
-    .slice(0, 3)
-    .map((channel) => Number(channel) / 255)
+const rgb = (color: string) => {
+  const channels = parseColorChannels(color)
+  return channels
+    ? [channels.r, channels.g, channels.b].map((channel) => channel / 255)
+    : [0, 0, 0]
+}
 
 export function createAsciiRenderer(
   canvas: HTMLCanvasElement,

@@ -5,6 +5,7 @@ import Footer from '#/components/Footer'
 import Header from '#/components/Header'
 import SmoothScroll from '#/components/SmoothScroll'
 import { NotebookProvider } from '#/components/NotebookMargins'
+import { PencilTraceProvider } from '#/components/pencil/PencilTrail'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -33,22 +34,24 @@ function RootDocument() {
     <NotebookProvider>
       <HeadContent />
       <SmoothScroll />
-      <div className="site-shell">
-        <Header />
-        <Outlet />
-        <Footer />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-      </div>
+      <PencilTraceProvider>
+        <div className="site-shell">
+          <Header />
+          <Outlet />
+          <Footer />
+          <TanStackDevtools
+            config={{
+              position: 'bottom-right',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        </div>
+      </PencilTraceProvider>
     </NotebookProvider>
   )
 }
