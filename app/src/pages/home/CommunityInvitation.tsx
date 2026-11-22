@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 import ActionButton from '#/components/ActionButton'
 import { offsetToNextRule, useNotebookRuleAlign } from '#/lib/notebook-align'
-import { splitSectionClasses } from './splitSectionClasses'
+import { splitSectionClasses } from './content/splitSectionClasses'
 
 export default function CommunityInvitation() {
   const sectionRef = useRef<HTMLElement>(null)

@@ -1,5 +1,5 @@
-import { worksheets } from './worksheets'
-import type { Worksheet } from './worksheets'
+import { worksheets } from './content/worksheets'
+import type { Worksheet } from './content/worksheets'
 import type { CSSProperties } from 'react'
 
 function WorksheetCard({ worksheet }: { worksheet: Worksheet }) {

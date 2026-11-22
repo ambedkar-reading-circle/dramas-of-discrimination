@@ -1,4 +1,4 @@
-import { splitSectionClasses } from './splitSectionClasses'
+import { splitSectionClasses } from './content/splitSectionClasses'
 import NotebookSurface from '#/components/NotebookSurface'
 
 export default function WorkshopRationale() {
