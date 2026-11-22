@@ -8,6 +8,7 @@ import type { RoughAnnotationConfig } from '#/lib/rough-notation'
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
   { to: '/about', label: 'About', exact: false },
+  { to: '/team', label: 'Team', exact: false },
 ] as const
 
 type NavEntry = (typeof navLinks)[number]
