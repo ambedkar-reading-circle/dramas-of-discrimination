@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef } from 'react'
-import { useRoughAnnotation } from '#/lib/rough-notation/useRoughAnnotation'
+import { useRoughAnnotation } from '#/lib/rough-notation'
 import type { RoughAnnotationConfig, RoughAnnotationType } from '#/lib/rough-notation'
 import type { LetterBlock } from '../content/manualContent'
 

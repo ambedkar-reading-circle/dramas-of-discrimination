@@ -2,6 +2,7 @@
 // https://github.com/rough-stuff/rough-notation
 
 export { annotate } from './annotate'
+export { useRoughAnnotation } from './useRoughAnnotation'
 export type {
   BracketType,
   FullPadding,

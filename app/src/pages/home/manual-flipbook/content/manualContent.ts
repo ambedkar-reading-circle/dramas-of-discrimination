@@ -1,4 +1,4 @@
-import type { RoughAnnotationType } from '#/lib/rough-notation/model'
+import type { RoughAnnotationType } from '#/lib/rough-notation'
 import { asciiVariants } from '../engine/asciiPatterns.ts'
 import type { AsciiVariant } from '../engine/asciiPatterns'
 

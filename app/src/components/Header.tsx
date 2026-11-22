@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import DodLogo from './DodLogo'
 import ThemeToggle from './ThemeToggle'
-import { useRoughAnnotation } from '#/lib/rough-notation/useRoughAnnotation'
+import { useRoughAnnotation } from '#/lib/rough-notation'
 import type { RoughAnnotationConfig } from '#/lib/rough-notation'
 
 const navLinks = [
