@@ -5,6 +5,8 @@
 //    @keyframes rule, so playback is not disabled by global reduced-motion
 //    `animation: none` rules and can be reversed for retractable hide().
 //  - An explicit prefers-reduced-motion gate makes drawing instant.
+//  - The stroke color is set as a CSS style, not an SVG presentation
+//    attribute, so configs may pass var()/color-mix() theme colors.
 
 import { SVG_NS } from './model'
 import type {
@@ -245,7 +247,7 @@ export function renderAnnotation(
     const path = document.createElementNS(SVG_NS, 'path')
     path.setAttribute('d', d)
     path.setAttribute('fill', 'none')
-    path.setAttribute('stroke', config.color || 'currentColor')
+    path.style.stroke = config.color || 'currentColor'
     path.setAttribute('stroke-width', `${strokeWidth}`)
     svg.appendChild(path)
     pathElements.push(path)

@@ -1,14 +1,15 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import DodLogo from './DodLogo'
+import PencilToggle from './PencilToggle'
 import ThemeToggle from './ThemeToggle'
 import { useRoughAnnotation } from '#/lib/rough-notation'
 import type { RoughAnnotationConfig } from '#/lib/rough-notation'
 
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
-  { to: '/about', label: 'About', exact: false },
-  { to: '/team', label: 'Team', exact: false },
+  { to: '/approach', label: 'Approach', exact: false },
+  { to: '/about-us', label: 'About Us', exact: false },
 ] as const
 
 type NavEntry = (typeof navLinks)[number]
@@ -100,6 +101,7 @@ export default function Header() {
         </div>
 
         <div className="col-start-2 row-start-1 flex items-center self-stretch justify-self-end md:col-start-3">
+          <PencilToggle />
           <ThemeToggle />
         </div>
       </nav>

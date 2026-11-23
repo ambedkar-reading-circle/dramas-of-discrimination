@@ -1,0 +1,48 @@
+@layer components {
+  .pencil-toggle {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+  }
+  .pencil-toggle:hover {
+    background: var(--link-bg-hover);
+  }
+  /* One glyph shows through the opening; the pair slides aside, like the theme discs. */
+  .pencil-toggle-window {
+    display: block;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+  }
+  .pencil-toggle-track {
+    display: flex;
+    width: 32px;
+    height: 16px;
+    transition: transform 550ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .pencil-toggle-track svg {
+    display: block;
+    flex: none;
+  }
+  .pencil-toggle[aria-pressed='false'] .pencil-toggle-track {
+    transform: translateX(-16px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pencil-toggle-track {
+      transition: none;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .pencil-toggle:not(:focus-visible) {
+    outline: 1px solid ButtonText;
+    outline-offset: -1px;
+  }
+}

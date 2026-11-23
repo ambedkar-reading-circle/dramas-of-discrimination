@@ -25,14 +25,14 @@ The publish workflow, state machine, immutability policy, and the public-renderi
 ### Input from A1 (resolved)
 Public rendering is decided ([A1](A1-public-rendering.md)): **no SSR on the public surface**. So the bridge is **not** "render on request" — it is a **build/snapshot** step:
 - A manifesto is **CSR-readable from Convex** (public-read) once approved, but **not** SEO-indexed.
-- The SEO/public page exists only after an admin batch-**"Syndicate"** rebuild emits a **static** snapshot.
+- The SEO/public page exists only after a facilitator-triggered batch-**"Syndicate"** rebuild emits a **static** snapshot.
 - Open for G2: the Syndicate state machine (who triggers it, batch mechanics), immutability/versioning of the static snapshot, and the Convex public-read access rule for unsyndicated manifestos (coordinate with C1/A2).
 
 ### Candidate framing (not yet decided)
 The *candidate* shape of this bridge is a **Syndicate Worker** seam (fog [A3](../MAP.md)):
 
-- **Consensus reached** (Convex state; see [G1](G1-consensus-semantics.md)) → **admin triggers** the Syndicate action.
+- **Consensus reached** (Convex state; see [G1](G1-consensus-semantics.md)) → **the Facilitator triggers** the Syndicate action ([B1](B1-auth-and-group-provisioning.md)).
 - The Worker **fetches** the agreed manifesto from Convex → **renders static HTML** → **deploys it as a Static Asset** (the only path by which a manifesto reaches the indexable public surface).
 - Open within this candidate: **static-snapshot immutability/versioning** — once deployed, is the snapshot frozen, versioned, or retractable?
 
-This stays a candidate — the 2-vs-3-Worker count (and thus whether a dedicated Syndicate Worker exists at all) is not fixed until [B1](B1-auth-and-group-provisioning.md) resolves. If a dedicated Worker is not warranted, the Syndicate step collapses into the existing private Worker or an admin build step; the *render-and-deploy-static* contract above still holds either way.
+This stays a candidate in shape only — the Worker count is now fixed at **2** ([B1](B1-auth-and-group-provisioning.md): identity lives in Convex — Convex Auth — so no auth Worker), which a dedicated Syndicate Worker fits comfortably. Whether each seam warrants its own script (vs collapsing Syndicate into the LLM Generation Worker) is [A3](A3-compute-decomposition.md)'s call; the *render-and-deploy-static* contract above holds either way.

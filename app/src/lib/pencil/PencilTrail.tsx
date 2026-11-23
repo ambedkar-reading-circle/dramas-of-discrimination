@@ -4,6 +4,7 @@ import { useRouterState } from '@tanstack/react-router'
 import { useMediaQuery } from '#/lib/use-media-query'
 import { createInkResolver } from './ink.ts'
 import { createPencilRenderer } from './createPencilRenderer.ts'
+import { PencilPreferenceProvider, usePencilPreferenceState } from './usePencilPreference.ts'
 import { usePointerTrace } from './usePointerTrace.ts'
 import type { PointerTrace, TrailRenderer } from './types.ts'
 import './PencilTrail.css'
@@ -13,7 +14,14 @@ const PencilTraceContext = createContext<PointerTrace | null>(null)
 export function PencilTraceProvider({ children }: { children: ReactNode }) {
   const trace = usePointerTrace()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
-  return <PencilTraceContext.Provider value={reducedMotion ? null : trace}>{children}</PencilTraceContext.Provider>
+  const preference = usePencilPreferenceState()
+  const activeTrace = preference.enabled && !reducedMotion ? trace : null
+
+  return (
+    <PencilPreferenceProvider value={preference}>
+      <PencilTraceContext.Provider value={activeTrace}>{children}</PencilTraceContext.Provider>
+    </PencilPreferenceProvider>
+  )
 }
 
 export function PencilSheet() {

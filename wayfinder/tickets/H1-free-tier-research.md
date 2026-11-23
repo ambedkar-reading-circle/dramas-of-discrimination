@@ -3,10 +3,10 @@ id: H1
 gh: 6
 title: "Research: free-tier limits, durability & gotchas (Cloudflare, Convex, auth, LLM)"
 type: research
-status: open
+status: closed
 labels: [wayfinder:research]
 blocked-by: []
-claim: null
+claim: "research-subagent"
 ---
 
 ## Question
@@ -26,3 +26,14 @@ The data + realtime plane now rests on Convex's free tier, and the candidate com
 - **Request quotas across multiple Workers** — confirm whether invocation/CPU limits are **per-Worker or account-wide** when several Workers run concurrently.
 
 These matter regardless of whether the 2-vs-3-Worker framing is ever formalized.
+
+### Now gates a decision (raised by D1)
+[D1](D1-how-live.md) made the Cloud-mode editing model **Yjs CRDT, conditional on these findings**. The Convex free-tier Yjs/connection/ops numbers above are no longer just load-bearing context — if they don't accommodate 4–5 concurrent editors per group × 4–5 groups, the spec **falls back to presence + last-write-wins per field**. Call this out explicitly in the findings verdict.
+
+## Resolution
+
+Findings: [../research/free-tier-limits.md](../research/free-tier-limits.md) (researched 2026-11-23, official docs only).
+
+**Verdict: NO-GO for Yjs-over-Convex as D1 specified it — on support risk, not capacity.** Convex free capacity passes with huge margin (1,000 concurrent sessions, 16 concurrent queries/mutations, 1M function calls/month vs ~25 editors), but the official Convex Yjs integration no longer exists (`@convex-dev/yjs` gone from npm, zero docs/repos); only a 3-star community `y-convex` remains. Per D1's conditionality, the spec falls back to **presence + last-write-wins per field**; the capacity numbers are recorded so a deliberate community-package/DIY reversal wouldn't be quota-blocked.
+
+Supporting findings: **Convex Auth is free-plan-included (supports the 2-Worker path; Email+Password needs Resend + domain — 3k emails/mo free)**; Workers Free allows **100 scripts/account** but the **100k req/day pool is account-wide, not per-Worker** — the 2-vs-3 Worker choice changes organization, not quota; and the official `@convex-dev/better-auth` component undermines the "Better-Auth forces a 3rd Worker" assumption (B1/A3 own that call). Unblocks [LLM provider](E1-llm-provider.md) with a four-way provider comparison.

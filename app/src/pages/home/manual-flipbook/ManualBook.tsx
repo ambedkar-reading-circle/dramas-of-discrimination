@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import HTMLFlipBook from 'react-pageflip'
-import { motion, useMotionValueEvent, useTransform } from 'motion/react'
+import { motion, useMotionValue, useMotionValueEvent, useTransform } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import type { BookDriver } from './types/flipbook-types'
 import { ManualPage } from './components/ManualPages'
 import { useManualFlipbook } from './hooks/useManualFlipbook'
 import { manualBackCover } from './content/manualContent'
 import { ManualPageState } from './context/ManualPageState'
+import { progressForSpread } from './engine/spreadPlan'
 
 // page-flip 2.0.7 ships TS source but no declarations. Keep the small surface we
 // use typed without pulling its non-strict source into the application's build.
@@ -21,7 +22,15 @@ interface FlipBookHandle {
     | undefined
 }
 
-export default function ManualBook({ desktop, progress }: { desktop: boolean; progress: MotionValue<number> }) {
+type ManualBookProps = { desktop: boolean } & ({ progress: MotionValue<number>; spread?: never } | { spread: number; progress?: never })
+
+export default function ManualBook({ desktop, progress: externalProgress, spread }: ManualBookProps) {
+  const driven = useMotionValue(0)
+  const progress = externalProgress ?? driven
+  useEffect(() => {
+    if (externalProgress) return
+    driven.set(progressForSpread(spread, desktop))
+  }, [desktop, driven, externalProgress, spread])
   const host = useRef<HTMLDivElement>(null)
   const book = useRef<FlipBookHandle>(null)
   const driver = useMemo<BookDriver>(

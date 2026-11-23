@@ -12,6 +12,7 @@ import {
   shapeForPage,
   turnTarget,
   planFor,
+  progressForSpread,
 } from './spreadPlan.ts'
 
 test('the letter moves forward onto five white pages without losing or repeating text', () => {
@@ -64,6 +65,12 @@ for (const desktop of [true, false]) {
   const layout = desktop ? 'desktop' : 'portrait'
   test(`${layout} reaches every page and the back cover before exit`, () => {
     const { heads, thresholds } = planFor(desktop)
+    assert.equal(progressForSpread(0, desktop), 0)
+    assert.equal(progressForSpread(heads.length - 1, desktop), 0.78)
+    assert.equal(
+      progressForSpread(1, desktop),
+      thresholds[0] + Math.min((thresholds[1] - thresholds[0]) / 2, 0.04),
+    )
     assert.equal(heads.at(-1), manualBackCover)
     assert.equal(thresholds.length, heads.length - 1)
     assert.ok(thresholds.at(-1)! < 0.8)

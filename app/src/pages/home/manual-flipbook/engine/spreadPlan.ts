@@ -29,6 +29,30 @@ const portraitPlan = makePlan(false)
 export const planFor = (desktop: boolean) =>
   desktop ? desktopPlan : portraitPlan
 
+/** How many spreads a layout can turn through, including the closed book. */
+export function spreadCount(desktop: boolean): number {
+  return planFor(desktop).heads.length
+}
+
+/** Spread index for the leaf the book is showing. */
+export function spreadIndexForPage(page: number, desktop: boolean): number {
+  const { heads } = planFor(desktop)
+  return Math.max(0, heads.filter((head) => head <= page).length - 1)
+}
+
+/**
+ * Progress that commits the book to `spread`. The last spread stops at 0.78,
+ * short of the exit threshold the scroll-driven book uses.
+ */
+export function progressForSpread(spread: number, desktop: boolean): number {
+  const { heads, thresholds } = planFor(desktop)
+  if (spread <= 0) return 0
+  if (spread >= heads.length - 1) return 0.78
+  const committed = thresholds[spread - 1]
+  const following = thresholds[spread]
+  return committed + Math.min((following - committed) / 2, 0.04)
+}
+
 export const shapeForPage = (page: number) =>
   page === 0 ? 0 : page === manualBackCover ? 2 : 1
 

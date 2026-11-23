@@ -23,9 +23,6 @@ export default function HomeHero() {
             <ActionButton href="#workshop-method" variant="primary" icon="↓">
               Explore the acts
             </ActionButton>
-            <ActionButton to="/about" variant="quiet" icon="↗">
-              About the project
-            </ActionButton>
           </div>
         </div>
       </div>

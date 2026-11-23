@@ -1,0 +1,903 @@
+/*
+ * Presentation deck layout: stage sizing between the site header and the deck
+ * controls, chip strip, overview grid, asset placeholders, presenter tools,
+ * fullscreen state, and contextual overrides for the embedded home-page
+ * components (WorkshopMethod, ManualBook). Colors and spacing come from the
+ * theme custom properties; nothing is hardcoded.
+ */
+@layer components {
+  /* The deck is the page: it fills the viewport under the site header, and
+     the fullscreen surface, so the window itself never scrolls. */
+  .site-shell:has(.presentation-deck) {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .site-shell:has(.presentation-deck) .site-footer {
+    display: none;
+  }
+
+  .site-shell:has(.presentation-deck) .content-page {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .presentation-deck {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: calc(var(--notebook-row) / 2);
+    min-height: 0;
+    padding-block: calc(var(--notebook-row) / 2);
+    overflow: hidden;
+  }
+
+  .notebook-surface:fullscreen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .notebook-surface:fullscreen .presentation-deck {
+    width: calc(100% - clamp(1.25rem, 4vw, 3rem));
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .presentation-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--notebook-row) var(--notebook-gutter);
+  }
+
+  .presentation-tools {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--notebook-row) / 4);
+  }
+
+  .deck-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font-family: var(--font-logo);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .deck-control-mark {
+    display: grid;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    place-items: center;
+  }
+
+  .deck-control-mark svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .deck-control-glyph {
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+
+  .deck-control:hover:not(:disabled) {
+    background: var(--link-bg-hover);
+  }
+
+  .deck-control[aria-pressed='true'] {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .deck-control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* The stage fills the space between the meta bar and the deck controls.
+     It is also the inline-size container the title slide's DodLogo wordmark
+     resolves its 10cqi against — it must be an element of definite width,
+     never the shrink-wrapped .slide-title itself (containment would collapse
+     it to nothing). Slides that outgrow the stage are scaled down to fit, so
+     the stage does not grow a vertical scrollbar. */
+  .slide-stage {
+    position: relative;
+    container-type: inline-size;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    border-radius: 0.125rem;
+  }
+
+  /* A scaled slide's layout box is taller than what is painted. Clipping it
+     avoids a scrollbar for space the reader cannot see. */
+  .slide-stage:has(.slide-frame--scaled) {
+    overflow: hidden;
+  }
+
+  .slide-frame {
+    grid-area: 1 / 1;
+    align-self: start;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .slide-frame:has(.slide--centered) {
+    align-self: center;
+  }
+
+  .slide-frame--scaled,
+  .slide-frame--scaled:has(.slide--centered) {
+    align-self: start;
+  }
+
+  .slide {
+    display: grid;
+    gap: var(--notebook-row);
+    align-content: start;
+    width: 100%;
+    min-width: 0;
+    transform-origin: top center;
+  }
+
+  .slide-heading {
+    max-width: 26ch;
+    text-wrap: balance;
+  }
+
+  .slide-body {
+    display: grid;
+    gap: var(--notebook-row);
+    align-content: start;
+    min-width: 0;
+  }
+
+  .slide-body > p,
+  .section-lede-copy {
+    max-width: 62ch;
+  }
+
+  .slide-interactive {
+    min-width: 0;
+  }
+
+  .slide--centered {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .slide--split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--notebook-gutter);
+  }
+
+  /* Fixed-position children place before auto-placed ones, so the header
+     spans explicitly and the body and interactive claim row 2. Direct children
+     only: .slide-asset also appears inside embeds. */
+  .slide--split > .slide-heading {
+    grid-column: 1 / -1;
+  }
+
+  .slide--split > .slide-body {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .slide--split > .slide-interactive,
+  .slide--split > .slide-asset {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  /* Title slide */
+  .slide-title {
+    display: grid;
+    gap: var(--notebook-row);
+    justify-items: center;
+  }
+
+  .slide-title-heading {
+    position: relative;
+    text-wrap: balance;
+  }
+
+  .slide-title-subtitle {
+    max-width: 48ch;
+    font-size: 1.25rem;
+  }
+
+  .slide-title-attribution {
+    max-width: 44ch;
+    color: var(--sea-ink-soft);
+  }
+
+  /* Slide nav stays on one row at the bottom of the viewport. */
+  .slide-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    flex: none;
+    gap: calc(var(--notebook-row) / 4);
+    width: 100%;
+    min-width: 0;
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+  }
+
+  .slide-nav-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--notebook-row) / 2);
+    min-width: 0;
+  }
+
+  .slide-nav-controls > .deck-control {
+    flex: none;
+  }
+
+  .slide-progress {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--ink-faint);
+  }
+
+  .slide-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--sea-ink);
+    transition: inline-size 250ms ease;
+  }
+
+  /* The overview control lives in the meta tools. This node only hosts the dialog. */
+  .slide-index {
+    display: contents;
+  }
+
+  .slide-index-strip {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .slide-index-chip {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font-family: var(--font-logo);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .slide-index-chip:hover {
+    background: var(--link-bg-hover);
+  }
+
+  .slide-index-chip[aria-current='true'] {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+    box-shadow: inset 0 0 0 1px var(--hl-bg);
+  }
+
+  .slide-index-gap {
+    box-shadow: none;
+  }
+
+  .slide-overview-dialog[open] {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--notebook-gutter);
+    border: 0;
+    background: transparent;
+    color: var(--sea-ink);
+    overflow: hidden;
+  }
+
+  .slide-overview-dialog::backdrop {
+    background: transparent;
+  }
+
+  html:has(.slide-overview-dialog[open]) .presentation-deck > :not(.slide-index) {
+    visibility: hidden;
+  }
+
+  .slide-overview-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--notebook-row);
+    width: min(72rem, 100%);
+    max-height: 100%;
+    padding: var(--notebook-row) var(--notebook-gutter);
+    overflow: hidden;
+  }
+
+  .slide-overview-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--notebook-row);
+  }
+
+  .slide-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--notebook-row) calc(var(--notebook-row) / 2);
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .slide-overview-card {
+    display: grid;
+    gap: calc(var(--notebook-row) / 4);
+    align-content: start;
+    text-align: start;
+    padding: calc(var(--notebook-row) / 2) 1rem calc(var(--notebook-row) / 2);
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+  }
+
+  .slide-overview-card:hover {
+    background: var(--link-bg-hover);
+  }
+
+  .slide-overview-card[aria-current='true'] {
+    box-shadow: inset 0 0 0 1px var(--sea-ink);
+    background: var(--ink-scrim);
+  }
+
+  .slide-overview-number {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    color: var(--stage-red);
+  }
+
+  .slide-overview-heading {
+    font-size: 1.0625rem;
+  }
+
+  /* Asset placeholders: framed, paper-tear-styled boxes at the slot's ratio. */
+  .slide-asset {
+    display: grid;
+    gap: calc(var(--notebook-row) / 2);
+    min-width: 0;
+  }
+
+  .slide-asset-placeholder {
+    --slide-asset-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+    aspect-ratio: var(--slide-asset-ratio);
+    border-radius: 0.125rem;
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      inset 0 0 0 6px transparent;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent 0 calc(var(--notebook-row) / 2 - 1px),
+        var(--ink-scrim) calc(var(--notebook-row) / 2 - 1px)
+          calc(var(--notebook-row) / 2)
+      ),
+      var(--bg-base);
+  }
+
+  .slide-asset--video .slide-asset-placeholder {
+    --slide-asset-ratio: 16 / 9;
+  }
+
+  .slide-asset--document .slide-asset-placeholder {
+    --slide-asset-ratio: 3 / 4;
+  }
+
+  .slide-asset-role {
+    font-family: var(--font-logo);
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    color: var(--sea-ink-soft);
+  }
+
+  .slide-asset-caption {
+    font-size: 0.8125rem;
+    color: var(--sea-ink-soft);
+  }
+
+  /* Reveal cards (03, 09) */
+  .slide-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: var(--notebook-gutter);
+  }
+
+  .slide-card {
+    display: grid;
+    gap: calc(var(--notebook-row) / 2);
+    align-content: start;
+    padding: calc(var(--notebook-row) / 2) 1rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+  }
+
+  .slide-card--open {
+    background: var(--ink-scrim);
+  }
+
+  .slide-card-trigger {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: start;
+    justify-self: start;
+    min-height: calc(2 * var(--notebook-row));
+    padding: var(--notebook-row) 0.75rem 0;
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+
+  .slide-card-trigger:hover {
+    background: var(--link-bg-hover);
+  }
+
+  .slide-pair-scenario {
+    color: var(--sea-ink-soft);
+  }
+
+  /* Objective points (04) and quotes (11) */
+  .slide-points ul,
+  .slide-quotes {
+    display: grid;
+    gap: var(--notebook-row);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .slide-point p,
+  .slide-quote p {
+    max-width: 58ch;
+    font-size: 1.125rem;
+  }
+
+  .slide-annotated {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    color: var(--stage-red);
+  }
+
+  .slide-points-next {
+    justify-self: start;
+    display: inline-flex;
+    min-height: calc(2 * var(--notebook-row));
+    padding: var(--notebook-row) 1rem 0;
+    border: 0;
+    border-radius: 0.125rem;
+    background: var(--hl-bg);
+    color: var(--hl-text);
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+
+  .slide-points-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .slide-quote {
+    padding: var(--notebook-row) 1.25rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+    background: var(--ink-scrim);
+    display: grid;
+    gap: calc(var(--notebook-row) / 4);
+  }
+
+  .slide-quote cite {
+    font-style: normal;
+    font-size: 0.875rem;
+    color: var(--sea-ink-soft);
+  }
+
+  /* Flip cards (05) */
+  .slide-flip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+    gap: var(--notebook-gutter);
+    perspective: 1200px;
+  }
+
+  .slide-flip {
+    position: relative;
+    min-width: 0;
+  }
+
+  .slide-flip-inner {
+    position: relative;
+    display: grid;
+    transform-style: preserve-3d;
+    transition: transform 500ms ease;
+  }
+
+  .slide-flip--open .slide-flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .slide-flip-face {
+    grid-area: 1 / 1;
+    display: grid;
+    gap: calc(var(--notebook-row) / 2);
+    align-content: center;
+    min-height: calc(7 * var(--notebook-row));
+    padding: var(--notebook-row) 1.25rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: var(--bg-base);
+    backface-visibility: hidden;
+  }
+
+  .slide-flip-face--back {
+    transform: rotateY(180deg);
+    background: var(--surface-warm);
+  }
+
+  .slide-flip-hint {
+    font-size: 0.8125rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .slide-flip-trigger {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 0;
+    border-radius: 0.125rem;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Mode switcher (12) */
+  .slide-modes {
+    display: grid;
+    gap: var(--notebook-row);
+    justify-items: start;
+  }
+
+  .slide-mode-buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: calc(var(--notebook-row) / 4);
+  }
+
+  .slide-mode-button {
+    min-height: calc(2 * var(--notebook-row));
+    padding: var(--notebook-row) 1rem 0;
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+
+  .slide-mode-button[aria-pressed='true'] {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .slide-mode-panel {
+    display: grid;
+    gap: calc(var(--notebook-row) / 2);
+    max-width: 62ch;
+    padding: var(--notebook-row) 1.25rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+    background: var(--ink-scrim);
+  }
+
+  /* Stepper (13) */
+  .slide-steps {
+    display: grid;
+    gap: var(--notebook-row);
+  }
+
+  .slide-steps-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: calc(var(--notebook-row) / 2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .slide-step-button {
+    display: grid;
+    gap: calc(var(--notebook-row) / 4);
+    justify-items: start;
+    min-height: calc(3 * var(--notebook-row));
+    padding: calc(var(--notebook-row) / 2) 1rem;
+    border: 0;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font-size: 0.9375rem;
+    text-align: start;
+  }
+
+  .slide-step--done .slide-step-button {
+    background: var(--ink-scrim);
+  }
+
+  .slide-step--current .slide-step-button {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .slide-step--current .step-number {
+    color: var(--hl-text);
+  }
+
+  .slide-step-button:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  .slide-step-detail {
+    max-width: 62ch;
+    padding: var(--notebook-row) 1.25rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+    background: var(--ink-scrim);
+  }
+
+  /* Principles (14) */
+  .slide-principles {
+    display: grid;
+    gap: var(--notebook-row);
+  }
+
+  .slide-principles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--notebook-row) var(--notebook-gutter);
+  }
+
+  .slide-principle {
+    border-radius: 0.125rem;
+    transition: background-color 180ms ease;
+  }
+
+  .slide-principle:hover,
+  .slide-principle:focus-within {
+    background: var(--ink-scrim);
+  }
+
+  /* Closing (15) */
+  .slide-closing {
+    display: grid;
+    gap: var(--notebook-row);
+    justify-items: center;
+  }
+
+  .slide-closing-lede {
+    font-size: 1.25rem;
+    max-width: 40ch;
+  }
+
+  .slide-closing .slide-asset {
+    width: min(100%, calc(20 * var(--notebook-row)));
+    justify-self: center;
+  }
+
+  /* Acts strip (06) */
+  .slide-acts {
+    font-family: var(--font-title);
+    font-size: 1.125rem;
+    letter-spacing: 0.02em;
+  }
+
+  .slide-acts-arrow {
+    color: var(--stage-red);
+  }
+
+  .slide-embed-hint {
+    font-size: 0.875rem;
+    color: var(--sea-ink-soft);
+  }
+
+  /* Screen-reader-only text. */
+  .slide-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Embedded home-page components: the deck hosts them inside a bounded stage,
+   so their viewport-scale sections relax to slide scale. Shared component
+   files are untouched; these overrides are presentation-context only. They
+   live outside @layer because WorkshopMethod.css itself is unlayered. */
+.presentation-embed {
+  display: grid;
+  gap: var(--notebook-row);
+  min-width: 0;
+}
+
+.presentation-method .workshop-method-surface {
+  min-height: 0;
+  padding-block: var(--notebook-row);
+  scroll-margin-top: 0;
+}
+
+.presentation-method .workshop-method {
+  padding-inline: 0;
+}
+
+.presentation-manual-book {
+  display: grid;
+  min-width: 0;
+}
+
+/* The book is driven by the presenter's turn controls below it, so the
+   engine's own click-to-flip is switched off to keep both in agreement. */
+.presentation-manual .manual-book-frame {
+  pointer-events: none;
+}
+
+.presentation-manual .manual-reader {
+  width: min(100%, 420px, calc((100svh - 16 * var(--notebook-row)) * 0.7));
+}
+
+.presentation-manual.manual-desktop .manual-reader {
+  width: min(100%, 900px, calc((100svh - 15 * var(--notebook-row)) * 1.4));
+}
+
+.presentation-manual-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: center;
+  gap: var(--notebook-row);
+}
+
+/* Worksheet previews (08) */
+.presentation-tables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--notebook-gutter);
+}
+
+.presentation-tables .worksheet-preview {
+  max-height: none;
+}
+
+/* Tablet video (10): the frame, without the home page's scroll choreography. */
+.presentation-video {
+  display: grid;
+  gap: var(--notebook-row);
+}
+
+.presentation-tablet-frame {
+  width: min(100%, 640px);
+  justify-self: center;
+}
+
+.presentation-video .slide-asset {
+  width: min(100%, 640px);
+  justify-self: center;
+}
+
+@media (max-width: 700px) {
+  .slide--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .slide--split > .slide-heading,
+  .slide--split > .slide-body,
+  .slide--split > .slide-interactive,
+  .slide--split > .slide-asset {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .slide-index-chip {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    font-size: 0.6875rem;
+  }
+
+  .presentation-tables {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .presentation-manual-controls {
+    display: grid;
+    justify-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-progress-fill {
+    transition: none;
+  }
+
+  .slide-flip-inner,
+  .slide-principle {
+    transition: none;
+  }
+}
+
+/* Unlayered on purpose: it must outrank the utilities layer that sizes the
+   DodLogo wordmark (text-[min(10cqi,8rem)]). The title slide wears the
+   wordmark one notch below the home hero's scale; cqi resolves against the
+   .slide-stage container. */
+.slide-title-heading .font-logo {
+  font-size: min(7cqi, 5.5rem);
+}

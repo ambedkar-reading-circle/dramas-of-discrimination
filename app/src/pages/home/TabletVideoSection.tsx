@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import NotebookSurface from '#/components/NotebookSurface'
+import TabletVideoFrame from '#/components/TabletVideoFrame'
 import { useMediaQuery } from '#/lib/use-media-query'
 import './TabletVideoSection.css'
 
@@ -26,15 +27,7 @@ export default function TabletVideoSection() {
       <div className="tablet-video-stage">
         <div className="tablet-video-perspective page-wrap">
           <motion.div className="tablet-video-motion" style={reducedMotion ? undefined : { y, rotateX, rotateY, rotate, scale }}>
-            <div className="tablet-video-frame">
-              <span className="tablet-video-camera" aria-hidden="true" />
-              <span className="tablet-video-button tablet-video-button--volume-one" aria-hidden="true" />
-              <span className="tablet-video-button tablet-video-button--volume-two" aria-hidden="true" />
-              <span className="tablet-video-button tablet-video-button--power" aria-hidden="true" />
-              <div className="tablet-video-screen">
-                <iframe src="https://www.youtube-nocookie.com/embed/_H9tByQyBv8" title="Dramas of Discrimination video" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-              </div>
-            </div>
+            <TabletVideoFrame />
           </motion.div>
         </div>
       </div>

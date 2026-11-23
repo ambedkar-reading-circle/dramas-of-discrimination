@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react'
-import ActionButton from '#/components/ActionButton'
 import { offsetToNextRule, useNotebookRuleAlign } from '#/lib/notebook-align'
 import { splitSectionClasses } from './content/splitSectionClasses'
 
@@ -34,9 +33,6 @@ export default function CommunityInvitation() {
       </div>
       <div className="notebook-stack justify-items-start">
         <p className="max-w-[65ch] text-ink-soft">We are building the facilitation app in the open, and it is not ready yet. The worksheets already are. Start with a scenario your group knows too well, and see where the rehearsal leads.</p>
-        <ActionButton to="/about" variant="quiet" icon="↗">
-          More about the project
-        </ActionButton>
       </div>
     </section>
   )
