@@ -1,0 +1,55 @@
+@layer components {
+  .instant-photo-layer {
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-slide-overlay);
+    container-type: size;
+    display: grid;
+    place-items: center;
+    overflow: clip;
+    pointer-events: none;
+  }
+
+  .instant-photo {
+    --rim: clamp(0.4rem, 2cqmin, 0.9rem);
+    --lip: clamp(1.5rem, 5cqmin, 2.25rem);
+    --caption-gap: calc(var(--notebook-row) / 4);
+    --rim-v: calc(var(--rim) * 1.7 + var(--caption-gap) + var(--lip));
+    grid-area: 1 / 1;
+    display: grid;
+    gap: var(--caption-gap);
+    margin: 0;
+    padding: var(--rim) var(--rim) calc(var(--rim) * 0.7);
+    cursor: grab;
+    touch-action: none;
+    background:
+      linear-gradient(160deg, var(--photo-sheen), transparent 45%),
+      radial-gradient(120% 90% at 50% 40%, transparent 60%, var(--photo-aging)),
+      var(--photo-stock);
+    border-radius: 3px;
+    box-shadow: var(--photo-shadow);
+    will-change: transform;
+  }
+
+  .instant-photo img {
+    display: block;
+    width: auto;
+    max-width: min(calc(90cqw - 2 * var(--rim)), 56rem);
+    height: auto;
+    max-height: calc(90cqh - var(--rim-v));
+    object-fit: cover;
+    filter: sepia(0.12) saturate(0.9) contrast(1.04);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .instant-photo figcaption {
+    display: grid;
+    place-items: center;
+    min-height: var(--lip);
+    font-family: var(--font-body);
+    font-size: clamp(0.95rem, 3cqmin, 1.25rem);
+    color: var(--photo-ink);
+    text-align: center;
+  }
+}

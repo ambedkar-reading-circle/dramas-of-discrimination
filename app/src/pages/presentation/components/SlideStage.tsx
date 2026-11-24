@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 import type { Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useMediaQuery } from '#/lib/use-media-query'
+import { usePrefersReducedMotion } from '#/lib/use-media-query'
+import { SlideStageHostContext } from '../hooks/useSlideStageHost'
 import SlideAssetPlaceholder from './SlideAssetPlaceholder'
 import type { Slide } from '../types'
 
-const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28 }
 
 export type SlideStageHandle = {
@@ -20,8 +20,14 @@ interface SlideStageProps {
 }
 
 export default function SlideStage({ slide, index, total, ref }: SlideStageProps) {
-  const reducedMotion = useMediaQuery(reducedMotionQuery)
+  const reducedMotion = usePrefersReducedMotion()
   const stage = useRef<HTMLDivElement>(null)
+  // The stage as state as well as a ref, so slide bodies re-render once it mounts.
+  const [host, setHost] = useState<HTMLDivElement | null>(null)
+  const stageRef = useCallback((element: HTMLDivElement | null) => {
+    stage.current = element
+    setHost(element)
+  }, [])
   const fit = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement | null>(null)
   const [scale, setScale] = useState(1)
@@ -93,23 +99,25 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
   const ownsHeading = slide.ownsHeading === true
 
   return (
-    <div ref={stage} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
-      <AnimatePresence initial={false} custom={direction}>
-        <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
-          <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
-            {!ownsHeading && (
-              <h2 ref={heading} className="slide-heading" tabIndex={-1}>
-                {slide.heading}
-              </h2>
-            )}
-            <div className="slide-body">{slide.body}</div>
-            {slide.interactive && <div className="slide-interactive">{slide.interactive}</div>}
-            {slide.assets?.map((asset) => (
-              <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />
-            ))}
-          </div>
-        </motion.div>
-      </AnimatePresence>
+    <div ref={stageRef} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
+      <SlideStageHostContext value={host}>
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
+            <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
+              {!ownsHeading && (
+                <h2 ref={heading} className="slide-heading" tabIndex={-1}>
+                  {slide.heading}
+                </h2>
+              )}
+              <div className="slide-body">{slide.body}</div>
+              {slide.interactive && <div className="slide-interactive">{slide.interactive}</div>}
+              {slide.assets?.map((asset) => (
+                <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </SlideStageHostContext>
     </div>
   )
 }

@@ -370,7 +370,23 @@ class RoughAnnotationImpl implements RoughAnnotation {
     return ret
   }
 
+  // Converts a viewport-space rect into the svg's own user space. Going
+  // through the inverse screen CTM undoes any CSS transform on an ancestor
+  // (e.g. a scale-to-fit slide); a plain client-rect subtraction would be in
+  // screen pixels and get scaled a second time when drawn.
   private svgRect(svg: SVGSVGElement, bounds: DOMRect | DOMRectReadOnly): Rect {
+    const ctm = svg.getScreenCTM()
+    if (ctm) {
+      const toSvg = ctm.inverse()
+      const topLeft = new DOMPoint(bounds.left, bounds.top).matrixTransform(toSvg)
+      const bottomRight = new DOMPoint(bounds.right, bounds.bottom).matrixTransform(toSvg)
+      return {
+        x: topLeft.x,
+        y: topLeft.y,
+        w: bottomRight.x - topLeft.x,
+        h: bottomRight.y - topLeft.y,
+      }
+    }
     const rect1 = svg.getBoundingClientRect()
     const rect2 = bounds
     return {

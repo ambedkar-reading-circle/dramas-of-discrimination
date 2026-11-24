@@ -1,48 +1,24 @@
-import { useMemo, useRef } from 'react'
-import DodLogo from '#/components/DodLogo'
-import { useRoughAnnotation } from '#/lib/rough-notation'
-import type { RoughAnnotationConfig } from '#/lib/rough-notation'
-import { useMediaQuery } from '#/lib/use-media-query'
-
-const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
+import { InstantPhotoLayer, usePhotoReveal } from '#/components/InstantPhoto'
+import { useSlideStageHost } from '../../hooks/useSlideStageHost'
+import ApproachReveal from './components/approach/ApproachReveal'
+import TitleWordmark from './components/TitleWordmark'
+import { approachPhotos } from './content/approachPhotos'
+import { subtitle } from './content/titleCopy'
+import { ApproachRevealContext } from './hooks/useApproachReveal'
+import type { ApproachSide } from './types'
 
 export function TitleSlideBody() {
-  const wordmark = useRef<HTMLSpanElement>(null)
-  const reducedMotion = useMediaQuery(reducedMotionQuery)
-  const config = useMemo<RoughAnnotationConfig>(
-    () => ({
-      type: 'bracket',
-      brackets: ['left', 'right'],
-      color: 'currentColor',
-      strokeWidth: 1.5,
-      padding: [8, 12],
-      animationDuration: 450,
-      hideDuration: 200,
-      animate: !reducedMotion,
-    }),
-    [reducedMotion],
-  )
-  const { show, hide } = useRoughAnnotation(wordmark, config)
+  const host = useSlideStageHost()
+  const reveal = usePhotoReveal<ApproachSide>()
+
   return (
-    <div className="slide-title rise-in">
-      <h1
-        className="slide-title-heading"
-        tabIndex={-1}
-        onPointerEnter={show}
-        onPointerLeave={hide}
-        onFocus={(e) => {
-          if (e.currentTarget.matches(':focus-visible')) show()
-        }}
-        onBlur={hide}
-      >
-        <span ref={wordmark}>
-          <DodLogo />
-        </span>
-      </h1>
-      <p className="slide-title-subtitle">A participatory workshop for dialogue, reflection, and action against workplace caste discrimination, where communities rehearse responses and author their own manifestos of inclusion.</p>
-      <p className="slide-title-attribution">
-        After Augusto Boal&apos;s Theatre of the Oppressed — the audience steps in as <em>spect-actors</em>.
-      </p>
-    </div>
+    <ApproachRevealContext value={reveal}>
+      <div className="rise-in grid justify-items-center gap-row">
+        <InstantPhotoLayer host={host} photo={reveal.active && approachPhotos[reveal.active]} controls={reveal} />
+        <TitleWordmark />
+        <p className="max-w-[48ch] text-[1.25rem]">{subtitle}</p>
+        <ApproachReveal />
+      </div>
+    </ApproachRevealContext>
   )
 }

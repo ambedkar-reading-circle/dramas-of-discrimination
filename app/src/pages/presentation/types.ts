@@ -15,4 +15,9 @@ export type Slide = Readonly<{
   layout?: 'default' | 'split' | 'grid' | 'centered'
   /** The body renders its own heading. The stage adds no h2, and the running head shows the count only. */
   ownsHeading?: boolean
+  /**
+   * Speaker notes: what to say over this slide, as points read in order. A
+   * visitor without a presenter reads the same points.
+   */
+  speakerNotes?: ReadonlyArray<string>
 }>

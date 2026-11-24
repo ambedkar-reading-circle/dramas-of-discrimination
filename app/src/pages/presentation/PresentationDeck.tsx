@@ -4,6 +4,7 @@ import MarkButton, { Mark } from '#/components/MarkButton'
 import { usePresentationDeck } from './hooks/usePresentationDeck'
 import SlideIndex, { SlideOverviewControl } from './components/SlideIndex'
 import SlideNav from './components/SlideNav'
+import SpeakerNotes, { SpeakerNotesControl } from './components/SpeakerNotes'
 import SlideStage from './components/SlideStage'
 import type { SlideStageHandle } from './components/SlideStage'
 import './PresentationDeck.css'
@@ -12,6 +13,7 @@ export default function PresentationDeck() {
   const { slide, total, goTo, next, prev, onDeckKeyDown, stageSwipeHandlers } = usePresentationDeck()
   const current = slides[slide - 1]
   const [overviewOpen, setOverviewOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const deck = useRef<HTMLElement>(null)
   const stage = useRef<SlideStageHandle>(null)
@@ -50,13 +52,14 @@ export default function PresentationDeck() {
   return (
     <section ref={deck} className="presentation-deck page-wrap" onKeyDown={onDeckKeyDown} {...stageSwipeHandlers}>
       <header className="presentation-meta">
-        <p className="eyebrow">
+        <p className="eyebrow" title={current.ownsHeading ? undefined : current.kicker}>
           <span>
             {String(slide).padStart(2, '0')} / {String(total).padStart(2, '0')}
           </span>
           {current.ownsHeading ? null : <> {current.kicker}</>}
         </p>
         <div className="presentation-tools">
+          <SpeakerNotesControl open={notesOpen} onOpen={() => setNotesOpen(true)} />
           <SlideOverviewControl open={overviewOpen} onOpen={() => setOverviewOpen(true)} />
           <MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />
         </div>
@@ -67,6 +70,8 @@ export default function PresentationDeck() {
       <SlideNav slides={slides} slide={slide} total={total} next={next} prev={prev} onSelect={goTo} onOpenOverview={() => setOverviewOpen(true)} />
 
       <SlideIndex slides={slides} current={slide} open={overviewOpen} onOpenChange={setOverviewOpen} onSelect={selectSlide} onFocusStage={focusStage} />
+
+      <SpeakerNotes slide={current} open={notesOpen} onOpenChange={setNotesOpen} />
 
       <p className="slide-sr" aria-live="polite">
         Slide {slide} of {total}: {current.heading}

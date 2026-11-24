@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { PointerEvent, ReactNode } from 'react'
+import type { PointerEvent, ReactNode, Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { TargetAndTransition, Transition } from 'motion/react'
 import { useMediaQuery } from '#/lib/use-media-query'
@@ -8,7 +8,12 @@ const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
 const ofClasses = 'font-of text-[2.15em] font-normal leading-0 tracking-[0]'
 
-const lineClasses = 'block relative top-[calc(0.5lh_-_var(--notebook-row)_+_var(--notebook-baseline)_-_var(--notebook-font-mono))]'
+const lineClasses = 'block'
+
+// Shifts the whole wordmark onto the notebook baseline. Applied to the outer
+// span (not each line) so the element's own bounding rect matches the painted
+// text — annotations measure that rect.
+const heroShift = 'relative top-[calc(0.5lh_-_var(--notebook-row)_+_var(--notebook-baseline)_-_var(--notebook-font-mono))]'
 
 const titleWords = ['Discrimination', 'Diversity', 'Inclusivity', 'Fraternity', 'Belonging'] as const
 const linkWords = ['of', 'for'] as const
@@ -104,7 +109,7 @@ function useTitleCycle() {
   return { word: titleWords[wordIndex], showsAlternate: wordIndex !== 0, cycling, startCycling, stopCycling }
 }
 
-export default function DodLogo({ variant = 'hero' }: { variant?: 'hero' | 'inline' }) {
+export default function DodLogo({ variant = 'hero', ref }: { variant?: 'hero' | 'inline'; ref?: Ref<HTMLSpanElement> }) {
   const { word, showsAlternate, cycling, startCycling, stopCycling } = useTitleCycle()
 
   const inkClasses = `transition-[filter] duration-200 ease-out ${cycling ? '[filter:drop-shadow(0_0_max(0.02em,0.5px)_currentColor)_drop-shadow(0_0_max(0.12em,4px)_color-mix(in_srgb,currentColor_40%,transparent))]' : ''}`
@@ -119,7 +124,7 @@ export default function DodLogo({ variant = 'hero' }: { variant?: 'hero' | 'inli
   }
 
   return (
-    <span className={`block w-fit text-start font-logo font-normal text-[min(10cqi,8rem,var(--dod-logo-max,8rem))] tracking-[-0.055em] leading-[round(up,1.3em,var(--notebook-row))] ${inkClasses}`} onPointerEnter={startCycling} onPointerLeave={stopCycling}>
+    <span ref={ref} className={`block w-fit ${heroShift} text-start font-logo font-normal text-[min(10cqi,8rem,var(--dod-logo-max,8rem))] tracking-[-0.055em] leading-[round(up,1.3em,var(--notebook-row))] ${inkClasses}`} onPointerEnter={startCycling} onPointerLeave={stopCycling}>
       <span className={`dod-logo-first ${lineClasses}`}>
         <span className="printed-ink">Dramas</span>
         <span className="sr-only"> of Discrimination</span> <LinkWord cycling={cycling} showsAlternate={showsAlternate} />
