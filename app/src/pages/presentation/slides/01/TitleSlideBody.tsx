@@ -39,7 +39,7 @@ export function TitleSlideBody() {
           <DodLogo />
         </span>
       </h1>
-      <p className="slide-title-subtitle">A workshop and web application for communities to rehearse ethical responses to workplace caste discrimination and author their own manifestos of inclusion.</p>
+      <p className="slide-title-subtitle">A participatory workshop for dialogue, reflection, and action against workplace caste discrimination, where communities rehearse responses and author their own manifestos of inclusion.</p>
       <p className="slide-title-attribution">
         After Augusto Boal&apos;s Theatre of the Oppressed — the audience steps in as <em>spect-actors</em>.
       </p>

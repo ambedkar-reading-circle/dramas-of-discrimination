@@ -22,7 +22,7 @@ export default function HomeHero() {
           <DodLogo />
         </h1>
         <div className="flex items-start justify-between gap-gutter max-lg:grid max-lg:gap-row">
-          <p className="hero-thesis max-w-[48ch] text-[1.25rem] max-md:text-[1.125rem]">A workshop and web application for communities to rehearse ethical responses to workplace caste discrimination and author their own manifestos of inclusion.</p>
+          <p className="hero-thesis max-w-[48ch] text-[1.25rem] max-md:text-[1.125rem]">A participatory workshop for dialogue, reflection, and action against workplace caste discrimination, where communities rehearse responses and author their own manifestos of inclusion.</p>
           <div className="hero-actions flex max-w-full min-w-0 flex-none flex-wrap gap-row max-sm:grid max-sm:w-full max-sm:justify-items-stretch">
             <ActionButton href="#workshop-method" variant="primary" icon="↓">
               Explore the acts
