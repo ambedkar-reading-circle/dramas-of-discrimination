@@ -1,20 +1,14 @@
-import { createPortal } from 'react-dom'
-import { AnimatePresence } from 'motion/react'
+import { RevealLayer } from '#/components/Reveal'
+import type { RevealControls } from '#/components/Reveal'
 import InstantPhoto from './InstantPhoto'
-import type { InstantPhotoData, PhotoControls } from './types'
+import type { InstantPhotoData } from './types'
 
 interface InstantPhotoLayerProps {
   host: HTMLElement | null
   photo: InstantPhotoData | null
-  controls: PhotoControls
+  controls: RevealControls
 }
 
 export default function InstantPhotoLayer({ host, photo, controls }: InstantPhotoLayerProps) {
-  if (!host) return null
-  return createPortal(
-    <div className="instant-photo-layer">
-      <AnimatePresence>{photo && <InstantPhoto key={photo.src} {...photo} controls={controls} />}</AnimatePresence>
-    </div>,
-    host,
-  )
+  return <RevealLayer host={host}>{photo && <InstantPhoto key={photo.src} {...photo} controls={controls} />}</RevealLayer>
 }

@@ -1,12 +1,13 @@
 import type { KeyboardEvent } from 'react'
-import type { PhotoReveal } from './types'
+import { revealTrigger } from './revealAttributes'
+import type { Reveal } from './types'
 
-export function usePhotoTrigger<TKey>(reveal: PhotoReveal<TKey>, key: TKey) {
+export function useRevealTrigger<TKey>(reveal: Reveal<TKey>, key: TKey) {
   return {
+    ...revealTrigger,
     role: 'button',
     tabIndex: 0,
     'aria-pressed': reveal.isOpen(key),
-    'data-photo-trigger': '',
     onClick: () => reveal.toggle(key),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key !== 'Enter' && event.key !== ' ') return

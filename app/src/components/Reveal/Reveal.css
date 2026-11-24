@@ -1,0 +1,12 @@
+@layer components {
+  .reveal-layer {
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-slide-overlay);
+    container-type: size;
+    display: grid;
+    place-items: center;
+    overflow: clip;
+    pointer-events: none;
+  }
+}

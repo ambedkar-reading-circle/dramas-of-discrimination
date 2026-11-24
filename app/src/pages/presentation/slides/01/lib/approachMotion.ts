@@ -1,4 +1,5 @@
 import type { Variants } from 'motion/react'
+import { cardSpring as spring } from '#/lib/card-motion'
 import type { ApproachSide } from '../types'
 
 const entry: Record<ApproachSide, { x: number; y: number; tilt: number }> = {
@@ -6,8 +7,6 @@ const entry: Record<ApproachSide, { x: number; y: number; tilt: number }> = {
   forum: { x: 32, y: 0, tilt: 1.5 },
   result: { x: 0, y: 20, tilt: 0 },
 }
-
-const spring = { type: 'spring', stiffness: 260, damping: 24 } as const
 
 export function diagramVariants(reduce: boolean): Variants {
   return {
@@ -47,13 +46,6 @@ export function cellVariants(reduce: boolean): Variants {
 export const connectorVariants: Variants = {
   closed: { opacity: 0, scale: 0.6 },
   open: { opacity: 1, scale: 1, transition: spring },
-}
-
-const cellHover = { y: -3, rotate: 0, transition: spring }
-
-/** Lifts a card on hover and keyboard focus; still under reduced motion. */
-export function hoverLift(reduce: boolean) {
-  return reduce ? {} : { whileHover: cellHover, whileFocus: cellHover }
 }
 
 export function triggerAnimation(open: boolean) {

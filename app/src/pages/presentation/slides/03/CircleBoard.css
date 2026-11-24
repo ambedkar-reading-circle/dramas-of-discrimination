@@ -1,0 +1,83 @@
+@layer components {
+  .circle-board {
+    --card-gap: calc(var(--notebook-gutter) / 2);
+    display: grid;
+    justify-items: center;
+    gap: calc(var(--notebook-row) * 1.5);
+    width: 100%;
+    max-width: 64rem;
+    margin-inline: auto;
+  }
+
+  .circle-group {
+    display: grid;
+    justify-items: center;
+    gap: calc(var(--notebook-row) * 0.75);
+    width: 100%;
+  }
+
+  .circle-group-label {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .circle-values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--card-gap);
+    width: calc((100% - 4 * var(--card-gap)) * 3 / 5 + 2 * var(--card-gap));
+  }
+
+  .circle-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--notebook-row) var(--card-gap);
+    width: 100%;
+  }
+
+  .circle-card {
+    display: grid;
+    align-content: center;
+    gap: 0.15rem;
+    min-height: calc(2.5 * var(--notebook-row));
+    padding: calc(0.5 * var(--notebook-row)) 0.75rem
+      calc(0.4 * var(--notebook-row));
+    text-align: center;
+    background: var(--surface-warm);
+    color: var(--sea-ink);
+  }
+
+  .circle-card-name {
+    font-size: 1.0625rem;
+  }
+
+  .circle-card-handle {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.75rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .circle-phone-layer {
+    perspective: 1400px;
+  }
+
+  .circle-phone {
+    --tablet-frame-screen-height: min(88cqh, 36rem);
+    grid-area: 1 / 1;
+    pointer-events: auto;
+    transform-style: preserve-3d;
+  }
+
+  @media (max-width: 700px) {
+    .circle-values {
+      width: 100%;
+    }
+
+    .circle-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

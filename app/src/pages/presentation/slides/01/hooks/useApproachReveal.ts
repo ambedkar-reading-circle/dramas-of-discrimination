@@ -1,12 +1,11 @@
 import { createContext, use } from 'react'
-import type { PhotoReveal } from '#/components/InstantPhoto'
+import type { Reveal } from '#/components/Reveal'
 import type { ApproachSide } from '../types'
 
-/** The photo reveal shared by the slide's photo layer and every approach cell. */
 export const ApproachRevealContext =
-  createContext<PhotoReveal<ApproachSide> | null>(null)
+  createContext<Reveal<ApproachSide> | null>(null)
 
-export function useApproachReveal(): PhotoReveal<ApproachSide> {
+export function useApproachReveal(): Reveal<ApproachSide> {
   const reveal = use(ApproachRevealContext)
   if (!reveal)
     throw new Error(

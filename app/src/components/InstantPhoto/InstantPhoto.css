@@ -1,15 +1,4 @@
 @layer components {
-  .instant-photo-layer {
-    position: absolute;
-    inset: 0;
-    z-index: var(--layer-slide-overlay);
-    container-type: size;
-    display: grid;
-    place-items: center;
-    overflow: clip;
-    pointer-events: none;
-  }
-
   .instant-photo {
     --rim: clamp(0.4rem, 2cqmin, 0.9rem);
     --lip: clamp(1.5rem, 5cqmin, 2.25rem);

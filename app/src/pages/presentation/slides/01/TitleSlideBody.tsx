@@ -1,4 +1,5 @@
-import { InstantPhotoLayer, usePhotoReveal } from '#/components/InstantPhoto'
+import { InstantPhotoLayer } from '#/components/InstantPhoto'
+import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
 import ApproachReveal from './components/approach/ApproachReveal'
 import TitleWordmark from './components/TitleWordmark'
@@ -9,7 +10,7 @@ import type { ApproachSide } from './types'
 
 export function TitleSlideBody() {
   const host = useSlideStageHost()
-  const reveal = usePhotoReveal<ApproachSide>()
+  const reveal = useReveal<ApproachSide>()
 
   return (
     <ApproachRevealContext value={reveal}>

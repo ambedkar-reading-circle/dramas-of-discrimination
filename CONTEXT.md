@@ -18,6 +18,10 @@ _Avoid_: online mode, synced mode, hosted mode
 The unit of collaboration — one set of ~4–5 people working through one Scenario and its two tables.
 _Avoid_: team, circle
 
+**Reading circle**:
+A real-world anti-caste collective that meets in public to read together, such as the Ambedkar Reading Circle in Bangalore; it hosts Workshops but is not a Group.
+_Avoid_: group, club
+
 **Member**:
 An individual person in Cloud mode, authenticated as themselves on their own device and belonging to a Group; the unit of presence, editing identity, and consensus attribution.
 _Avoid_: user, account, participant

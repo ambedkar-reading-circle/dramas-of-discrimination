@@ -1,8 +1,9 @@
 import type { Ref } from 'react'
 import { motion } from 'motion/react'
+import { hoverLift } from '#/lib/card-motion'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { approachTrigger } from '../../content/approachCopy'
-import { hoverLift, triggerAnimation } from '../../lib/approachMotion'
+import { triggerAnimation } from '../../lib/approachMotion'
 
 interface ApproachTriggerProps {
   controlsId: string

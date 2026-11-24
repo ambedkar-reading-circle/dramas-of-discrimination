@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { PhotoReveal } from './types'
+import { insideReveal } from './revealAttributes'
+import type { Reveal } from './types'
 
-/** A press on the photo or on a trigger is not an outside press; each handles its own. */
-const insideReveal = '.instant-photo, [data-photo-trigger]'
-
-export function usePhotoReveal<TKey>(): PhotoReveal<TKey> {
+export function useReveal<TKey>(): Reveal<TKey> {
   const [active, setActive] = useState<TKey | null>(null)
 
   const open = useCallback((key: TKey) => setActive(key), [])
@@ -15,18 +13,17 @@ export function usePhotoReveal<TKey>(): PhotoReveal<TKey> {
     [],
   )
 
-  // While a photo shows, Escape or a press anywhere else puts it back.
   const showing = active !== null
   useEffect(() => {
     if (!showing) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
-      // Captured ahead of the diagram's own Escape, which would fold it away.
       event.stopPropagation()
       setActive(null)
     }
     const onPointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Element && event.target.closest(insideReveal)) return
+      if (event.target instanceof Element && event.target.closest(insideReveal))
+        return
       setActive(null)
     }
     window.addEventListener('keydown', onKeyDown, true)

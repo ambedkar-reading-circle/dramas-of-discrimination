@@ -157,7 +157,7 @@
   }
 
   .slide-frame:has(.slide--centered) {
-    align-self: center;
+    align-self: safe center;
   }
 
   .slide-frame--scaled,
@@ -1057,9 +1057,8 @@
   width: min(100cqw, calc((100cqh - 2.5rem) * 16 / 9));
 }
 
-/* The frame's 200px floor would push a tablet on a short stage past 16:9. */
-.presentation-video .tablet-video-screen,
-.presentation-video .tablet-video-screen iframe {
+.presentation-video .tablet-frame-screen,
+.presentation-video .tablet-frame-screen iframe {
   min-height: 0;
 }
 
