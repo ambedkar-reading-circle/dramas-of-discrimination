@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { Slide } from '../types'
 import MarkButton, { Mark } from '#/components/MarkButton'
+import { twoDigit } from '#/lib/format'
 
 interface SlideIndexProps {
   slides: ReadonlyArray<Slide>
@@ -87,7 +88,7 @@ export default function SlideIndex({ slides, current, open, onOpenChange, onSele
                   onClick={() => choose(index + 1)}
                 >
                   <span className="slide-overview-number" aria-hidden="true">
-                    {String(index + 1).padStart(2, '0')}
+                    {twoDigit(index + 1)}
                   </span>
                   <span>{slide.heading}</span>
                 </button>

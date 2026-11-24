@@ -1,21 +1,31 @@
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
 
+/** The section the deck must fit in one viewport, and its padded content. */
+export interface DeckFitTarget {
+  surface: RefObject<HTMLElement | null>
+  content: RefObject<HTMLElement | null>
+}
+
 /**
  * Measures how tall the deck may be for the whole section to fit one viewport:
  * the window height minus the section padding and every non-deck row (lede,
- * index, hint). Returned for the fan's scale.
+ * index, hint). Returned for the fan's scale. Without a section to fit, the
+ * deck keeps its natural size.
  */
 export function useDeckFit(
-  surface: RefObject<HTMLElement | null>,
+  fitTo: DeckFitTarget | undefined,
   deck: RefObject<HTMLDivElement | null>,
 ) {
   const [available, setAvailable] = useState<number | null>(null)
+  // The refs are stable even when the object carrying them is not.
+  const surface = fitTo?.surface
+  const content = fitTo?.content
 
   useEffect(() => {
-    const section = surface.current
+    const section = surface?.current
+    const wrap = content?.current
     const deckElement = deck.current
-    const wrap = section?.querySelector<HTMLElement>('.workshop-method')
     if (!section || !deckElement || !wrap) return
     let frame = 0
     const measure = () => {
@@ -42,7 +52,7 @@ export function useDeckFit(
       observer.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [surface, deck])
+  }, [surface, content, deck])
 
   return available
 }

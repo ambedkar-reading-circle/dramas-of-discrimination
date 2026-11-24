@@ -1,0 +1,320 @@
+/*
+ * What lies on and over an open facilitation sheet: taped stickers, and the
+ * manual pages or photographic prints they lay over it. The tokens live on
+ * .method-collection beside the sheet's paper and ink.
+ */
+.method-collection {
+  --activity-card: #fffdf6;
+  --activity-shadow-ink: #131857;
+  --activity-line: color-mix(in srgb, var(--activity-ink) 17%, transparent);
+  --activity-tape: color-mix(in srgb, var(--activity-ink) 12%, transparent);
+  --activity-tape-edge: color-mix(in srgb, var(--activity-ink) 8%, transparent);
+  --activity-lift:
+    0 1px 2px color-mix(in srgb, var(--activity-shadow-ink) 10%, transparent),
+    0 8px 18px -10px
+      color-mix(in srgb, var(--activity-shadow-ink) 25%, transparent);
+  --activity-lift-raised:
+    0 1px 2px color-mix(in srgb, var(--activity-shadow-ink) 10%, transparent),
+    0 14px 28px -12px
+      color-mix(in srgb, var(--activity-shadow-ink) 35%, transparent);
+}
+
+/* A slip of paper taped to the sheet. Each one sets its own lean. */
+.method-taped {
+  --tape-width: 44px;
+  position: relative;
+  border: 1px solid var(--activity-line);
+  border-radius: 2px;
+  background: var(--activity-card);
+  color: var(--activity-ink);
+  box-shadow: var(--activity-lift);
+  rotate: var(--sticker-tilt, 2deg);
+  transition:
+    rotate 200ms ease,
+    translate 200ms ease,
+    box-shadow 200ms ease;
+}
+.method-taped::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: var(--tape-width);
+  height: 16px;
+  translate: -50% 0;
+  rotate: var(--tape-tilt, -4deg);
+  background: var(--activity-tape);
+  box-shadow: inset 0 0 0 1px var(--activity-tape-edge);
+}
+.method-taped:hover,
+.method-taped[aria-expanded='true'] {
+  rotate: 0deg;
+  translate: 0 -2px;
+  box-shadow: var(--activity-lift-raised);
+}
+.method-taped:focus-visible {
+  outline: 2px solid var(--activity-ink);
+  outline-offset: 3px;
+}
+
+/* The manual's pages, taped by the sheet's header. */
+.method-manual-stickers {
+  position: absolute;
+  top: calc(var(--method-dialog-pad) + 56px);
+  right: var(--method-dialog-pad);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.method-manual-sticker {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 12px 16px 10px;
+  cursor: pointer;
+}
+.method-manual-sticker-label {
+  font: 11px/1.2 var(--font-logo);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.method-manual-sticker-range {
+  font: 10px/1.2 var(--font-logo);
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+/* The worksheet, blank and filled, taped under the drawing. */
+.method-worksheets {
+  margin-top: 22px;
+}
+.method-worksheet-stickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+/* A step with photographs is a sticker itself: tap the step to lay its prints over the sheet. */
+.method-instructions li.method-instructions-sticker {
+  display: block;
+  margin-block: 6px 2px;
+}
+.method-step-sticker {
+  --tape-width: 52px;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px 12px 12px;
+  text-align: start;
+  rotate: var(--sticker-tilt, 1deg);
+  cursor: zoom-in;
+}
+.method-step-sticker > span:first-child {
+  font: 10px/1.6 var(--font-logo);
+  padding-top: 4px;
+  opacity: 0.7;
+}
+.method-step-sticker > span:last-child {
+  font: 17px/1.5 var(--font-body);
+}
+
+/* The backdrop both overlays share: tap anywhere to put them away. */
+.method-manual {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: var(--method-dialog-inset);
+  background: color-mix(in srgb, var(--activity-shadow-ink) 8%, transparent);
+  cursor: zoom-out;
+  overflow: hidden;
+}
+
+/* Manual pages, side by side as a spread, with torn inner edges. */
+.method-manual-spread {
+  --page-scale: 0.76;
+  --page-gap: 1px;
+  --page-aspect: 0.705;
+  --page-fit-width: calc(
+    (
+        100vw - 2 * var(--method-dialog-inset) - (var(--page-count) - 1) *
+          var(--page-gap)
+      ) /
+      var(--page-count)
+  );
+  --page-height: calc(
+    var(--page-scale) *
+      min(
+        calc(100dvh - 2 * var(--method-dialog-inset) - 32px),
+        calc(var(--page-fit-width) / var(--page-aspect))
+      )
+  );
+  display: flex;
+  gap: var(--page-gap);
+  max-width: 100%;
+  padding-bottom: 24px;
+  overflow: visible;
+  outline: none;
+}
+.method-manual-page {
+  position: relative;
+  flex: none;
+  margin: 0;
+  filter: drop-shadow(
+      0 1px 2px color-mix(in srgb, var(--activity-shadow-ink) 20%, transparent)
+    )
+    drop-shadow(
+      0 16px 22px
+        color-mix(in srgb, var(--activity-shadow-ink) 25%, transparent)
+    );
+}
+.method-manual-page img {
+  --tear-width: 6px;
+  display: block;
+  height: var(--page-height);
+  width: auto;
+  mask-image: linear-gradient(#000, #000), url('/paper-tear-right.svg');
+  mask-size:
+    calc(100% - var(--tear-width) + 1px) 100%,
+    var(--tear-width) 768px;
+  mask-position:
+    left top,
+    right top;
+  mask-repeat: no-repeat, repeat-y;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.method-manual-page:nth-child(even) img {
+  mask-image: linear-gradient(#000, #000), url('/paper-tear-left.svg');
+  mask-position:
+    right top,
+    left top;
+}
+.method-manual-page figcaption {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  translate: -50% 0;
+  font: 10px/1 var(--font-logo);
+  letter-spacing: 0.08em;
+  color: var(--activity-ink);
+}
+
+/* Photographs as bordered prints, each in an even share of the screen. */
+.method-step-photo-spread {
+  --print-gap: clamp(16px, 3vmin, 36px);
+  --print-scale: 0.86;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--print-gap);
+  max-width: 100%;
+  outline: none;
+}
+.method-step-photo-print {
+  flex: none;
+  width: min-content;
+  margin: 0;
+  padding: clamp(8px, 1.4vmin, 14px);
+  background: var(--activity-card);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--activity-shadow-ink) 20%, transparent),
+    0 18px 36px -12px
+      color-mix(in srgb, var(--activity-shadow-ink) 40%, transparent);
+}
+/* Each print keeps its own shape, inside an even share of the screen. */
+.method-step-photo-print img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(
+    var(--print-scale) *
+      (
+        100vw - 2 * var(--method-dialog-inset) - (var(--print-count) - 1) *
+          var(--print-gap) - 32px * var(--print-count)
+      ) /
+      var(--print-count)
+  );
+  max-height: calc(
+    var(--print-scale) * (100dvh - 2 * var(--method-dialog-inset) - 150px)
+  );
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.method-step-photo-print figcaption {
+  margin-top: clamp(8px, 1.4vmin, 14px);
+  font: 16px/1.4 var(--font-body);
+  color: var(--activity-ink);
+}
+.method-step-photo-print figcaption span {
+  margin-right: 0.6em;
+  font: 10px/1 var(--font-logo);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+/* Phones held upright: one page or print at a time, swiped sideways. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .method-manual {
+    background: color-mix(in srgb, var(--activity-shadow-ink) 28%, transparent);
+  }
+  .method-manual-spread {
+    --page-scale: 0.88;
+    --page-fit-width: calc(100vw - 2 * var(--method-dialog-inset) - 8px);
+    padding-inline: calc((1 - var(--page-scale)) * 50%);
+    overflow: auto hidden;
+    padding-block: 12px 28px;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-snap-type: x mandatory;
+  }
+  .method-manual-page {
+    scroll-snap-align: center;
+  }
+  .method-manual-page figcaption {
+    color: var(--activity-paper);
+  }
+  .method-step-photo-spread {
+    --print-scale: 1;
+    justify-content: flex-start;
+    overflow: auto hidden;
+    padding: 12px 8px 20px;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-snap-type: x mandatory;
+  }
+  .method-step-photo-print {
+    scroll-snap-align: center;
+  }
+  .method-step-photo-print img {
+    max-width: calc(100vw - 2 * var(--method-dialog-inset) - 48px);
+    max-height: 60dvh;
+  }
+  .method-step-photo-print figcaption {
+    max-width: calc(100vw - 2 * var(--method-dialog-inset) - 48px);
+  }
+}
+@media (max-width: 640px) {
+  .method-manual-stickers {
+    position: relative;
+    top: auto;
+    right: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-shrink: 0;
+    justify-self: start;
+    align-self: flex-start;
+    margin-top: 16px;
+  }
+  .method-manual-sticker {
+    padding: 10px 12px 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .method-taped {
+    transition: none;
+  }
+}

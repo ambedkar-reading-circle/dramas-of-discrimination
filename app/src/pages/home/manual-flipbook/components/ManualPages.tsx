@@ -5,6 +5,7 @@ import { ManualPageState, useManualPageActive } from '../context/ManualPageState
 import { AnnotatedParagraph } from './AnnotatedPhrase'
 import { ManualAsciiCanvas } from './ManualAsciiCanvas'
 import '../ManualFlipbook.css'
+import { twoDigit } from '#/lib/format'
 
 // The letter is re-typeset as short reading pages between the two covers.
 export function ManualPage({ index }: { index: number }) {
@@ -89,7 +90,7 @@ function ManualFolio({ index }: { index: number }) {
     <div className="manual-letter-folio" aria-hidden="true">
       <span>{index % 2 === 1 ? manual.title : 'Ambedkar Reading Circle'}</span>
       <span className="manual-page-number">
-        {String(index).padStart(2, '0')} / {String(manualPages.length).padStart(2, '0')}
+        {twoDigit(index)} / {twoDigit(manualPages.length)}
       </span>
     </div>
   )

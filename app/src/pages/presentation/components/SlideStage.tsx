@@ -122,7 +122,7 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
                   {slide.heading}
                 </h2>
               )}
-              <div className="slide-body">{slide.body}</div>
+              {slide.body != null && <div className="slide-body">{slide.body}</div>}
               {slide.interactive && <div className="slide-interactive">{slide.interactive}</div>}
               {slide.assets?.map((asset) => (
                 <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />

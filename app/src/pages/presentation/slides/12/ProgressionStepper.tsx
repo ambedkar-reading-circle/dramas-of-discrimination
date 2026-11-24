@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { twoDigit } from '#/lib/format'
 
 export function ProgressionStepper() {
   const stages = [
@@ -15,7 +16,7 @@ export function ProgressionStepper() {
           <li className={`slide-step ${index === stage ? 'slide-step--current' : ''} ${index < stage ? 'slide-step--done' : ''}`} key={item.name}>
             <button className="slide-step-button" type="button" disabled={index > stage} aria-current={index === stage ? 'step' : undefined} onClick={() => setStage(index)}>
               <span className="step-number" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
+                {twoDigit(index + 1)}
               </span>
               <span className="notebook-text">{item.name}</span>
             </button>

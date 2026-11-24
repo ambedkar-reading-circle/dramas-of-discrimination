@@ -3,7 +3,9 @@ import type { Transition } from 'motion/react'
 import type { WorkshopActivity } from '../content/workshopActivities'
 import { ActivityDrawing } from '../content/activityDrawings'
 import { offsets, rotations } from '../content/deckChoreography'
+import type { DeckGeometry } from '../hooks/useDeckLayout'
 import { activityDialogId } from './ActivityDialog'
+import { twoDigit } from '#/lib/format'
 
 interface ActivitySheetProps {
   activity: WorkshopActivity
@@ -11,18 +13,16 @@ interface ActivitySheetProps {
   total: number
   /** This sheet is the one open in the dialog. */
   selected: boolean
-  small: boolean
-  /** Closed-fan scale that fits the deck to the viewport. */
-  fit: number
-  spread: number
-  cardWidth: number
+  /** The fan's layout: card size, spacing and fit-to-screen scale. */
+  geometry: DeckGeometry
   reduceMotion: boolean
   transition: Transition
   onTrigger: (index: number) => void
 }
 
 /** One card in the fanned deck. Opening it shows the full sheet in ActivityDialog. */
-export function ActivitySheet({ activity, index, total, selected, small, fit, spread, cardWidth, reduceMotion, transition, onTrigger }: ActivitySheetProps) {
+export function ActivitySheet({ activity, index, total, selected, geometry, reduceMotion, transition, onTrigger }: ActivitySheetProps) {
+  const { small, fit, spread, cardWidth } = geometry
   const lifted = { y: (offsets[index] - 25) * fit, rotate: 0 }
   return (
     <motion.li
@@ -40,7 +40,7 @@ export function ActivitySheet({ activity, index, total, selected, small, fit, sp
           activity
         </span>
         <span>
-          {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+          {twoDigit(index + 1)} / {twoDigit(total)}
         </span>
       </div>
       <h3>{activity.name}</h3>

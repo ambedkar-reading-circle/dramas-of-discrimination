@@ -1,6 +1,13 @@
 import { useEffect, useRef } from 'react'
+import '../ActivityOverlays.css'
+import { twoDigit } from '#/lib/format'
 import type { WorkshopActivity } from '../content/workshopActivities'
 import { ActivityDrawing } from '../content/activityDrawings'
+import { resolveOverlay } from '../content/sheetOverlay'
+import { useSheetOverlay } from '../hooks/useSheetOverlay'
+import { WorksheetStickers, ManualStickers } from './ActivityStickers'
+import { ActivityStepList } from './ActivityStepList'
+import { SheetOverlay } from './SheetOverlay'
 
 interface ActivityDialogProps {
   activities: WorkshopActivity[]
@@ -10,18 +17,24 @@ interface ActivityDialogProps {
 }
 
 export const activityDialogId = 'workshop-activity-dialog'
+const overlayId = 'workshop-activity-overlay'
 
 /**
  * The open facilitation sheet, as a modal over the viewport. `showModal()`
  * puts it in the top layer, so it escapes every host's transforms, clipping
  * and stacking (the home section, the /approach slide stage) and sits above
  * the site header. The page behind is inert, so the sheet carries its own
- * previous/next controls.
+ * previous/next controls. Its stickers lay manual pages or photographs over
+ * it; while they are out, Escape and the backdrop put them away first.
  */
 export function ActivityDialog({ activities, active, onSelect, onClose }: ActivityDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const open = active !== null
+  const activity = active === null ? null : activities[active]
+  const overlay = useSheetOverlay(active, overlayId)
+  const overlayContent = activity ? resolveOverlay(activity, overlay.shown) : null
+  const overlayOpen = overlayContent !== null
 
   useEffect(() => {
     const element = dialog.current
@@ -38,9 +51,7 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
     content.current?.scrollTo({ top: 0 })
   }, [active])
 
-  const activity = active === null ? null : activities[active]
   const total = activities.length
-  const pad = (n: number) => String(n).padStart(2, '0')
   const previous = active !== null && active > 0 ? active - 1 : null
   const next = active !== null && active < total - 1 ? active + 1 : null
 
@@ -52,15 +63,22 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
       aria-labelledby={activity ? 'method-dialog-title' : undefined}
       data-lenis-prevent=""
       onClose={onClose}
+      onCancel={(event) => {
+        if (!overlayOpen) return
+        event.preventDefault()
+        overlay.close()
+      }}
       onClick={(event) => {
         // The dialog box is the padded backdrop area around the sheet.
-        if (event.target === event.currentTarget) onClose()
+        if (event.target !== event.currentTarget) return
+        if (overlayOpen) overlay.close()
+        else onClose()
       }}
       // Keep keys here: the /approach deck turns slides on arrow keys.
       onKeyDown={(event) => event.stopPropagation()}
     >
       {activity && active !== null && (
-        <article className="method-dialog-sheet" key={active}>
+        <article className="method-dialog-sheet" key={active} inert={overlayOpen}>
           <button type="button" className="method-dialog-close" aria-label="Close sheet" onClick={onClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
               <path d="m5 5 14 14M19 5 5 19" />
@@ -74,7 +92,7 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
                 activity
               </span>
               <span>
-                {pad(active + 1)} / {pad(total)}
+                {twoDigit(active + 1)} / {twoDigit(total)}
               </span>
             </div>
             <h3 id="method-dialog-title">{activity.name}</h3>
@@ -84,19 +102,13 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
               {activity.duration} minutes
             </div>
           </header>
+          <ManualStickers activity={activity} triggerFor={overlay.triggerFor} />
           <div ref={content} className="method-sheet-content" role="region" aria-label={`${activity.name} activity details`} tabIndex={0}>
             <p className="method-sheet-summary">{activity.summary}</p>
             <div className="method-sheet-columns">
               <div>
-                <h4>IN THE ROOM</h4>
-                <ol className="method-instructions">
-                  {activity.steps.map((step, n) => (
-                    <li key={step}>
-                      <span aria-hidden="true">{pad(n + 1)}</span>
-                      <p>{step}</p>
-                    </li>
-                  ))}
-                </ol>
+                <h4>ACTIVITIES</h4>
+                <ActivityStepList steps={activity.steps} triggerFor={overlay.triggerFor} />
               </div>
               <aside className="method-facilitator">
                 <h4>A PROMPT TO BEGIN</h4>
@@ -105,11 +117,8 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
                 </span>
                 <p>{activity.prompt}</p>
                 <ActivityDrawing name={activity.name} />
+                <WorksheetStickers activity={activity} triggerFor={overlay.triggerFor} />
               </aside>
-            </div>
-            <div className="method-sheet-takeaway">
-              <span>TAKE FORWARD</span>
-              <p>{activity.takeaway}</p>
             </div>
           </div>
           <nav className="method-dialog-footer" aria-label="Other activities">
@@ -125,6 +134,7 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
           </nav>
         </article>
       )}
+      {activity && <SheetOverlay id={overlayId} content={overlayContent} onClose={overlay.close} />}
     </dialog>
   )
 }

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Slide } from '../types'
 import MarkButton, { Mark } from '#/components/MarkButton'
+import { twoDigit } from '#/lib/format'
+import SpeakerNoteTabs, { speakerNoteTabId } from './SpeakerNoteTabs'
 
 /** Shown until a slide has its own speaker notes written. */
 const PLACEHOLDER_NOTES: ReadonlyArray<string> = ['Speaker notes for this slide still to be written.', 'Each point is one thing the presenter says, in order.', 'A visitor without a presenter reads the same points.']
+const PLACEHOLDER_TAB_NOTES: ReadonlyArray<string> = ['Speaker notes for this part still to be written.', ...PLACEHOLDER_NOTES.slice(1)]
 
 interface SpeakerNotesProps {
   slide: Slide
@@ -21,16 +24,27 @@ export default function SpeakerNotes({ slide, open, onOpenChange }: SpeakerNotes
   const dialog = useRef<HTMLDialogElement>(null)
   // A programmatic close (effect cleanup) must not echo back as a state change.
   const ignoreClose = useRef(false)
-  const points = slide.speakerNotes?.length ? slide.speakerNotes : PLACEHOLDER_NOTES
-  // Ticked points per slide id. Kept while the deck is mounted, so moving
-  // between slides keeps each slide's progress.
+  // A slide without tabs is read as one untitled part, so the rest of the
+  // dialog handles both the same way.
+  const tabs = slide.speakerNoteTabs
+  const parts = tabs ?? [{ label: '', speakerNotes: slide.speakerNotes }]
+  // The open part per slide id, kept like the ticks below.
+  const [openTabs, setOpenTabs] = useState<Readonly<Record<string, number>>>({})
+  const tab = Math.min(openTabs[slide.id] ?? 0, parts.length - 1)
+  const selectTab = (index: number) => setOpenTabs((all) => ({ ...all, [slide.id]: index }))
+  const notes = parts[tab]?.speakerNotes
+  const placeholder = tabs ? PLACEHOLDER_TAB_NOTES : PLACEHOLDER_NOTES
+  const points = notes?.length ? notes : placeholder
+  // Ticked points per slide id and part. Kept while the deck is mounted, so
+  // moving between slides keeps each slide's progress.
   const [checked, setChecked] = useState<Readonly<Record<string, ReadonlyArray<number>>>>({})
-  const ticked = checked[slide.id] ?? []
+  const tickKey = `${slide.id}:${tab}`
+  const ticked = checked[tickKey] ?? []
   const toggle = (point: number) => {
     setChecked((all) => {
-      const current = all[slide.id] ?? []
+      const current = all[tickKey] ?? []
       const next = current.includes(point) ? current.filter((p) => p !== point) : [...current, point]
-      return { ...all, [slide.id]: next }
+      return { ...all, [tickKey]: next }
     })
   }
 
@@ -66,13 +80,18 @@ export default function SpeakerNotes({ slide, open, onOpenChange }: SpeakerNotes
       >
         <div className="speaker-notes-panel">
           <MarkButton label="Close speaker notes" className="speaker-notes-close" onClick={() => onOpenChange(false)} mark={<CloseNotesMark />} />
-          <ol className={slide.speakerNotes?.length ? 'speaker-notes-points' : 'speaker-notes-points is-placeholder'} id="speaker-notes">
+          {tabs && <SpeakerNoteTabs tabs={tabs} selected={tab} onSelect={selectTab} panelId="speaker-notes" />}
+          <ol
+            className={notes?.length ? 'speaker-notes-points' : 'speaker-notes-points is-placeholder'}
+            id="speaker-notes"
+            {...(tabs ? { role: 'tabpanel', 'aria-labelledby': speakerNoteTabId(tab) } : {})}
+          >
             {points.map((point, i) => (
               <li key={i}>
                 <label className="speaker-notes-point">
                   <input className="speaker-notes-check" type="checkbox" checked={ticked.includes(i)} onChange={() => toggle(i)} />
                   <span className="speaker-notes-number" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
+                    {twoDigit(i + 1)}
                   </span>
                   <span>{point}</span>
                 </label>

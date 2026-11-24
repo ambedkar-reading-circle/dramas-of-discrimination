@@ -8,11 +8,11 @@ import { snapBaselineToRule, useNotebookRuleAlign } from '#/lib/notebook-align'
  * rules; the offsets land in `--method-baseline-offset` per control.
  */
 export function useControlAlignment(
-  surface: RefObject<HTMLElement | null>,
+  surface: RefObject<HTMLElement | null> | undefined,
   deck: RefObject<HTMLDivElement | null>,
 ) {
   const alignText = useCallback(() => {
-    const element = surface.current
+    const element = surface?.current
     if (!element) return
     const origin = element.getBoundingClientRect().top
     const row = parseFloat(getComputedStyle(element).lineHeight)
@@ -38,7 +38,7 @@ export function useControlAlignment(
   }, [surface])
 
   const observeAlignment = useCallback(() => {
-    const element = surface.current
+    const element = surface?.current
     if (!element) return []
     // The section can keep its viewport minimum while the deck changes size.
     return [

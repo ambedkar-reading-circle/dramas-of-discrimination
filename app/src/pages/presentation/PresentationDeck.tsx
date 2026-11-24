@@ -8,6 +8,7 @@ import SpeakerNotes, { SpeakerNotesControl } from './components/SpeakerNotes'
 import SlideStage from './components/SlideStage'
 import type { SlideStageHandle } from './components/SlideStage'
 import './PresentationDeck.css'
+import { twoDigit } from '#/lib/format'
 
 export default function PresentationDeck() {
   const { slide, total, goTo, next, prev, onDeckKeyDown, stageSwipeHandlers } = usePresentationDeck()
@@ -54,7 +55,7 @@ export default function PresentationDeck() {
       <header className="presentation-meta">
         <p className="eyebrow" title={current.ownsHeading ? undefined : current.kicker}>
           <span>
-            {String(slide).padStart(2, '0')} / {String(total).padStart(2, '0')}
+            {twoDigit(slide)} / {twoDigit(total)}
           </span>
           {current.ownsHeading ? null : <> {current.kicker}</>}
         </p>

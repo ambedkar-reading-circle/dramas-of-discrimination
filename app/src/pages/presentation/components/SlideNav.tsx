@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { Slide } from '../types'
 import MarkButton, { MarkGlyph } from '#/components/MarkButton'
+import { twoDigit } from '#/lib/format'
 
 interface SlideNavProps {
   slides: ReadonlyArray<Slide>
@@ -123,7 +124,7 @@ export default function SlideNav({ slides, slide, total, next, prev, onSelect, o
                 aria-label={`Slide ${entry.number}: ${slides[entry.number - 1].heading}`}
                 onClick={() => onSelect(entry.number)}
               >
-                {String(entry.number).padStart(2, '0')}
+                {twoDigit(entry.number)}
               </button>
             ),
           )}
