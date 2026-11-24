@@ -3,6 +3,7 @@ import NotebookSurface from '#/components/NotebookSurface'
 import TeamHero from '#/pages/about-us/TeamHero'
 import TeamJoinNote from '#/pages/about-us/TeamJoinNote'
 import TeamRoster from '#/pages/about-us/TeamRoster'
+import TeamContributors from '#/pages/about-us/TeamContributors'
 
 export const Route = createFileRoute('/about-us')({
   head: () => ({
@@ -17,6 +18,7 @@ function AboutUs() {
     <NotebookSurface as="main" id="main-content" className="content-page [--notebook-section-space:calc(2*var(--notebook-row))]" tabIndex={-1}>
       <TeamHero />
       <TeamRoster />
+      <TeamContributors />
       <TeamJoinNote />
     </NotebookSurface>
   )

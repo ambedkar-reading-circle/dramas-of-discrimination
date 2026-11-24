@@ -25,7 +25,7 @@ const members: ReadonlyArray<TeamMember> = [
   },
   {
     id: 'pratham',
-    name: 'Pratham',
+    name: 'Pratham Swamy',
     photo: '/team/Pratham.png',
     intro:
       'Convenor at ARC; facilitates DoD workshops; MSc Applied Psychology student at MAHE, Bangalore.',
@@ -46,7 +46,7 @@ const members: ReadonlyArray<TeamMember> = [
   },
   {
     id: 'vignesh-shiva-subramaniam',
-    name: 'Vignesh Shiva Subramaniam',
+    name: 'Vignesh Shiva Subramaniam M',
     photo: '/team/Vignesh S.png',
     intro:
       'Co-founder and convenor at ARC; facilitates DoD workshops; National Coordinator at the Alliance of Indian Waste Pickers, working on waste governance and informal labour rights.',

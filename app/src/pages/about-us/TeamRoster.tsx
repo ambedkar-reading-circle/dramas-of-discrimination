@@ -14,6 +14,9 @@ function memberInitials(name: string) {
 export default function TeamRoster() {
   return (
     <section className="notebook-section page-wrap">
+      <div className="section-lede">
+        <p className="eyebrow">Team</p>
+      </div>
       <div className="grid grid-cols-3 gap-x-gutter gap-y-row items-start max-lg:grid-cols-1 max-lg:gap-row">
         {teamMembers.map((member) => (
           <article key={member.id} className="notebook-stack">
