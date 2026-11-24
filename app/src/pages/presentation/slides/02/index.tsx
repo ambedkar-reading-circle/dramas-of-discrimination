@@ -1,15 +1,20 @@
 import type { Slide } from '../../types'
+import { VideoEmbed } from './VideoEmbed'
 
 export const slide = {
   id: '02',
-  kicker: 'The collective',
-  heading: 'The Ambedkar Reading Circle',
+  kicker: 'The Workshop',
+  heading: 'Dramas of Discrimination',
+  // The tablet is the whole slide. The heading stays for screen readers and
+  // for the stage's focus-on-arrival, but is not drawn.
+  ownsHeading: true,
   body: (
     <>
-      <p className="section-lede-copy">An anti-caste collective in Bangalore. The Workshop first ran with circles gathered in Cubbon Park in 2023 — one group among the sibling circles that read, screen films, and argue together.</p>
-      <p className="text-ink-soft">A Community of roughly twenty to twenty-five people organises itself into four or five Groups; each Group takes one Scenario and works it through both tables.</p>
+      <h2 className="sr-only" tabIndex={-1}>
+        Dramas of Discrimination
+      </h2>
+      <VideoEmbed />
     </>
   ),
-  assets: [{ role: 'image', note: 'The circle in Cubbon Park' }],
-  layout: 'split',
+  layout: 'fill',
 } satisfies Slide

@@ -1,14 +1,10 @@
 import type { Slide } from '../../types'
-import { TablesPreview } from './TablesPreview'
+import { ManualEmbed } from './ManualEmbed'
 
 export const slide = {
   id: '08',
-  kicker: 'The Rehearsal',
-  heading: 'The two tables',
-  body: (
-    <>
-      <p className="section-lede-copy">One Scenario, staged twice. The Actor map lists each Actor, its Ideal behaviour, and its Failures; the Play script stages the Scenario as directed Dialogues, each tagged to the Failures it shows.</p>
-      <TablesPreview />
-    </>
-  ),
+  kicker: 'The Facilitator',
+  heading: 'The manual',
+  body: <p className="section-lede-copy">The printed manual the Facilitator carries: a letter of invitation, the acts, and the sheets groups fill in. Turn the pages live during the talk.</p>,
+  interactive: <ManualEmbed />,
 } satisfies Slide

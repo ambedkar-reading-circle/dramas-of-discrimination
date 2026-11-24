@@ -2,6 +2,7 @@ import { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, u
 import type { Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
+import { SlideDirectionContext } from '../hooks/useSlideDirection'
 import { SlideStageHostContext } from '../hooks/useSlideStageHost'
 import SlideAssetPlaceholder from './SlideAssetPlaceholder'
 import type { Slide } from '../types'
@@ -43,7 +44,7 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
   // Direction of travel for the slide transition, derived during render so the
   // entering variant sees the correct side on its first frame.
   const lastIndex = useRef(index)
-  const [direction, setDirection] = useState(1)
+  const [direction, setDirection] = useState<1 | -1>(1)
   if (index !== lastIndex.current) {
     setDirection(index > lastIndex.current ? 1 : -1)
     lastIndex.current = index
@@ -51,10 +52,17 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
 
   // Shrink a slide that is taller or wider than the stage. Scaling up would
   // leave the notebook's type size, so extra room stays empty.
+  // A fill slide sizes itself to the stage, and its entrance travels outside
+  // it on purpose, so it is never measured or scaled.
+  const fills = slide.layout === 'fill'
   useLayoutEffect(() => {
     const stageEl = stage.current
     const fitEl = fit.current
     if (!stageEl || !fitEl) return
+    if (fills) {
+      setScale(1)
+      return
+    }
 
     let frame = 0
     const measure = () => {
@@ -80,7 +88,7 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
       cancelAnimationFrame(frame)
       observer.disconnect()
     }
-  }, [index, slide.id])
+  }, [index, slide.id, fills])
 
   // Move focus to the new slide's heading so keyboard users are never stranded
   // inside the previous slide's embed; reset the stage scroll for each slide.
@@ -90,17 +98,22 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
     stage.current?.scrollTo({ top: 0, behavior: 'instant' })
   }, [focusHeading, index])
 
-  const variants = {
-    enter: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${6 * dir}%` }),
-    center: { opacity: 1, x: '0%' },
-    exit: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${-6 * dir}%` }),
-  }
+  // A fill slide's frame holds still: its content brings its own entrance
+  // and exit (the same variant names), and a frame fade would wash it out.
+  const variants = fills && !reducedMotion
+    ? { enter: { opacity: 1, x: '0%' }, center: { opacity: 1, x: '0%' }, exit: { opacity: 1, x: '0%', transition: { when: 'afterChildren' } } }
+    : {
+        enter: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${6 * dir}%` }),
+        center: { opacity: 1, x: '0%' },
+        exit: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${-6 * dir}%` }),
+      }
 
   const ownsHeading = slide.ownsHeading === true
 
   return (
     <div ref={stageRef} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
       <SlideStageHostContext value={host}>
+        <SlideDirectionContext value={direction}>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
             <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
@@ -117,6 +130,7 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
             </div>
           </motion.div>
         </AnimatePresence>
+        </SlideDirectionContext>
       </SlideStageHostContext>
     </div>
   )

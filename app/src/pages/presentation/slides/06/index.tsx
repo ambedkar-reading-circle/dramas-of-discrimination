@@ -1,33 +1,16 @@
-import { workshopActivities } from '#/pages/home/workshop-method'
 import type { Slide } from '../../types'
-import { MethodEmbed } from './MethodEmbed'
-
-/** The five act names, reused from the workshop-method data the embed renders. */
-const actDisplayNames: Record<string, string> = {
-  IntroTime: 'Intro Time',
-  PartTime: 'Part-Time A/B',
-  StoryTime: 'Story Time',
-  PlayTime: 'Playtime',
-  OverTime: 'Overtime',
-}
+import { FlipCard } from './FlipCard'
 
 export const slide = {
   id: '06',
-  kicker: 'The method',
-  heading: 'The Workshop in five acts',
-  body: (
-    <p className="slide-acts" aria-label={workshopActivities.map((activity) => actDisplayNames[activity.name] ?? activity.name).join(', then ')}>
-      {workshopActivities.map((activity, index) => (
-        <span key={activity.name}>
-          {index > 0 && (
-            <span className="slide-acts-arrow" aria-hidden="true">
-              {' → '}
-            </span>
-          )}
-          {actDisplayNames[activity.name] ?? activity.name}
-        </span>
-      ))}
-    </p>
+  kicker: 'Two capacities',
+  heading: 'What the Workshop measures',
+  body: <p className="section-lede-copy">Two capacities a Community carries out of the room. Turn each card over.</p>,
+  interactive: (
+    <div className="slide-flip-grid">
+      <FlipCard title="Articulation capacity" front="Can the Group say what happened, and to whom?" back="The Actor map and Play script sharpen a Group’s ability to articulate a Scenario — Actors, Ideal behaviours, Failures, and the Dialogues that show them." />
+      <FlipCard title="Intervention capacity" front="What does the Group dare to do when it steps in?" back="PlayTime’s repeated interventions grow a repertoire the Community carries out of the room — measured by what Members try next." />
+    </div>
   ),
-  interactive: <MethodEmbed />,
+  layout: 'grid',
 } satisfies Slide

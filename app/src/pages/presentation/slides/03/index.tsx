@@ -1,18 +1,15 @@
 import type { Slide } from '../../types'
-import { DetailCard } from './DetailCard'
 
 export const slide = {
   id: '03',
-  kicker: 'Beyond the workshop',
-  heading: 'What ARC does',
-  body: <p className="section-lede-copy">The circle keeps several doors open. Each reveals a line of detail — open them as you talk.</p>,
-  interactive: (
-    <div className="slide-card-grid">
-      <DetailCard title="Lectures & talks" detail="Speakers read caste, law, and history to a public room." />
-      <DetailCard title="Film screenings" detail="Screenings that put stories next to argument." />
-      <DetailCard title="Workshops" detail="Rehearsal rooms for responses to discrimination — this method among them." />
-      <DetailCard title="Panel discussions" detail="Panels that bring practitioners and audiences into one argument." />
-    </div>
+  kicker: 'The collective',
+  heading: 'The Ambedkar Reading Circle',
+  body: (
+    <>
+      <p className="section-lede-copy">An anti-caste collective in Bangalore. The Workshop first ran with circles gathered in Cubbon Park in 2023 — one group among the sibling circles that read, screen films, and argue together.</p>
+      <p className="text-ink-soft">A Community of roughly twenty to twenty-five people organises itself into four or five Groups; each Group takes one Scenario and works it through both tables.</p>
+    </>
   ),
-  layout: 'grid',
+  assets: [{ role: 'image', note: 'The circle in Cubbon Park' }],
+  layout: 'split',
 } satisfies Slide

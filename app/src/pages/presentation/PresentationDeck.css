@@ -688,7 +688,7 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Objective points (04) and quotes (11) */
+  /* Objective points (05) and quotes (12) */
   .slide-points ul,
   .slide-quotes {
     display: grid;
@@ -743,7 +743,7 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Flip cards (05) */
+  /* Flip cards (06) */
   .slide-flip-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
@@ -801,7 +801,7 @@
     cursor: pointer;
   }
 
-  /* Mode switcher (12) */
+  /* Mode switcher (13) */
   .slide-modes {
     display: grid;
     gap: var(--notebook-row);
@@ -841,7 +841,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Stepper (13) */
+  /* Stepper (14) */
   .slide-steps {
     display: grid;
     gap: var(--notebook-row);
@@ -898,7 +898,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Principles (14) */
+  /* Principles (15) */
   .slide-principles {
     display: grid;
     gap: var(--notebook-row);
@@ -920,7 +920,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Closing (15) */
+  /* Closing (16) */
   .slide-closing {
     display: grid;
     gap: var(--notebook-row);
@@ -937,7 +937,7 @@
     justify-self: center;
   }
 
-  /* Acts strip (06) */
+  /* Acts strip (07) */
   .slide-acts {
     font-family: var(--font-title);
     font-size: 1.125rem;
@@ -1013,7 +1013,7 @@
   gap: var(--notebook-row);
 }
 
-/* Worksheet previews (08) */
+/* Worksheet previews (09) */
 .presentation-tables {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1024,20 +1024,56 @@
   max-height: none;
 }
 
-/* Tablet video (10): the frame, without the home page's scroll choreography. */
+/* Tablet video (02): the tablet alone, as large as the stage allows. The
+   frame stretches to the stage's height so the body can measure both axes. */
+/* Raised, so the tablet crosses over the neighbouring slide as it travels
+   instead of under it. */
+.slide-frame:has(.slide--fill) {
+  z-index: 1;
+  align-self: stretch;
+}
+
+.slide--fill {
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.slide--fill > .slide-body {
+  container-type: size;
+  place-items: center;
+  align-content: center;
+}
+
 .presentation-video {
   display: grid;
-  gap: var(--notebook-row);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
 }
 
-.presentation-tablet-frame {
-  width: min(100%, 640px);
-  justify-self: center;
+/* 16:9 screen plus the bezel and camera, about 2.5rem of height. */
+.presentation-video-motion {
+  width: min(100cqw, calc((100cqh - 2.5rem) * 16 / 9));
 }
 
-.presentation-video .slide-asset {
-  width: min(100%, 640px);
-  justify-self: center;
+/* The frame's 200px floor would push a tablet on a short stage past 16:9. */
+.presentation-video .tablet-video-screen,
+.presentation-video .tablet-video-screen iframe {
+  min-height: 0;
+}
+
+/* The tablet travels in and out past the viewport's side edges, so
+   the deck stops clipping at its own edges while a fill slide is on stage.
+   The page under the site header still clips, so nothing scrolls. */
+.presentation-deck:has(.slide--fill),
+.slide-stage:has(.slide--fill) {
+  overflow: visible;
+}
+
+.slide-stage:has(.slide--fill) {
+  mask-image: none;
+  animation: none;
 }
 
 @media (max-width: 700px) {

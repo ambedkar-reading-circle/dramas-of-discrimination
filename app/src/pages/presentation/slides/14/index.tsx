@@ -1,10 +1,10 @@
 import type { Slide } from '../../types'
-import { PrinciplesGrid } from './PrinciplesGrid'
+import { ProgressionStepper } from './ProgressionStepper'
 
 export const slide = {
   id: '14',
-  kicker: 'The practice',
-  heading: 'Principles',
-  body: <PrinciplesGrid />,
-  layout: 'grid',
+  kicker: 'The consensus',
+  heading: 'From Rehearsal to manifesto',
+  body: <p className="section-lede-copy">How a Group’s tables become the Community’s manifesto. Advance the stepper one stage at a time.</p>,
+  interactive: <ProgressionStepper />,
 } satisfies Slide

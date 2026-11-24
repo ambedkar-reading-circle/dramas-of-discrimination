@@ -1,10 +1,10 @@
 import type { Slide } from '../../types'
-import { QuoteDeck } from './QuoteDeck'
 
 export const slide = {
   id: '11',
-  kicker: 'Verbatim',
-  heading: 'What groups say',
-  body: <p className="section-lede-copy">Feedback from the room, verbatim. Reveal the quotes one at a time.</p>,
-  interactive: <QuoteDeck />,
+  kicker: 'The room',
+  heading: 'Rehearsal in action',
+  body: <p className="section-lede-copy">Groups mid-Workshop: mapping Actors, scripting Dialogues, stepping into the scene.</p>,
+  assets: [{ role: 'video', note: 'A second clip, from a Rehearsal' }],
+  layout: 'split',
 } satisfies Slide

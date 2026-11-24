@@ -14,6 +14,7 @@ import { slide as slide12 } from './12'
 import { slide as slide13 } from './13'
 import { slide as slide14 } from './14'
 import { slide as slide15 } from './15'
+import { slide as slide16 } from './16'
 
 export const slides: ReadonlyArray<Slide> = [
   slide01,
@@ -31,4 +32,5 @@ export const slides: ReadonlyArray<Slide> = [
   slide13,
   slide14,
   slide15,
+  slide16,
 ]

@@ -1,10 +1,33 @@
+import { workshopActivities } from '#/pages/home/workshop-method'
 import type { Slide } from '../../types'
-import { ManualEmbed } from './ManualEmbed'
+import { MethodEmbed } from './MethodEmbed'
+
+/** The five act names, reused from the workshop-method data the embed renders. */
+const actDisplayNames: Record<string, string> = {
+  IntroTime: 'Intro Time',
+  PartTime: 'Part-Time A/B',
+  StoryTime: 'Story Time',
+  PlayTime: 'Playtime',
+  OverTime: 'Overtime',
+}
 
 export const slide = {
   id: '07',
-  kicker: 'The Facilitator',
-  heading: 'The manual',
-  body: <p className="section-lede-copy">The printed manual the Facilitator carries: a letter of invitation, the acts, and the sheets groups fill in. Turn the pages live during the talk.</p>,
-  interactive: <ManualEmbed />,
+  kicker: 'The method',
+  heading: 'The Workshop in five acts',
+  body: (
+    <p className="slide-acts" aria-label={workshopActivities.map((activity) => actDisplayNames[activity.name] ?? activity.name).join(', then ')}>
+      {workshopActivities.map((activity, index) => (
+        <span key={activity.name}>
+          {index > 0 && (
+            <span className="slide-acts-arrow" aria-hidden="true">
+              {' → '}
+            </span>
+          )}
+          {actDisplayNames[activity.name] ?? activity.name}
+        </span>
+      ))}
+    </p>
+  ),
+  interactive: <MethodEmbed />,
 } satisfies Slide

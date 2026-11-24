@@ -1,10 +1,10 @@
 import type { Slide } from '../../types'
-import { ModeSwitcher } from './ModeSwitcher'
+import { QuoteDeck } from './QuoteDeck'
 
 export const slide = {
   id: '12',
-  kicker: 'The platform',
-  heading: 'One method, two modes',
-  body: <p className="section-lede-copy">The same Workshop runs alone or together. Switch modes to show the difference.</p>,
-  interactive: <ModeSwitcher />,
+  kicker: 'Verbatim',
+  heading: 'What groups say',
+  body: <p className="section-lede-copy">Feedback from the room, verbatim. Reveal the quotes one at a time.</p>,
+  interactive: <QuoteDeck />,
 } satisfies Slide

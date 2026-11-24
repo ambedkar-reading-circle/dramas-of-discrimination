@@ -12,7 +12,7 @@ export type Slide = Readonly<{
   body: ReactNode
   interactive?: ReactNode
   assets?: ReadonlyArray<AssetSlot>
-  layout?: 'default' | 'split' | 'grid' | 'centered'
+  layout?: 'default' | 'split' | 'grid' | 'centered' | 'fill'
   /** The body renders its own heading. The stage adds no h2, and the running head shows the count only. */
   ownsHeading?: boolean
   /**

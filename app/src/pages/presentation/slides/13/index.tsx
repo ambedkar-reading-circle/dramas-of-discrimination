@@ -1,10 +1,10 @@
 import type { Slide } from '../../types'
-import { ProgressionStepper } from './ProgressionStepper'
+import { ModeSwitcher } from './ModeSwitcher'
 
 export const slide = {
   id: '13',
-  kicker: 'The consensus',
-  heading: 'From Rehearsal to manifesto',
-  body: <p className="section-lede-copy">How a Group’s tables become the Community’s manifesto. Advance the stepper one stage at a time.</p>,
-  interactive: <ProgressionStepper />,
+  kicker: 'The platform',
+  heading: 'One method, two modes',
+  body: <p className="section-lede-copy">The same Workshop runs alone or together. Switch modes to show the difference.</p>,
+  interactive: <ModeSwitcher />,
 } satisfies Slide

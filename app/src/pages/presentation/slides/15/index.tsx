@@ -1,11 +1,10 @@
 import type { Slide } from '../../types'
-import { ClosingSlideBody } from './ClosingSlideBody'
+import { PrinciplesGrid } from './PrinciplesGrid'
 
 export const slide = {
   id: '15',
-  kicker: 'Thank you',
-  heading: 'Jai Bhim',
-  body: <ClosingSlideBody />,
-  assets: [{ role: 'image', note: 'Contact & QR artwork' }],
-  layout: 'centered',
+  kicker: 'The practice',
+  heading: 'Principles',
+  body: <PrinciplesGrid />,
+  layout: 'grid',
 } satisfies Slide
