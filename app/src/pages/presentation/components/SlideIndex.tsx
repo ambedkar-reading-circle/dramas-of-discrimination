@@ -64,7 +64,7 @@ export default function SlideIndex({ slides, current, open, onOpenChange, onSele
       <dialog
         ref={dialog}
         className="slide-overview-dialog"
-        aria-labelledby="slide-overview-title"
+        aria-label="All slides"
         data-lenis-prevent=""
         onClose={onDialogClose}
         onClick={(event) => {
@@ -73,31 +73,27 @@ export default function SlideIndex({ slides, current, open, onOpenChange, onSele
         onKeyDown={(event) => event.stopPropagation()}
       >
         <div className="slide-overview-panel">
-          <div className="slide-overview-bar">
-            <p id="slide-overview-title" className="eyebrow">
-              <span>All slides</span>
-            </p>
-            <MarkButton label="Close overview" onClick={() => onOpenChange(false)} mark={<CloseOverviewMark />} />
-          </div>
-          <div className="slide-overview" id="slide-overview">
+          <MarkButton label="Close overview" className="slide-overview-close" onClick={() => onOpenChange(false)} mark={<CloseOverviewMark />} />
+          <ol className="slide-overview" id="slide-overview">
             {slides.map((slide, index) => (
-              <button
-                className="slide-overview-card"
-                key={slide.id}
-                type="button"
-                ref={(element) => {
-                  cards.current[index] = element
-                }}
-                aria-current={index === current - 1 ? 'true' : undefined}
-                onClick={() => choose(index + 1)}
-              >
-                <span className="slide-overview-number" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className="slide-overview-heading">{slide.heading}</span>
-              </button>
+              <li key={slide.id}>
+                <button
+                  className="slide-overview-item"
+                  type="button"
+                  ref={(element) => {
+                    cards.current[index] = element
+                  }}
+                  aria-current={index === current - 1 ? 'true' : undefined}
+                  onClick={() => choose(index + 1)}
+                >
+                  <span className="slide-overview-number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span>{slide.heading}</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </dialog>
     </div>
