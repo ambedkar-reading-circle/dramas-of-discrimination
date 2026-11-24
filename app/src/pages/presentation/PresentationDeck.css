@@ -688,8 +688,7 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Objective points (05) and quotes (12) */
-  .slide-points ul,
+  /* Quotes (10) */
   .slide-quotes {
     display: grid;
     gap: var(--notebook-row);
@@ -698,16 +697,9 @@
     list-style: none;
   }
 
-  .slide-point p,
   .slide-quote p {
     max-width: 58ch;
     font-size: 1.125rem;
-  }
-
-  .slide-annotated {
-    font-family: var(--font-title);
-    font-size: 1.25rem;
-    color: var(--stage-red);
   }
 
   .slide-points-next {
@@ -743,65 +735,7 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Flip cards (06) */
-  .slide-flip-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
-    gap: var(--notebook-gutter);
-    perspective: 1200px;
-  }
-
-  .slide-flip {
-    position: relative;
-    min-width: 0;
-  }
-
-  .slide-flip-inner {
-    position: relative;
-    display: grid;
-    transform-style: preserve-3d;
-    transition: transform 500ms ease;
-  }
-
-  .slide-flip--open .slide-flip-inner {
-    transform: rotateY(180deg);
-  }
-
-  .slide-flip-face {
-    grid-area: 1 / 1;
-    display: grid;
-    gap: calc(var(--notebook-row) / 2);
-    align-content: center;
-    min-height: calc(7 * var(--notebook-row));
-    padding: var(--notebook-row) 1.25rem;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--line);
-    background: var(--bg-base);
-    backface-visibility: hidden;
-  }
-
-  .slide-flip-face--back {
-    transform: rotateY(180deg);
-    background: var(--surface-warm);
-  }
-
-  .slide-flip-hint {
-    font-size: 0.8125rem;
-    color: var(--sea-ink-soft);
-  }
-
-  .slide-flip-trigger {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border: 0;
-    border-radius: 0.125rem;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  /* Mode switcher (13) */
+  /* Mode switcher (11) */
   .slide-modes {
     display: grid;
     gap: var(--notebook-row);
@@ -841,7 +775,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Stepper (14) */
+  /* Stepper (12) */
   .slide-steps {
     display: grid;
     gap: var(--notebook-row);
@@ -898,7 +832,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Principles (15) */
+  /* Principles (13) */
   .slide-principles {
     display: grid;
     gap: var(--notebook-row);
@@ -920,7 +854,7 @@
     background: var(--ink-scrim);
   }
 
-  /* Closing (16) */
+  /* Closing (14) */
   .slide-closing {
     display: grid;
     gap: var(--notebook-row);
@@ -937,7 +871,7 @@
     justify-self: center;
   }
 
-  /* Acts strip (07) */
+  /* Acts strip (05) */
   .slide-acts {
     font-family: var(--font-title);
     font-size: 1.125rem;
@@ -1013,7 +947,7 @@
   gap: var(--notebook-row);
 }
 
-/* Worksheet previews (09) */
+/* Worksheet previews (07) */
 .presentation-tables {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1109,7 +1043,6 @@
     transition: none;
   }
 
-  .slide-flip-inner,
   .slide-principle,
   .slide-title-taped {
     transition: none;

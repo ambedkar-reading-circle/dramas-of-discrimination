@@ -1,10 +1,11 @@
 import type { Slide } from '../../types'
-import { ProgressionStepper } from './ProgressionStepper'
+import { ClosingSlideBody } from './ClosingSlideBody'
 
 export const slide = {
   id: '14',
-  kicker: 'The consensus',
-  heading: 'From Rehearsal to manifesto',
-  body: <p className="section-lede-copy">How a Group’s tables become the Community’s manifesto. Advance the stepper one stage at a time.</p>,
-  interactive: <ProgressionStepper />,
+  kicker: 'Thank you',
+  heading: 'Jai Bhim',
+  body: <ClosingSlideBody />,
+  assets: [{ role: 'image', note: 'Contact & QR artwork' }],
+  layout: 'centered',
 } satisfies Slide

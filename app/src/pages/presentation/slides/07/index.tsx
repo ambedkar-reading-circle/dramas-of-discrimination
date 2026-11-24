@@ -1,33 +1,14 @@
-import { workshopActivities } from '#/pages/home/workshop-method'
 import type { Slide } from '../../types'
-import { MethodEmbed } from './MethodEmbed'
-
-/** The five act names, reused from the workshop-method data the embed renders. */
-const actDisplayNames: Record<string, string> = {
-  IntroTime: 'Intro Time',
-  PartTime: 'Part-Time A/B',
-  StoryTime: 'Story Time',
-  PlayTime: 'Playtime',
-  OverTime: 'Overtime',
-}
+import { TablesPreview } from './TablesPreview'
 
 export const slide = {
   id: '07',
-  kicker: 'The method',
-  heading: 'The Workshop in five acts',
+  kicker: 'The Rehearsal',
+  heading: 'The two tables',
   body: (
-    <p className="slide-acts" aria-label={workshopActivities.map((activity) => actDisplayNames[activity.name] ?? activity.name).join(', then ')}>
-      {workshopActivities.map((activity, index) => (
-        <span key={activity.name}>
-          {index > 0 && (
-            <span className="slide-acts-arrow" aria-hidden="true">
-              {' → '}
-            </span>
-          )}
-          {actDisplayNames[activity.name] ?? activity.name}
-        </span>
-      ))}
-    </p>
+    <>
+      <p className="section-lede-copy">One Scenario, staged twice. The Actor map lists each Actor, its Ideal behaviour, and its Failures; the Play script stages the Scenario as directed Dialogues, each tagged to the Failures it shows.</p>
+      <TablesPreview />
+    </>
   ),
-  interactive: <MethodEmbed />,
 } satisfies Slide

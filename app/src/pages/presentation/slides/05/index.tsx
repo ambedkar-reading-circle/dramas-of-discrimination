@@ -1,14 +1,33 @@
+import { workshopActivities } from '#/pages/home/workshop-method'
 import type { Slide } from '../../types'
-import { ObjectivePoints } from './ObjectivePoints'
+import { MethodEmbed } from './MethodEmbed'
+
+/** The five act names, reused from the workshop-method data the embed renders. */
+const actDisplayNames: Record<string, string> = {
+  IntroTime: 'Intro Time',
+  PartTime: 'Part-Time A/B',
+  StoryTime: 'Story Time',
+  PlayTime: 'Playtime',
+  OverTime: 'Overtime',
+}
 
 export const slide = {
   id: '05',
-  kicker: 'The case',
-  heading: 'Why the Workshop exists',
+  kicker: 'The method',
+  heading: 'The Workshop in five acts',
   body: (
-    <>
-      <p className="section-lede-copy">Discrimination is systemic; responses deserve rehearsal, not just sentiment. Reveal the points one at a time.</p>
-      <ObjectivePoints />
-    </>
+    <p className="slide-acts" aria-label={workshopActivities.map((activity) => actDisplayNames[activity.name] ?? activity.name).join(', then ')}>
+      {workshopActivities.map((activity, index) => (
+        <span key={activity.name}>
+          {index > 0 && (
+            <span className="slide-acts-arrow" aria-hidden="true">
+              {' → '}
+            </span>
+          )}
+          {actDisplayNames[activity.name] ?? activity.name}
+        </span>
+      ))}
+    </p>
   ),
+  interactive: <MethodEmbed />,
 } satisfies Slide

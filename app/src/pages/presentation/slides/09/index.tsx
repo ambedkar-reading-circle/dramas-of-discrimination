@@ -1,14 +1,10 @@
 import type { Slide } from '../../types'
-import { TablesPreview } from './TablesPreview'
 
 export const slide = {
   id: '09',
-  kicker: 'The Rehearsal',
-  heading: 'The two tables',
-  body: (
-    <>
-      <p className="section-lede-copy">One Scenario, staged twice. The Actor map lists each Actor, its Ideal behaviour, and its Failures; the Play script stages the Scenario as directed Dialogues, each tagged to the Failures it shows.</p>
-      <TablesPreview />
-    </>
-  ),
+  kicker: 'The room',
+  heading: 'Rehearsal in action',
+  body: <p className="section-lede-copy">Groups mid-Workshop: mapping Actors, scripting Dialogues, stepping into the scene.</p>,
+  assets: [{ role: 'video', note: 'A second clip, from a Rehearsal' }],
+  layout: 'split',
 } satisfies Slide

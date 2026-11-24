@@ -1,10 +1,10 @@
 import type { Slide } from '../../types'
-import { ModeSwitcher } from './ModeSwitcher'
+import { PrinciplesGrid } from './PrinciplesGrid'
 
 export const slide = {
   id: '13',
-  kicker: 'The platform',
-  heading: 'One method, two modes',
-  body: <p className="section-lede-copy">The same Workshop runs alone or together. Switch modes to show the difference.</p>,
-  interactive: <ModeSwitcher />,
+  kicker: 'The practice',
+  heading: 'Principles',
+  body: <PrinciplesGrid />,
+  layout: 'grid',
 } satisfies Slide
