@@ -40,13 +40,3 @@ export const flightTransition: Transition = {
 }
 
 export const fadeTransition: Transition = { duration: 0.15 }
-
-export const elasticDrag = {
-  dragElastic: 0.35,
-  dragSnapToOrigin: true,
-  dragTransition: { bounceStiffness: 260, bounceDamping: 18 },
-} as const
-
-export function lifted(tilt: number): TargetAndTransition {
-  return { scale: 1.04, rotate: tilt * 0.4, cursor: 'grabbing' }
-}

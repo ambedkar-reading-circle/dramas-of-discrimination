@@ -1,5 +1,3 @@
-import type { RefObject } from 'react'
-
 export type Direction = 'left' | 'right' | 'bottom'
 
 export interface InstantPhotoData {
@@ -25,6 +23,5 @@ export interface PhotoReveal<TKey> extends PhotoControls {
 }
 
 export interface InstantPhotoProps extends InstantPhotoData {
-  bounds?: RefObject<HTMLElement | null>
   controls: PhotoControls
 }

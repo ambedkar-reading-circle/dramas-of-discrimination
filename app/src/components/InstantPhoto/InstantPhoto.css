@@ -20,8 +20,7 @@
     gap: var(--caption-gap);
     margin: 0;
     padding: var(--rim) var(--rim) calc(var(--rim) * 0.7);
-    cursor: grab;
-    touch-action: none;
+    cursor: pointer;
     background:
       linear-gradient(160deg, var(--photo-sheen), transparent 45%),
       radial-gradient(120% 90% at 50% 40%, transparent 60%, var(--photo-aging)),
