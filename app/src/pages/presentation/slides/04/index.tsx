@@ -1,18 +1,26 @@
 import type { Slide } from '../../types'
-import { DetailCard } from './DetailCard'
+import { MissionBoard } from './MissionBoard'
 
 export const slide = {
   id: '04',
-  kicker: 'Beyond the workshop',
-  heading: 'What ARC does',
-  body: <p className="section-lede-copy">The circle keeps several doors open. Each reveals a line of detail — open them as you talk.</p>,
-  interactive: (
-    <div className="slide-card-grid">
-      <DetailCard title="Lectures & talks" detail="Speakers read caste, law, and history to a public room." />
-      <DetailCard title="Film screenings" detail="Screenings that put stories next to argument." />
-      <DetailCard title="Workshops" detail="Rehearsal rooms for responses to discrimination — this method among them." />
-      <DetailCard title="Panel discussions" detail="Panels that bring practitioners and audiences into one argument." />
-    </div>
-  ),
-  layout: 'grid',
+  kicker: 'The mission',
+  heading: 'What the tool sets out to do',
+  body: <MissionBoard />,
+  layout: 'centered',
+  speakerNotes: [
+    'Back to Dramas of Discrimination itself. What it is for, and what it can hold.',
+    'It sets out to make the work environment more just and more inclusive, through interactive and participatory methods.',
+    'Its aim is to cultivate, and to advocate for, proactive engagement in addressing caste-based discrimination in Indian workplaces.',
+    'So, at heart, it is a platform for rehearsing change. A space where a different ending can be tried before it is needed.',
+    'Along the way, it does something quieter. It gauges and gathers the collective caste consciousness of the people taking part.',
+    'First, articulation. How does a diverse community recognise and name instances of caste-based discrimination, especially the ones that are rarely said out loud?',
+    'Second, intervention. In a discriminatory situation, what are the many ways people might respond? Confronting it, negotiating around it, or quietly shifting the scene.',
+    'R. Roosevelt Thomas Jr., often called the father of diversity management, made the business case in 1990. “In business terms,” he wrote, “a diverse work force is not something your company ought to have; it’s something your company does have, or soon will have.”',
+    'Laws can bring people in, but they cannot finish the work. In his words, affirmative action “gets the new fuel into the tank, the new people through the front door. Something else will have to get them into the driver’s seat.”',
+    'Why gather this together, rather than hand down rules? The sociologists Frank Dobbin and Alexandra Kalev analysed three decades’ worth of company data.',
+    'They found that rules can provoke resistance. In their words, “laboratory studies show that this kind of force-feeding can activate bias rather than stamp it out,” and “people often rebel against rules to assert their autonomy.”',
+    'What works better is engaging people in solving the problem. “When managers actively help boost diversity in their companies,” they write, “… they begin to think of themselves as diversity champions.”',
+    'That is the hope here too. A community that helps build its own inclusion has a reason to protect it.',
+    'Or, as Thomas put it, “It’s our reality. We need to make it our strength.”',
+  ],
 } satisfies Slide

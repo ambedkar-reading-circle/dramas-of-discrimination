@@ -1,0 +1,180 @@
+@layer components {
+  .mission-board {
+    --card-gap: var(--notebook-gutter);
+    display: grid;
+    justify-items: center;
+    gap: calc(var(--notebook-row) / 2);
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
+  }
+
+  .mission-lede {
+    max-width: 46ch;
+    margin: 0 0 calc(var(--notebook-row) / 2);
+    font-size: 1.25rem;
+  }
+
+  .mission-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--card-gap);
+    width: 100%;
+  }
+
+  /* Taped like the title slide's cards, but read, not pressed. */
+  .mission-card {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+    gap: calc(var(--notebook-row) / 4);
+    padding: calc(0.6 * var(--notebook-row)) 1.25rem
+      calc(0.5 * var(--notebook-row));
+    text-align: start;
+    background: var(--surface-warm);
+    color: var(--sea-ink);
+  }
+
+  .mission-card-name {
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--stage-red);
+  }
+
+  .mission-card-lead {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .mission-card-rows {
+    display: grid;
+    gap: calc(var(--notebook-row) / 8);
+    margin: calc(var(--notebook-row) / 4) 0 0;
+  }
+
+  .mission-card-rows div {
+    display: grid;
+    grid-template-columns: 5.75rem minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  .mission-card-rows dt {
+    font-size: 0.8125rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .mission-card-rows dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: var(--sea-ink-soft);
+  }
+
+  /* A pencilled spectrum with illustrative marks on it. */
+  .mission-scale {
+    display: grid;
+    align-self: end;
+    gap: calc(var(--notebook-row) / 8);
+    margin-top: calc(var(--notebook-row) / 2);
+  }
+
+  .mission-track {
+    position: relative;
+    height: calc(var(--notebook-row) * 0.5);
+    background: linear-gradient(var(--line), var(--line)) center / 100% 1px
+      no-repeat;
+  }
+
+  .mission-track::before,
+  .mission-track::after {
+    content: '';
+    position: absolute;
+    top: 25%;
+    width: 1px;
+    height: 50%;
+    background: var(--line);
+  }
+
+  .mission-track::before {
+    left: 0;
+  }
+
+  .mission-track::after {
+    right: 0;
+  }
+
+  .mission-reading {
+    position: absolute;
+    top: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin: -0.3rem 0 0 -0.3rem;
+    border-radius: 50%;
+    background: var(--stage-red);
+    box-shadow: 0 0 0 2px var(--surface-warm);
+  }
+
+  .mission-ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .mission-merge {
+    display: grid;
+    color: var(--sea-ink-soft);
+  }
+
+  .mission-merge svg {
+    rotate: 180deg;
+  }
+
+  .mission-result {
+    display: grid;
+    gap: 0.1rem;
+    padding: calc(0.4 * var(--notebook-row)) 1.5rem
+      calc(0.35 * var(--notebook-row));
+    max-width: 32rem;
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .mission-result-name {
+    font-size: 1.1875rem;
+  }
+
+  .mission-result-note {
+    font-size: 0.8125rem;
+    opacity: 0.85;
+  }
+
+  .mission-result-finding {
+    margin-top: calc(var(--notebook-row) / 4);
+    padding-top: calc(var(--notebook-row) / 4);
+    border-top: 1px solid color-mix(in srgb, var(--hl-text) 25%, transparent);
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+
+  .mission-source {
+    max-width: 40rem;
+    margin-top: calc(var(--notebook-row) / 4);
+    font-size: 0.75rem;
+    color: var(--sea-ink-soft);
+  }
+
+  .mission-source a {
+    color: inherit;
+  }
+
+  @media (max-width: 700px) {
+    .mission-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
