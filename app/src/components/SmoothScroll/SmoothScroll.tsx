@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import Lenis from 'lenis'
 import 'lenis/dist/lenis.css'
+import { registerPageScroller } from './pageScroller'
 import { useMediaQuery } from '#/lib/use-media-query'
 
 /** Enhance the window scroll so sticky layout and Motion keep using native positions. */
@@ -20,6 +21,7 @@ export default function SmoothScroll() {
       syncTouch: false,
       allowNestedScroll: true,
     })
+    registerPageScroller(lenis)
 
     // Stop the old page's inertia before the router resets or restores scroll.
     const unsubscribe = router.subscribe('onBeforeLoad', () => {
@@ -76,6 +78,7 @@ export default function SmoothScroll() {
       disposed = true
       window.removeEventListener('click', onAnchorClick)
       unsubscribe()
+      registerPageScroller(null)
       lenis.destroy()
     }
   }, [router, reducedMotion])
