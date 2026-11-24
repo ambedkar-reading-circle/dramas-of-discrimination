@@ -1,3 +1,32 @@
+@property --stage-fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --stage-fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes slide-stage-fade {
+  0% {
+    --stage-fade-top: 0px;
+    --stage-fade-bottom: var(--stage-fade);
+  }
+  8% {
+    --stage-fade-top: var(--stage-fade);
+  }
+  92% {
+    --stage-fade-bottom: var(--stage-fade);
+  }
+  100% {
+    --stage-fade-top: var(--stage-fade);
+    --stage-fade-bottom: 0px;
+  }
+}
+
 /*
  * Presentation deck layout: stage sizing between the site header and the deck
  * controls, chip strip, overview grid, asset placeholders, presenter tools,
@@ -89,6 +118,21 @@
   .slide-stage:has(.slide-frame--scaled) {
     overflow: clip;
     overflow-clip-margin: 0.5rem;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .slide-stage:not(:has(.slide-frame--scaled)) {
+      --stage-fade: calc(var(--notebook-row) * 1.5);
+      mask-image: linear-gradient(
+        to bottom,
+        transparent,
+        #000 var(--stage-fade-top),
+        #000 calc(100% - var(--stage-fade-bottom)),
+        transparent
+      );
+      animation: slide-stage-fade linear both;
+      animation-timeline: scroll(self block);
+    }
   }
 
   .slide-frame {
