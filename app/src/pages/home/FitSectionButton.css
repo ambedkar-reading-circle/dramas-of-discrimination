@@ -1,0 +1,16 @@
+@layer components {
+  /* Placement only; the look is the shared MarkButton. Bottom-left keeps
+     clear of the dev tools trigger in the opposite corner. */
+  .fit-section-button {
+    position: fixed;
+    /* Above the footer, which shares the site foreground layer. */
+    z-index: calc(var(--layer-site-foreground) + 1);
+    left: max(16px, env(safe-area-inset-left, 0px));
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  }
+  @media print {
+    .fit-section-button {
+      display: none;
+    }
+  }
+}

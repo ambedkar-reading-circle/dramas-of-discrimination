@@ -1,10 +1,5 @@
 .workshop-method-surface {
   --notebook-section-space: calc(2 * var(--notebook-row));
-  --method-open-height: clamp(
-    400px,
-    calc(100svh - 13 * var(--notebook-row)),
-    800px
-  );
   /* Land the surface at the viewport top; clear the navbar inside it.
      Cancel the shared anchor offset for this full-screen section only. */
   scroll-margin-top: calc(0px - var(--site-header-height));
@@ -16,6 +11,8 @@
   --sea-ink: var(--hl-text);
   --sea-ink-soft: color-mix(in srgb, var(--hl-text) 85%, transparent);
   --ink-faint: color-mix(in srgb, var(--hl-text) 16%, transparent);
+  --activity-paper: #f8f3e7;
+  --activity-ink: #2b448e;
 }
 .workshop-method .section-lede {
   grid-template-columns: minmax(0, 1fr);
@@ -24,8 +21,6 @@
   top: var(--method-baseline-offset, var(--notebook-text-offset));
 }
 .method-collection {
-  --activity-paper: #f8f3e7;
-  --activity-ink: #2b448e;
   margin-block: var(--notebook-row) 0;
 }
 .method-deck {
@@ -59,14 +54,16 @@
   overflow-wrap: normal;
   transition: box-shadow 220ms;
 }
-.method-sheet:not(.method-sheet--open):hover,
-.method-sheet:not(.method-sheet--open):focus-within {
+.method-sheet:hover,
+.method-sheet:focus-within,
+.method-sheet--selected {
   z-index: 15 !important;
   box-shadow:
     0 3px 6px #1318571f,
     0 20px 40px #13185729;
 }
-.method-sheet :is(p, h3, h4) {
+.method-sheet :is(p, h3, h4),
+.method-dialog-sheet :is(p, h3, h4) {
   top: 0;
   margin: 0;
 }
@@ -80,13 +77,14 @@
   font-size: 9px;
   letter-spacing: 0.1em;
 }
-.method-sheet h3 {
+.method-sheet h3,
+.method-dialog-sheet h3 {
   margin-top: 12px;
   font: 29px/1.2 var(--font-logo);
   letter-spacing: -0.065em;
   text-wrap: nowrap;
 }
-.method-sheet .method-sheet-subtitle {
+.method-sheet-subtitle {
   margin-top: 8px;
   min-height: 30px;
   font: 9px/1.6 var(--font-logo);
@@ -165,54 +163,10 @@
   outline: 2px solid var(--activity-ink);
   outline-offset: 5px;
 }
-.method-sheet--open {
-  display: flex;
-  flex-direction: column;
-  height: var(--method-open-height);
-  padding: 32px 36px 60px;
-}
-.method-sheet--open > :not(.method-sheet-content) {
-  flex-shrink: 0;
-}
-.method-sheet--open h3 {
-  font-size: clamp(32px, 6vw, 52px);
-  margin-top: 20px;
-}
-.method-sheet--open .method-sheet-topline {
-  padding-right: 40px;
-}
-.method-sheet--open .method-sheet-subtitle {
-  max-width: none;
-  font-size: 11px;
-  min-height: 0;
-}
-.method-sheet--open .method-sheet-timing {
-  margin-top: 16px;
-}
-.method-sheet--open .method-sheet-trigger {
-  display: grid;
-  place-items: center;
-  inset: 12px 12px auto auto;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 50%;
-}
-.method-sheet--open .method-sheet-trigger:hover {
-  background: #2b448e0c;
-}
-.method-sheet--open .method-sheet-trigger > svg {
-  display: block;
-}
-.method-sheet--open .method-sheet-footer {
-  left: 36px;
-  right: 36px;
-  font-size: 8px;
-}
 .method-sheet-content {
   flex: 1;
   min-height: 0;
-  margin-top: 24px;
+  margin-top: 20px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
@@ -224,7 +178,7 @@
   outline: 1px solid var(--activity-ink);
   outline-offset: -1px;
 }
-.method-sheet .method-sheet-summary {
+.method-dialog-sheet .method-sheet-summary {
   font: 19px/1.55 var(--font-body);
   max-width: 65ch;
 }
@@ -234,7 +188,7 @@
   gap: 32px;
   margin-top: 28px;
 }
-.method-sheet h4 {
+.method-dialog-sheet h4 {
   font: 10px/1.5 var(--font-logo);
   letter-spacing: 0.07em;
 }
@@ -329,11 +283,6 @@
 .method-index-button:hover {
   background: color-mix(in srgb, var(--sea-ink) 10%, transparent);
 }
-.method-index-button[aria-pressed='true'] {
-  background: var(--sea-ink);
-  color: var(--hl-bg);
-  box-shadow: inset 0 0 0 1px var(--sea-ink);
-}
 .method-index-button:focus-visible {
   outline: 2px solid var(--stage-red);
   outline-offset: 3px;
@@ -346,9 +295,6 @@
   opacity: 0.75;
 }
 @media (max-width: 700px) {
-  .method-sheet--open {
-    padding: 26px 22px 70px;
-  }
   .method-sheet-columns {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -359,17 +305,212 @@
   .method-facilitator .method-drawing {
     display: none;
   }
-  .method-sheet--open .method-sheet-footer {
-    left: 22px;
-    right: 22px;
-    font-size: 6px;
-  }
   .method-index {
     column-gap: 2px;
   }
   .method-index-button {
     font-size: 10px;
     padding-inline: 8px;
+  }
+}
+/* The open sheet: a modal in the top layer, inset from every viewport edge
+   so it reads as a sheet laid over the page rather than a takeover. */
+.method-dialog {
+  --method-dialog-inset: clamp(12px, 4vmin, 48px);
+  --method-dialog-pad: clamp(18px, 3.5vmin, 36px);
+}
+.method-dialog[open] {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  /* Fixed tracks, so the sheet's percentage height resolves against the
+     viewport minus the inset and can never grow past the screen. */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(var(--method-dialog-inset), env(safe-area-inset-top, 0px))
+    max(var(--method-dialog-inset), env(safe-area-inset-right, 0px))
+    max(var(--method-dialog-inset), env(safe-area-inset-bottom, 0px))
+    max(var(--method-dialog-inset), env(safe-area-inset-left, 0px));
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+/* The page stays as it is behind the sheet: no tint, no blur. */
+.method-dialog::backdrop {
+  background: transparent;
+}
+.method-dialog-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(880px, 100%);
+  height: min(820px, 100%);
+  max-height: calc(100dvh - 2 * var(--method-dialog-inset));
+  padding: var(--method-dialog-pad) var(--method-dialog-pad) 0;
+  color: var(--activity-ink);
+  background: var(--activity-paper) url('/manual-cotton-paper.svg') repeat;
+  background-size: 420px;
+  border: 1px solid #2b448e2b;
+  border-radius: 4px 8px 8px 4px;
+  box-shadow:
+    0 4px 10px #1318571f,
+    0 30px 70px #13185740;
+  overflow-wrap: normal;
+  animation: method-dialog-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes method-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+.method-dialog-header {
+  flex-shrink: 0;
+  padding-right: 44px;
+}
+.method-dialog-sheet h3 {
+  margin-top: 16px;
+  font-size: clamp(32px, 6vw, 52px);
+}
+.method-dialog-sheet .method-sheet-subtitle {
+  max-width: none;
+  min-height: 0;
+  font-size: 11px;
+}
+.method-dialog-sheet .method-sheet-timing {
+  margin-top: 14px;
+}
+.method-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.method-dialog-close:hover {
+  background: #2b448e0c;
+}
+.method-dialog-close:focus-visible,
+.method-dialog-step:focus-visible {
+  outline: 2px solid var(--activity-ink);
+  outline-offset: 2px;
+}
+.method-dialog-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid #2b448e35;
+  padding-block: 6px;
+}
+.method-dialog-step {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 0.125rem;
+  background: transparent;
+  color: inherit;
+  font: 11px/1.2 var(--font-logo);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.method-dialog-step:first-child {
+  margin-left: -8px;
+}
+.method-dialog-step:last-child {
+  margin-right: -8px;
+}
+.method-dialog-step:hover:not(:disabled) {
+  background: #2b448e0c;
+}
+.method-dialog-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.method-dialog-mark {
+  font: 8px/1.5 var(--font-logo);
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+/* Short viewports: a tighter header leaves the room to the reading area. */
+@media (max-height: 640px) {
+  .method-dialog-sheet h3 {
+    margin-top: 6px;
+    font-size: 30px;
+  }
+  .method-dialog-sheet .method-sheet-timing {
+    margin-top: 8px;
+  }
+  .method-dialog-sheet .method-sheet-content {
+    margin-top: 12px;
+  }
+}
+@media (max-width: 520px) {
+  .method-dialog-mark {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .method-dialog-sheet {
+    animation: none;
+  }
+}
+/* Keep the page still behind the modal. */
+html:has(.method-dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+/* Short screens: spend less on padding so the deck keeps its size. */
+@media (max-height: 960px) {
+  .workshop-method-surface {
+    --notebook-section-space: var(--notebook-row);
+  }
+}
+/* Wide but short: the index moves beside the deck instead of under it. */
+@media (min-width: 1001px) and (max-height: 960px) {
+  .method-collection {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 11rem;
+    grid-template-areas:
+      'deck index'
+      'deck hint';
+    grid-template-rows: auto auto;
+    column-gap: var(--notebook-gutter);
+    align-items: center;
+  }
+  .method-deck {
+    grid-area: deck;
+  }
+  .method-index {
+    grid-area: index;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    align-self: end;
+  }
+  .method-index-button {
+    justify-content: flex-start;
+  }
+  .method-collection .method-deck-hint {
+    grid-area: hint;
+    align-self: start;
+    margin-top: var(--notebook-row);
+    text-align: start;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -380,13 +521,6 @@
 @media print {
   .workshop-method-surface {
     min-height: 0;
-  }
-  .method-sheet--open {
-    height: auto;
-  }
-  .method-sheet-content {
-    flex: none;
-    overflow: visible;
   }
   .method-deck {
     height: auto !important;
@@ -407,7 +541,8 @@
   }
   .method-index,
   .method-sheet-trigger,
-  .method-deck-hint {
+  .method-deck-hint,
+  .method-dialog {
     display: none;
   }
 }

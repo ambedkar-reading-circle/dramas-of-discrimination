@@ -137,7 +137,7 @@ inside unruled controls and are exempt from ink alignment.
 ## Growth and section boundaries
 
 All participating boxes must begin on a row boundary and occupy whole rows,
-including vertical padding and gaps. A 91px image in a 32px grid reserves 96px;
+including vertical padding and gaps (the hero is the one exception; see below). A 91px image in a 32px grid reserves 96px;
 a 105px image reserves 128px. Neighbours move by whole rows as content grows.
 
 - Use stacks for prose groups instead of accumulating paragraph margins.
@@ -148,13 +148,14 @@ a 105px image reserves 128px. Neighbours move by whole rows as content grows.
 - Keep decoration outside normal flow. Do not clip text to enforce a row count.
 - Preserve image aspect ratios and width/height attributes during lazy loading.
 
-The hero stays in normal flow. Its minimum height rounds approximately one
-viewport, less a two-row desktop or four-row mobile header allowance, UP to
-whole rows. This allowance is intentionally approximate: header size is
-independent of the sheet. Longer content expands the hero. Its automatic spacer
-is a whole-row remainder because both the minimum height and the content's total
-allocation are whole rows. No parent flexible track can leave a fractional-row
-gap after the hero.
+**Exception: the hero.** The hero stays in normal flow, and its minimum height
+is exactly one viewport less the measured header height
+(`100svh - var(--site-header-height)`). It is not rounded to whole rows, so it
+fills the first screen precisely. Its bottom padding takes up the fractional
+remainder, so the hero's own content still sits on the ruling. Longer content
+expands the hero. Because the hero's total height can be a fractional number of
+rows, sections after it are not required to begin on a row boundary. Do not add
+compensating offsets to re-align them.
 
 Main never stretches to fill spare viewport space. The footer absorbs spare
 space on short pages. The inverse band paints its own ruling from a top boundary

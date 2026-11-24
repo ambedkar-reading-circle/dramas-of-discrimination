@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react'
 import NotebookSurface from '#/components/NotebookSurface'
 import TabletVideoFrame from '#/components/TabletVideoFrame'
 import { useMediaQuery } from '#/lib/use-media-query'
+import { viewportSection } from './FitSectionButton'
 import './TabletVideoSection.css'
 
 const compactQuery = '(max-width: 480px)'
@@ -23,7 +24,7 @@ export default function TabletVideoSection() {
   const scale = useTransform(scrollYProgress, [0, 0.48, 0.52, 1], [0.78, 1, 1, 0.78])
 
   return (
-    <NotebookSurface as="section" tone="inverse" ref={section} className="tablet-video-section notebook-section" aria-label="Project video" data-reduced-motion={reducedMotion}>
+    <NotebookSurface as="section" {...viewportSection} tone="inverse" ref={section} className="tablet-video-section notebook-section" aria-label="Project video" data-reduced-motion={reducedMotion}>
       <div className="tablet-video-stage">
         <div className="tablet-video-perspective page-wrap">
           <motion.div className="tablet-video-motion" style={reducedMotion ? undefined : { y, rotateX, rotateY, rotate, scale }}>

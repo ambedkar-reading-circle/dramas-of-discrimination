@@ -315,7 +315,7 @@ try {
       false,
       `overflow at ${width}`,
     )
-    const desktop = width >= 1001 && height >= 800
+    const desktop = width >= 701 && width >= height
     const plan = planFor(desktop)
     for (const [step, i] of plan.heads.entries()) {
       if (step === 0) continue

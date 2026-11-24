@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import NotebookSurface from '#/components/NotebookSurface'
 import CommunityInvitation from '#/pages/home/CommunityInvitation'
+import FitSectionButton from '#/pages/home/FitSectionButton'
 import HomeHero from '#/pages/home/HomeHero'
 import ManualFlipbookSection from '#/pages/home/ManualFlipbookSection'
 import TabletVideoSection from '#/pages/home/TabletVideoSection'
@@ -18,6 +19,7 @@ function Home() {
         <WorkshopMethod />
         <CommunityInvitation />
       </div>
+      <FitSectionButton />
     </NotebookSurface>
   )
 }

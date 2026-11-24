@@ -4,10 +4,12 @@ import { motion, useScroll, useTransform } from 'motion/react'
 import { ManualReading } from '#/pages/home/manual-flipbook'
 import NotebookSurface from '#/components/NotebookSurface'
 import { useMediaQuery } from '#/lib/use-media-query'
+import { viewportSection } from './FitSectionButton'
 import './ManualFlipbookSection.css'
 
 const ManualBook = lazy(() => import('#/pages/home/manual-flipbook/ManualBook'))
-const desktopQuery = '(min-width: 1001px) and (min-height: 800px)'
+// A landscape viewport fits two pages as large as one portrait page, so it gets the spread.
+const desktopQuery = '(min-width: 701px) and (orientation: landscape)'
 const reducedQuery = '(prefers-reduced-motion: reduce)'
 
 class BookFallback extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
@@ -81,6 +83,7 @@ export default function ManualFlipbookSection() {
     </Stage>
   )
   const sectionProps = {
+    ...viewportSection,
     ref: section,
     id: 'manual-preview',
     className: `manual-section notebook-section ${desktop ? 'manual-desktop' : ''} ${animated ? 'manual-animated' : ''}`,

@@ -119,7 +119,7 @@ export default function DodLogo({ variant = 'hero' }: { variant?: 'hero' | 'inli
   }
 
   return (
-    <span className={`block w-fit text-start font-logo font-normal text-[min(10cqi,8rem)] tracking-[-0.055em] leading-[round(up,1.3em,var(--notebook-row))] ${inkClasses}`} onPointerEnter={startCycling} onPointerLeave={stopCycling}>
+    <span className={`block w-fit text-start font-logo font-normal text-[min(10cqi,8rem,var(--dod-logo-max,8rem))] tracking-[-0.055em] leading-[round(up,1.3em,var(--notebook-row))] ${inkClasses}`} onPointerEnter={startCycling} onPointerLeave={stopCycling}>
       <span className={`dod-logo-first ${lineClasses}`}>
         <span className="printed-ink">Dramas</span>
         <span className="sr-only"> of Discrimination</span> <LinkWord cycling={cycling} showsAlternate={showsAlternate} />

@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
 
-/** Tracks the deck width and the open sheet height for the fan layout. */
-export function useDeckMetrics(
-  deck: RefObject<HTMLDivElement | null>,
-  active: number | null,
-) {
+/** Tracks the deck width for the fan layout. */
+export function useDeckMetrics(deck: RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(900)
-  const [sheetHeight, setSheetHeight] = useState(620)
 
   useEffect(() => {
     const element = deck.current
@@ -19,17 +15,5 @@ export function useDeckMetrics(
     return () => observer.disconnect()
   }, [deck])
 
-  useEffect(() => {
-    const element = deck.current?.querySelector<HTMLLIElement>(
-      '.method-sheet--open',
-    )
-    if (!element) return
-    const observer = new ResizeObserver(() =>
-      setSheetHeight(element.offsetHeight),
-    )
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [deck, active])
-
-  return { width, sheetHeight }
+  return width
 }

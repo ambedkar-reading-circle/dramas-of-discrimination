@@ -11,7 +11,7 @@ export function MethodIndex({ activities, active, onSelect }: MethodIndexProps) 
     <>
       <nav className="method-index" aria-label="Choose a workshop activity">
         {activities.map((activity, index) => (
-          <button className="method-index-button" key={activity.name} type="button" aria-pressed={active === index} onClick={() => onSelect(index)}>
+          <button className="method-index-button" key={activity.name} type="button" aria-haspopup="dialog" aria-current={active === index ? 'true' : undefined} onClick={() => onSelect(index)}>
             <span className="notebook-text">
               <span className="method-index-number">{String(index + 1).padStart(2, '0')}</span>
               {activity.name}
@@ -19,7 +19,7 @@ export function MethodIndex({ activities, active, onSelect }: MethodIndexProps) 
           </button>
         ))}
       </nav>
-      <p className="method-deck-hint">{active === null ? 'Select any activity to open its facilitation sheet.' : 'Choose another sheet below, or press Esc to return to the collection.'}</p>
+      <p className="method-deck-hint">Select any activity to open its facilitation sheet.</p>
     </>
   )
 }

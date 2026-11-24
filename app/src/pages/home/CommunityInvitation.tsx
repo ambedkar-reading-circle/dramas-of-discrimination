@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { offsetToNextRule, useNotebookRuleAlign } from '#/lib/notebook-align'
 import { splitSectionClasses } from './content/splitSectionClasses'
+import { viewportSection } from './FitSectionButton'
 
 export default function CommunityInvitation() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -26,7 +27,7 @@ export default function CommunityInvitation() {
   useNotebookRuleAlign(observePadding, alignPadding)
 
   return (
-    <section ref={sectionRef} className={`${splitSectionClasses} shadow-[inset_0_1px_var(--ink-faint)]`} style={{ paddingTop: 'calc(var(--notebook-section-space) + var(--community-rule-offset, 0px))' }}>
+    <section {...viewportSection} ref={sectionRef} className={`${splitSectionClasses} shadow-[inset_0_1px_var(--ink-faint)]`} style={{ paddingTop: 'calc(var(--notebook-section-space) + var(--community-rule-offset, 0px))' }}>
       <div className="notebook-stack">
         <p className="eyebrow">Bring it to your community</p>
         <h2>Run the workshop in your community.</h2>
