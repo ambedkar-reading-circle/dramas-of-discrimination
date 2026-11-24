@@ -13,18 +13,15 @@ export interface InstantPhotoData {
 
 /** What a shown photo can do to the reveal that opened it. */
 export interface PhotoControls {
-  keep: () => void
   close: () => void
-  startDrag: () => void
-  endDrag: () => void
 }
 
 export interface PhotoReveal<TKey> extends PhotoControls {
   active: TKey | null
   open: (key: TKey) => void
   isOpen: (key: TKey) => boolean
-  /** Closes the photo if it was open when the press began, otherwise opens it. */
-  toggle: (key: TKey, wasOpen: boolean) => void
+  /** Opens this key's photo, or puts it back if it is the one showing. */
+  toggle: (key: TKey) => void
 }
 
 export interface InstantPhotoProps extends InstantPhotoData {
