@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { slides } from './slides'
-import DeckControl, { DeckMark } from './components/DeckControl'
+import MarkButton, { Mark } from '#/components/MarkButton'
 import { usePresentationDeck } from './hooks/usePresentationDeck'
 import SlideIndex, { SlideOverviewControl } from './components/SlideIndex'
 import SlideNav from './components/SlideNav'
@@ -58,7 +58,7 @@ export default function PresentationDeck() {
         </p>
         <div className="presentation-tools">
           <SlideOverviewControl open={overviewOpen} onOpen={() => setOverviewOpen(true)} />
-          <DeckControl label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />
+          <MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />
         </div>
       </header>
 
@@ -77,16 +77,16 @@ export default function PresentationDeck() {
 
 function FullscreenMark() {
   return (
-    <DeckMark>
+    <Mark>
       <path d="M6 2.5H2.5V6M10 2.5h3.5V6M13.5 10v3.5H10M2.5 10v3.5H6" />
-    </DeckMark>
+    </Mark>
   )
 }
 
 function ExitFullscreenMark() {
   return (
-    <DeckMark>
+    <Mark>
       <path d="M6 2.5v3.5H2.5M10 2.5v3.5h3.5M13.5 10H10v3.5M2.5 10H6v3.5" />
-    </DeckMark>
+    </Mark>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Slide } from '../types'
-import DeckControl, { DeckMark } from './DeckControl'
+import MarkButton, { Mark } from '#/components/MarkButton'
 
 interface SlideIndexProps {
   slides: ReadonlyArray<Slide>
@@ -13,7 +13,7 @@ interface SlideIndexProps {
 
 /** Opens the slide grid. Rendered beside the fullscreen control, not in the deck flow. */
 export function SlideOverviewControl({ open, onOpen }: { open: boolean; onOpen: () => void }) {
-  return <DeckControl label="Overview" expanded={open} controls="slide-overview" popup="dialog" onClick={onOpen} mark={<OverviewMark />} />
+  return <MarkButton label="Overview" expanded={open} controls="slide-overview" popup="dialog" onClick={onOpen} mark={<OverviewMark />} />
 }
 
 /** Overview dialog. The slide grid opens as a modal over the deck. */
@@ -77,7 +77,7 @@ export default function SlideIndex({ slides, current, open, onOpenChange, onSele
             <p id="slide-overview-title" className="eyebrow">
               <span>All slides</span>
             </p>
-            <DeckControl label="Close overview" onClick={() => onOpenChange(false)} mark={<CloseOverviewMark />} />
+            <MarkButton label="Close overview" onClick={() => onOpenChange(false)} mark={<CloseOverviewMark />} />
           </div>
           <div className="slide-overview" id="slide-overview">
             {slides.map((slide, index) => (
@@ -106,19 +106,19 @@ export default function SlideIndex({ slides, current, open, onOpenChange, onSele
 
 function OverviewMark() {
   return (
-    <DeckMark>
+    <Mark>
       <rect x="2" y="2" width="5" height="5" />
       <rect x="9" y="2" width="5" height="5" />
       <rect x="2" y="9" width="5" height="5" />
       <rect x="9" y="9" width="5" height="5" />
-    </DeckMark>
+    </Mark>
   )
 }
 
 function CloseOverviewMark() {
   return (
-    <DeckMark>
+    <Mark>
       <path d="m3.5 3.5 9 9M12.5 3.5l-9 9" />
-    </DeckMark>
+    </Mark>
   )
 }

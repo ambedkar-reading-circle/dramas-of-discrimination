@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { Slide } from '../types'
-import DeckControl from './DeckControl'
+import MarkButton, { MarkGlyph } from '#/components/MarkButton'
 
 interface SlideNavProps {
   slides: ReadonlyArray<Slide>
@@ -103,7 +103,7 @@ export default function SlideNav({ slides, slide, total, next, prev, onSelect, o
   return (
     <div className="slide-nav">
       <nav className="slide-nav-controls" aria-label="Change slides">
-        <DeckControl label="Previous slide" disabled={slide <= 1} onClick={prev} mark={<span className="deck-control-glyph">←</span>} />
+        <MarkButton label="Previous slide" disabled={slide <= 1} onClick={prev} mark={<MarkGlyph>←</MarkGlyph>} />
         <div ref={stripRef} className="slide-index-strip" role="group" aria-label="Jump to a slide" data-lenis-prevent="" onKeyDown={onStripKeyDown}>
           {entries.map((entry) =>
             entry.kind === 'gap' ? (
@@ -128,7 +128,7 @@ export default function SlideNav({ slides, slide, total, next, prev, onSelect, o
             ),
           )}
         </div>
-        <DeckControl label="Next slide" disabled={slide >= total} onClick={next} mark={<span className="deck-control-glyph">→</span>} />
+        <MarkButton label="Next slide" disabled={slide >= total} onClick={next} mark={<MarkGlyph>→</MarkGlyph>} />
       </nav>
       <div className="slide-progress" aria-hidden="true">
         <div className="slide-progress-fill" style={{ inlineSize: `${(slide / total) * 100}%` }} />
