@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import type { Transition, Variants } from 'motion/react'
+import type { Variants } from 'motion/react'
 import DodLogo from '#/components/DodLogo'
 import { twoDigit } from '#/lib/format'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
 import { recordedExamples } from './content/recordedExamples'
+import { GuideJourney, motionUnlessReduced, stateOf } from './GuideJourney'
 import './FacilitationGuideMockup.css'
 
 /** Every step of the workshop in order, so Back and Next walk the whole journey. */
@@ -22,16 +23,6 @@ const stickerTilts = [-1.8, 1.4, -0.9, 2.1]
 const startElapsed = 47 * 60 + 12
 
 const ease = [0.22, 1, 0.36, 1] as const
-const spring: Transition = { type: 'spring', stiffness: 260, damping: 30 }
-
-type StepState = 'done' | 'now' | 'next'
-
-function stateOf(index: number, current: number): StepState {
-  return index < current ? 'done' : index === current ? 'now' : 'next'
-}
-
-/** How full an act's track is: done and upcoming acts are settled, the current one fills by step. */
-const settledFill: Partial<Record<StepState, number>> = { done: 1, next: 0 }
 
 function clock(seconds: number) {
   const h = Math.floor(seconds / 3600)
@@ -104,30 +95,7 @@ export function FacilitationGuideMockup() {
       </header>
 
       <div className="fac-screen">
-        <nav className="fac-journey" aria-label="Workshop journey">
-          <ol>
-            {workshopActivities.map((item, index) => {
-              const state = stateOf(index, act)
-              const fill = settledFill[state] ?? (step + 0.5) / item.steps.length
-              return (
-                <li key={item.name} data-state={state} style={{ flexGrow: item.duration }}>
-                  <button type="button" onClick={() => goTo(index, 0)} aria-current={state === 'now' ? 'step' : undefined}>
-                    <span className="fac-journey-num">{twoDigit(index + 1)}</span>
-                    <span className="fac-journey-name">{item.name}</span>
-                    <span className="fac-journey-time">{item.duration}′</span>
-                  </button>
-                  <span className="fac-journey-track" aria-hidden="true">
-                    {item.steps.map((_, stepIndex) => (
-                      <span key={stepIndex} className="fac-journey-notch" style={{ left: `${(stepIndex / item.steps.length) * 100}%` }} />
-                    ))}
-                    <motion.span className="fac-journey-fill" initial={false} animate={{ width: `${fill * 100}%` }} transition={reducedMotion ? { duration: 0 } : spring} />
-                    {state === 'now' && <motion.span layoutId="fac-here" className="fac-journey-here" style={{ left: `${fill * 100}%` }} transition={reducedMotion ? { duration: 0 } : spring} />}
-                  </span>
-                </li>
-              )
-            })}
-          </ol>
-        </nav>
+        <GuideJourney act={act} step={step} onSelect={(index) => goTo(index, 0)} />
 
         <div className="fac-desk">
           <AnimatePresence initial={false} mode="popLayout" custom={direction}>
@@ -161,7 +129,7 @@ export function FacilitationGuideMockup() {
                       return (
                         <li key={item.text} data-state={state}>
                           {state === 'now' && (
-                            <motion.span layoutId={`fac-now-${act}`} className="fac-step-slip" aria-hidden="true" transition={reducedMotion ? { duration: 0 } : spring}>
+                            <motion.span layoutId={`fac-now-${act}`} className="fac-step-slip" aria-hidden="true" transition={motionUnlessReduced(reducedMotion)}>
                               <span className="fac-step-tape" />
                             </motion.span>
                           )}

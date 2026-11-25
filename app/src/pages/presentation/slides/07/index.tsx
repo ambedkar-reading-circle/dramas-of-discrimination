@@ -4,8 +4,16 @@ import { ModesMockup } from './ModesMockup'
 export const slide = {
   id: '07',
   kicker: 'Future plans · B',
-  heading: 'Local & Cloud modes',
-  body: <p className="section-lede-copy">In Local mode the room works on one shared device, and nothing leaves it. In Cloud mode the Community opts in, and every Member joins their Group from their own device.</p>,
+  heading: 'Who holds the data',
   interactive: <ModesMockup />,
-  speakerNotes: ['Local mode runs entirely in one browser, on one device. There is no account, and the work stays in that browser. Nothing leaves the device.', 'When a Rehearsal is done, Local mode turns its tables into a prompt the room can carry to an LLM of its own choosing. The platform never sees it.', 'Cloud mode is the opt-in. A Facilitator registers the Community, creates its Groups, and hands each Group a Join code.', 'Each Member then joins their Group from their own device, and the Group’s work stays in sync across all of them.'],
+  speakerNoteTabs: [
+    {
+      label: 'Local mode',
+      speakerNotes: ['Both modes run the same facilitation guide. What changes is where the data lives, and that is for the Community to decide.', 'Local mode is about data sovereignty. The guide is only a shell: it runs in one browser on the room’s shared screen, with no account, and the Rehearsal never leaves that device.', 'On screen, one cursor fills the Actor map. The room talks it through, and one person writes it down.', 'When the Rehearsal is done, Local mode turns its tables into a prompt the Community can take to an LLM of its own choosing. The platform never sees it.'],
+    },
+    {
+      label: 'Cloud mode',
+      speakerNotes: ['Cloud mode is the opt-in. The Community chooses to share its data with the platform, and through it with other Communities working through the same questions.', 'In return it gets a live, shared platform. A Facilitator registers the Community and hands each Group a Join code. Every Community keeps its own space.', 'On screen, every Member writes into the same sheet from their own device, at the same time, each under their own name.', 'There is no single scribe. In a truly participatory spirit, everyone charts the course together.'],
+    },
+  ],
 } satisfies Slide
