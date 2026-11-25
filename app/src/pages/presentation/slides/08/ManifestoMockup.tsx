@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
@@ -7,6 +7,7 @@ import { GuideFrame } from '../shared/GuideFrame'
 import { ModeBar } from '../shared/ModeControls'
 import type { Mode } from '../shared/ModeControls'
 import { SheetTabs } from '../shared/SheetTabs'
+import { useCopyText } from '../shared/useCopyText'
 import { WriterCaret, WriterCursors } from '../shared/WriterCursors'
 import { FernCorner } from './FernCorner'
 import { draft, prompt } from './content/manifesto'
@@ -42,22 +43,7 @@ export function ManifestoMockup() {
 
 /** Local mode: the Group's worksheets as a prompt, ready to copy. */
 function PromptExport() {
-  const [copied, setCopied] = useState(false)
-
-  useEffect(() => {
-    if (!copied) return
-    const timer = setTimeout(() => setCopied(false), 2200)
-    return () => clearTimeout(timer)
-  }, [copied])
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(prompt)
-      setCopied(true)
-    } catch {
-      setCopied(false)
-    }
-  }
+  const { copied, copy } = useCopyText(prompt)
 
   return (
     <>

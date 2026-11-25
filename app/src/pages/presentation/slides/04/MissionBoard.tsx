@@ -7,24 +7,12 @@ import type { Reveal } from '#/components/Reveal'
 import { cardSpring, hoverLift } from '#/lib/card-motion'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
+import { riseVariants } from '../shared/motion'
 import { cards, missionLabel, missionPhotos, missionResult, missionResultFinding, missionResultNote, missionSource } from './content/mission'
 import type { MissionCard, MissionPhotoKey } from './content/mission'
 import './MissionBoard.css'
 
 const arrow = { size: 18, strokeWidth: 1.5 }
-
-// The slide frame animates from "enter" to "center"; these inherit it.
-function riseVariants(reduce: boolean, tilt = 0): Variants {
-  return {
-    enter: reduce ? { opacity: 0 } : { opacity: 0, y: 14, rotate: 0 },
-    center: (order: number) => ({
-      opacity: 1,
-      y: 0,
-      rotate: reduce ? 0 : tilt,
-      transition: reduce ? { duration: 0.15 } : { ...cardSpring, delay: 0.15 + order * 0.12 },
-    }),
-  }
-}
 
 // The marks settle onto the spectrum after their card lands.
 function readingVariants(reduce: boolean): Variants {

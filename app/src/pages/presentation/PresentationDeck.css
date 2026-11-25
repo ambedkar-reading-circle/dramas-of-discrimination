@@ -681,28 +681,6 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Closing */
-  .slide-closing {
-    display: grid;
-    gap: var(--notebook-row);
-    justify-items: center;
-  }
-
-  .slide-closing-lede {
-    font-size: 1.25rem;
-    max-width: 40ch;
-  }
-
-  .slide-closing .slide-asset {
-    width: min(100%, calc(20 * var(--notebook-row)));
-    justify-self: center;
-  }
-
-  .slide-embed-hint {
-    font-size: 0.875rem;
-    color: var(--sea-ink-soft);
-  }
-
   /* Screen-reader-only text. */
   .slide-sr {
     position: absolute;
