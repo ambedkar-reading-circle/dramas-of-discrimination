@@ -24,7 +24,7 @@ export function MethodCollection({ fitTo, hint = true }: MethodCollectionProps) 
   const transition = reduceMotion ? { duration: 0 } : spring
 
   return (
-    <div className="method-collection" data-notebook-independent>
+    <div className="method-collection activity-surface" data-notebook-independent>
       <div className="method-deck" ref={deck} style={{ height: geometry.height }}>
         <ol className="method-sheets" aria-label="Workshop activities">
           {workshopActivities.map((activity, index) => (

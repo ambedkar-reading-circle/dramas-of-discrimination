@@ -1,0 +1,760 @@
+/* The facilitation guide. Navy chrome around a cream screen, as the real
+   app has it; the act lies open on it as the same facilitation sheet the
+   method uses (cotton paper, blue ink, taped stickers). Every region has a
+   fixed size, so moving between steps never shifts the layout. Fixed colours
+   in either theme: it stands for a screen the room will see. */
+@layer components {
+  .fac {
+    --fac-navy: var(--primary-blue);
+    --fac-cream: var(--primary-white);
+    --fac-red: #9d2f2f;
+    --fac-desk-height: 31rem;
+
+    display: grid;
+    gap: 0.375rem;
+    width: 100%;
+    max-width: 66rem;
+    margin-inline: auto;
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    background: var(--fac-navy);
+    color: var(--fac-cream);
+    box-shadow:
+      0 2px 4px rgb(19 24 87 / 0.15),
+      0 24px 48px -16px rgb(19 24 87 / 0.4);
+  }
+
+  /* The app sets its own type, off the notebook's ruled rows. */
+  .fac :where(p, h3, h4, figure, figcaption) {
+    top: 0;
+    margin: 0;
+  }
+
+  .fac button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  .fac button:focus-visible {
+    outline: 2px solid var(--fac-red);
+    outline-offset: 2px;
+  }
+
+  .fac-label {
+    font: 10px/1.5 var(--font-logo);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--activity-ink);
+    opacity: 0.75;
+  }
+
+  /* Navy bars, top and foot */
+  .fac-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 2.75rem;
+    padding: 0.25rem 0.375rem 0.25rem 0.75rem;
+    font: 12px/1.4 var(--font-logo);
+  }
+
+  .fac-bar-title {
+    display: inline-flex;
+    gap: 0.5rem;
+    font-size: 13px;
+  }
+
+  .fac-bar-room {
+    margin-inline-start: auto;
+  }
+
+  .fac-hl {
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    box-shadow: inset 0 0 0 1px rgb(255 255 238 / 0.45);
+  }
+
+  .fac-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 8.5rem;
+    justify-content: center;
+    padding: 0.4375rem 0.875rem;
+    border-radius: 0.25rem;
+    background: var(--fac-cream);
+    color: var(--fac-red);
+    font: 14px/1 var(--font-logo);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fac-clock-dot {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: var(--fac-red);
+    animation: fac-breathe 2.4s ease-in-out infinite;
+  }
+
+  .fac-bar--foot {
+    gap: 0.75rem;
+  }
+
+  .fac-wordmark {
+    flex: none;
+  }
+
+  .fac-pace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-inline-start: auto;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  .fac-pace .method-clock {
+    width: 11px;
+    height: 11px;
+    border: 1px solid;
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .fac-pace .method-clock::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    width: 3px;
+    height: 4px;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+  }
+
+  .fac-nav {
+    display: flex;
+    flex: none;
+    gap: 0.375rem;
+  }
+
+  .fac-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    min-width: 5.5rem;
+    min-height: 2.125rem;
+    padding: 0 0.875rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px rgb(255 255 238 / 0.5);
+    font: 12px/1 var(--font-logo);
+    white-space: nowrap;
+    transition:
+      background 180ms ease,
+      translate 180ms ease;
+  }
+
+  .fac-btn:hover:not(:disabled) {
+    background: rgb(255 255 238 / 0.1);
+  }
+
+  .fac .fac-btn--primary {
+    min-width: 9.5rem;
+    justify-content: center;
+    background: var(--fac-cream);
+    color: var(--fac-navy);
+    box-shadow: none;
+  }
+
+  .fac .fac-btn--primary:hover:not(:disabled) {
+    background: #fff;
+    translate: 0 -1px;
+  }
+
+  .fac-btn-arrow {
+    transition: translate 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fac-btn--primary:hover:not(:disabled) .fac-btn-arrow {
+    translate: 3px 0;
+  }
+
+  .fac-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .fac-logo {
+    height: 2.125rem;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--fac-cream);
+  }
+
+  /* The cream screen between the bars */
+  .fac-screen {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.875rem 0.875rem 0;
+    border-radius: 0.25rem;
+    background: var(--fac-cream);
+    color: var(--fac-navy);
+  }
+
+  /* Journey: five acts, each as wide as its share of the day */
+  .fac-journey ol {
+    display: flex;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fac-journey li {
+    display: grid;
+    gap: 0.375rem;
+    flex-basis: 0;
+    min-width: 7.25rem;
+  }
+
+  .fac-journey button {
+    display: flex;
+    align-items: baseline;
+    gap: 0.375rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0 0 1px var(--ink-faint);
+    font: 12px/1.4 var(--font-logo);
+    white-space: nowrap;
+    transition:
+      background 220ms ease,
+      color 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .fac-journey button:hover {
+    background: var(--ink-scrim);
+  }
+
+  .fac-journey [data-state='now'] button {
+    background: var(--fac-navy);
+    color: var(--fac-cream);
+    box-shadow: none;
+  }
+
+  .fac-journey [data-state='next'] button {
+    color: color-mix(in srgb, var(--fac-navy) 60%, var(--fac-cream));
+  }
+
+  .fac-journey-num {
+    font-size: 9px;
+    opacity: 0.55;
+  }
+
+  .fac-journey-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fac-journey-time {
+    margin-inline-start: auto;
+    font-size: 10px;
+    opacity: 0.65;
+  }
+
+  .fac-journey-track {
+    position: relative;
+    height: 3px;
+    margin-inline: 0.125rem;
+    border-radius: 999px;
+    background: var(--ink-faint);
+  }
+
+  .fac-journey-notch {
+    position: absolute;
+    top: -2px;
+    width: 1px;
+    height: 7px;
+    background: color-mix(in srgb, var(--fac-navy) 35%, transparent);
+  }
+
+  .fac-journey-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: inherit;
+    background: var(--fac-navy);
+  }
+
+  .fac-journey-here {
+    position: absolute;
+    top: 50%;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin: -0.3125rem 0 0 -0.3125rem;
+    border: 2px solid var(--fac-cream);
+    border-radius: 50%;
+    background: var(--fac-red);
+    box-shadow: 0 0 0 1px var(--fac-red);
+  }
+
+  .fac-journey-here::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1px solid var(--fac-red);
+    animation: fac-ripple 2.4s ease-out infinite;
+  }
+
+  /* The desk: a fixed stage the sheets slide on and off */
+  .fac-desk {
+    position: relative;
+    height: var(--fac-desk-height);
+    margin-inline: -0.875rem;
+    padding: 0.25rem 0.875rem 0.875rem;
+    overflow: hidden;
+  }
+
+  .fac-sheet {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    padding: 1.125rem 1.375rem 1.25rem;
+    color: var(--activity-ink);
+    background: var(--activity-paper) url('/manual-cotton-paper.svg') repeat;
+    background-size: 420px;
+    border: 1px solid #2b448e2b;
+    border-radius: 4px 8px 8px 4px;
+    box-shadow:
+      0 2px 3px #13185712,
+      0 8px 20px #13185717,
+      inset 4px 0 5px #a58c5d0c;
+  }
+
+  .fac-sheet-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 1rem;
+    min-height: 4.75rem;
+  }
+
+  .fac-topline {
+    font: 10px/1.2 var(--font-logo);
+    letter-spacing: 0.03em;
+  }
+
+  .fac-sheet-title {
+    margin-top: 0.375rem;
+    font: 34px/1.1 var(--font-logo);
+    letter-spacing: -0.065em;
+    white-space: nowrap;
+  }
+
+  .fac-sheet-subtitle {
+    margin-top: 0.375rem;
+    font: 10px/1.4 var(--font-logo);
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  .fac-stickers {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 0.625rem;
+    padding-top: 0.5rem;
+  }
+
+  .fac-sticker {
+    display: grid;
+    white-space: nowrap;
+    gap: 3px;
+    padding: 0.625rem 0.75rem 0.5rem;
+    --tape-width: 34px;
+    cursor: pointer;
+  }
+
+  .fac-sticker-label {
+    font: 10px/1.2 var(--font-logo);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .fac-sticker-detail {
+    font: 9px/1.2 var(--font-logo);
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+
+  .fac-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 1.75rem;
+    min-height: 0;
+  }
+
+  /* Steps, with the current one taped on as a slip */
+  .fac-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    min-height: 0;
+  }
+
+  .fac-steps {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fac-steps li {
+    position: relative;
+  }
+
+  .fac-step-slip {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--activity-line);
+    border-radius: 2px;
+    background: var(--activity-card);
+    box-shadow: var(--activity-lift);
+    rotate: -0.5deg;
+  }
+
+  .fac-step-tape {
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    width: 44px;
+    height: 14px;
+    translate: -50% 0;
+    rotate: -4deg;
+    background: var(--activity-tape);
+    box-shadow: inset 0 0 0 1px var(--activity-tape-edge);
+  }
+
+  .fac-steps button {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.375rem 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 0.625rem;
+    border-radius: 2px;
+    transition: opacity 300ms ease;
+  }
+
+  .fac-steps [data-state='next'] button:hover,
+  .fac-steps [data-state='done'] button:hover {
+    background: color-mix(in srgb, var(--activity-ink) 5%, transparent);
+  }
+
+  .fac-step-num {
+    padding-top: 0.25rem;
+    font: 10px/1.6 var(--font-logo);
+    opacity: 0.7;
+  }
+
+  .fac-step-text {
+    font: 16px/1.45 var(--font-body);
+  }
+
+  .fac-steps [data-state='done'] button {
+    opacity: 0.5;
+  }
+
+  .fac-steps [data-state='next'] button {
+    opacity: 0.72;
+  }
+
+  .fac-prompt {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dotted #2b448e55;
+  }
+
+  /* Two lines, always, so the prompt never moves between acts. */
+  .fac-prompt p {
+    display: -webkit-box;
+    height: calc(2 * 1.4em);
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font: 18px/1.4 var(--font-body);
+    text-wrap: pretty;
+  }
+
+  .fac-quote {
+    margin-inline-end: 0.25rem;
+    font: 28px/0 var(--font-logo);
+    vertical-align: -0.35em;
+    color: var(--fac-red);
+  }
+
+  /* The recorded example, laid on the sheet as an instant print */
+  .fac-media {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    min-height: 0;
+    padding-left: 1.5rem;
+    border-left: 1px dotted #2b448e55;
+  }
+
+  .fac-print-stage {
+    position: relative;
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    align-items: start;
+  }
+
+  .fac-print {
+    grid-area: 1 / 1;
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0.625rem;
+    border-radius: 3px;
+    background:
+      linear-gradient(160deg, var(--photo-sheen), transparent 45%),
+      radial-gradient(120% 90% at 50% 40%, transparent 60%, var(--photo-aging)),
+      var(--photo-stock);
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.06),
+      0 1px 1px rgb(0 0 0 / 0.1),
+      0 8px 16px -4px rgb(0 0 0 / 0.18),
+      0 18px 32px -12px rgb(19 24 87 / 0.3);
+    color: var(--photo-ink);
+  }
+
+  .fac-video {
+    position: relative;
+    display: grid;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #0b0e33;
+    color: #fff;
+  }
+
+  .fac-video-still {
+    grid-area: 1 / 1;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    animation: fac-drift 14s ease-in-out infinite alternate;
+  }
+
+  .fac-video-still img {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.12) saturate(0.9) contrast(1.04);
+  }
+
+  /* Two manual pages, laid as an open spread on a dark desk. */
+  .fac-video[data-spread] .fac-video-still {
+    justify-content: center;
+    gap: 1px;
+    padding: 0.5rem 0 1.75rem;
+  }
+
+  .fac-video[data-spread] .fac-video-still img {
+    flex: none;
+    width: auto;
+    object-fit: contain;
+    filter: none;
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.45);
+  }
+
+  /* The drifting still paints as its own layer, so what lies on it is lifted. */
+  .fac-video-shade,
+  .fac-video-play {
+    position: relative;
+  }
+
+  .fac-video-shade {
+    grid-area: 1 / 1;
+    background: linear-gradient(0deg, rgb(11 14 51 / 0.75), transparent 45%);
+  }
+
+  .fac-video-play {
+    grid-area: 1 / 1;
+    place-self: center;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    padding-inline-start: 0.1875rem;
+    border-radius: 50%;
+    background: rgb(255 255 238 / 0.92);
+    color: var(--fac-navy);
+    box-shadow:
+      0 0 0 7px rgb(255 255 238 / 0.2),
+      0 6px 18px rgb(0 0 0 / 0.35);
+    transition: scale 220ms ease;
+  }
+
+  .fac-print:hover .fac-video-play {
+    scale: 1.06;
+  }
+
+  .fac-video-bar {
+    position: absolute;
+    inset: auto 0.625rem 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.375rem 0.75rem;
+    font: 10px/1 var(--font-logo);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fac-video-scrub {
+    grid-column: 1 / -1;
+    height: 3px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.3);
+  }
+
+  .fac-video-scrub span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--fac-cream);
+  }
+
+  .fac-video-cc {
+    opacity: 0.8;
+  }
+
+  .fac-print figcaption {
+    display: -webkit-box;
+    height: calc(3 * 1.35em);
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    font: 14px/1.35 var(--font-body);
+  }
+
+  @keyframes fac-breathe {
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes fac-ripple {
+    from {
+      opacity: 0.7;
+      scale: 0.6;
+    }
+    to {
+      opacity: 0;
+      scale: 1.6;
+    }
+  }
+
+  @keyframes fac-drift {
+    from {
+      scale: 1;
+      translate: 0 0;
+    }
+    to {
+      scale: 1.07;
+      translate: -1.5% -1%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fac *,
+    .fac *::before,
+    .fac *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* Narrow screens: the sheet stacks and grows to its content. */
+  @media (max-width: 760px) {
+    .fac-desk {
+      height: auto;
+    }
+
+    .fac-stickers {
+      flex-wrap: wrap;
+    }
+
+    .fac-prompt p {
+      height: auto;
+      -webkit-line-clamp: unset;
+    }
+
+    .fac-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .fac-media {
+      order: -1;
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .fac-sheet-head {
+      flex-direction: column;
+    }
+
+    .fac-stickers {
+      justify-content: flex-start;
+    }
+
+    .fac-prompt {
+      margin-top: 0.5rem;
+    }
+
+    .fac-bar-room,
+    .fac-pace,
+    .fac-wordmark,
+    .fac-logo {
+      display: none;
+    }
+
+    .fac-nav {
+      margin-inline-start: auto;
+    }
+
+    .fac-journey ol {
+      gap: 0.25rem;
+    }
+
+    /* Too narrow to size acts by length: each takes an equal share. */
+    .fac-journey li {
+      flex-grow: 1 !important;
+      min-width: 0;
+    }
+
+    .fac-journey-num,
+    .fac-journey-time {
+      display: none;
+    }
+
+    .fac-journey button {
+      justify-content: center;
+      font-size: 10px;
+      padding-inline: 0.125rem;
+    }
+  }
+}

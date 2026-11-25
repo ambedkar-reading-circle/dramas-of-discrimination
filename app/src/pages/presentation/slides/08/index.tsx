@@ -1,19 +1,11 @@
 import type { Slide } from '../../types'
-import { PairCard } from './PairCard'
+import { ManifestoMockup } from './ManifestoMockup'
 
 export const slide = {
   id: '08',
-  kicker: 'Where it runs',
-  heading: 'Scenarios & interventions',
-  body: <p className="section-lede-copy">The method travels: each pair is a Scenario and the intervention a Group rehearsed for it.</p>,
-  interactive: (
-    <div className="slide-card-grid slide-pairs">
-      <PairCard context="Peer groups" scenario="Banter mimics a friend’s dialect for laughs." intervention="A peer names it in the moment and holds the line." />
-      <PairCard context="Schools & villages" scenario="Children seated apart at the midday meal." intervention="A teacher seats everyone together — and answers for it." />
-      <PairCard context="Workplaces" scenario="“Not a culture fit,” said of a Bahujan candidate." intervention="A colleague asks the panel to show its rubric." />
-      <PairCard context="Neighbours" scenario="A flat is “already taken” when the surname shows." intervention="Another resident vouches and stays with the application." />
-      <PairCard context="Media" scenario="Coverage hides the caste pattern in a story." intervention="Readers write in; the desk corrects the frame." />
-    </div>
-  ),
-  layout: 'grid',
+  kicker: 'Future plans · C',
+  heading: 'The Manifesto of Inclusion',
+  body: <p className="section-lede-copy">Once every Group has submitted its Rehearsal, the Facilitator generates the Workshop’s Manifesto of Inclusion. It joins a repository beside the Manifestos of every other Workshop.</p>,
+  interactive: <ManifestoMockup />,
+  speakerNotes: ['Each Group’s Members sign off their Rehearsal when it is ready, and the Facilitator submits it to the Workshop.', 'Once every Rehearsal is in, the Facilitator generates a manifesto draft from all of their tables together: the Actors, their Failures, and the interventions the room rehearsed.', 'Every Manifesto joins a shared repository, so each Community can read what others have committed to, from workplaces to colleges to neighbourhoods.'],
 } satisfies Slide

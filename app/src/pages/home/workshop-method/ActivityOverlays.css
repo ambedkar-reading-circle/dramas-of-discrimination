@@ -1,9 +1,11 @@
 /*
  * What lies on and over an open facilitation sheet: taped stickers, and the
  * manual pages or photographic prints they lay over it. The tokens live on
- * .method-collection beside the sheet's paper and ink.
+ * .activity-surface: the method collection, or any page that lays a sheet out.
  */
-.method-collection {
+.activity-surface {
+  --activity-paper: #f8f3e7;
+  --activity-ink: #2b448e;
   --activity-card: #fffdf6;
   --activity-shadow-ink: #131857;
   --activity-line: color-mix(in srgb, var(--activity-ink) 17%, transparent);

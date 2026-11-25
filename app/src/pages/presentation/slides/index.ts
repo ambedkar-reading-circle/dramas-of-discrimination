@@ -8,11 +8,6 @@ import { slide as slide06 } from './06'
 import { slide as slide07 } from './07'
 import { slide as slide08 } from './08'
 import { slide as slide09 } from './09'
-import { slide as slide10 } from './10'
-import { slide as slide11 } from './11'
-import { slide as slide12 } from './12'
-import { slide as slide13 } from './13'
-import { slide as slide14 } from './14'
 
 export const slides: ReadonlyArray<Slide> = [
   slide01,
@@ -24,9 +19,4 @@ export const slides: ReadonlyArray<Slide> = [
   slide07,
   slide08,
   slide09,
-  slide10,
-  slide11,
-  slide12,
-  slide13,
-  slide14,
 ]

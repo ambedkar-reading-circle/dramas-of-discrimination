@@ -18,10 +18,6 @@
 .workshop-method .section-lede .eyebrow {
   top: var(--method-baseline-offset, var(--notebook-text-offset));
 }
-.method-collection {
-  --activity-paper: #f8f3e7;
-  --activity-ink: #2b448e;
-}
 .workshop-method .method-collection {
   margin-block: var(--notebook-row) 0;
 }

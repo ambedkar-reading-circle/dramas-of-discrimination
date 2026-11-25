@@ -1,5 +1,9 @@
+/** The five acts of the workshop, in order. */
+export type ActivityName =
+  'IntroTime' | 'PartTime' | 'StoryTime' | 'PlayTime' | 'OverTime'
+
 export interface WorkshopActivity {
-  name: string
+  name: ActivityName
   title: string
   duration: number
   preview: string

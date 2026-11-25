@@ -1,10 +1,11 @@
 import type { Slide } from '../../types'
+import { ClosingSlideBody } from './ClosingSlideBody'
 
 export const slide = {
   id: '09',
-  kicker: 'The room',
-  heading: 'Rehearsal in action',
-  body: <p className="section-lede-copy">Groups mid-Workshop: mapping Actors, scripting Dialogues, stepping into the scene.</p>,
-  assets: [{ role: 'video', note: 'A second clip, from a Rehearsal' }],
-  layout: 'split',
+  kicker: 'Thank you',
+  heading: 'Any questions?',
+  body: <ClosingSlideBody />,
+  layout: 'centered',
+  speakerNotes: ['Thank the audience.', 'Open the floor for questions.'],
 } satisfies Slide
