@@ -20,7 +20,7 @@ const afterLastAct = workshopActivities.length
 
 const tabs: Record<Mode, ReadonlyArray<string>> = {
   local: ['Worksheets', 'Prompt export'],
-  cloud: ['Worksheets', 'Manifesto', 'Repository'],
+  cloud: ['Worksheets', 'Manifesto', 'Portal'],
 }
 
 /**

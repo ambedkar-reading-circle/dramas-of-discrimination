@@ -91,3 +91,9 @@ _Avoid_: Table 2, dialogue graph, storytime sheet, scene graph
 **Dialogue**:
 A directed line in the Rehearsal's Play script — one speaker to one listener — which may carry tags naming the Failures it shows. A speaker without an Actor row stays unlinked forever.
 _Avoid_: line, utterance, edge
+
+### Public surface
+
+**Manifesto portal**:
+The open, public collection of every Manifesto of Inclusion a Community chooses to share — browsable by kind of Community, searchable, and read together for the pledges the collection holds in common. A Cloud-mode Community publishes to it; a Local-mode Community may bring its finished Manifesto or keep it to itself.
+_Avoid_: repository, library, archive, gallery

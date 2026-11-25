@@ -8,6 +8,12 @@
     --fac-cream: var(--primary-white);
     --fac-red: #9d2f2f;
     --fac-desk-height: 31rem;
+    /* The charter a Manifesto of Inclusion is laid out as, wherever it is read. */
+    --charter-paper: #f6ebcf;
+    --charter-ink: #2e2114;
+    --charter-gold: #a8823a;
+    --charter-fern: #56703a;
+    --charter-red: #8c2a22;
 
     display: grid;
     gap: 0.375rem;

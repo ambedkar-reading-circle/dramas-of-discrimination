@@ -8,11 +8,6 @@
 @layer components {
   .mani {
     --fac-desk-height: 38rem;
-    --charter-paper: #f6ebcf;
-    --charter-ink: #2e2114;
-    --charter-gold: #a8823a;
-    --charter-fern: #56703a;
-    --charter-red: #8c2a22;
   }
 
   .mani .fac-sheet {

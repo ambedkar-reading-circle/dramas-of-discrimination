@@ -11,9 +11,11 @@ type GuideFrameProps = {
   className?: string
   /** The mode the guide runs in, if the slide shows one. */
   mode?: Mode
-  /** Where the room is in the workshop journey. */
-  act: number
-  step: number
+  /** The top bar's title; the facilitation guide's, unless the screen is another. */
+  title?: ReactNode
+  /** Where the room is in the workshop journey; a screen above the Workshop shows none. */
+  act?: number
+  step?: number
   onSelectAct?: (act: number) => void
   /** The top bar past its title. */
   bar: ReactNode
@@ -23,19 +25,23 @@ type GuideFrameProps = {
   children: ReactNode
 }
 
+const guideTitle = (
+  <>
+    <span aria-hidden="true">↺</span> Facilitation guide
+  </>
+)
+
 /** The facilitation guide's shell: navy bars around a cream screen, the workshop journey across the top, and a desk below it. */
-export function GuideFrame({ label, className, mode, act, step, onSelectAct, bar, foot, children }: GuideFrameProps) {
+export function GuideFrame({ label, className, mode, title = guideTitle, act, step, onSelectAct, bar, foot, children }: GuideFrameProps) {
   return (
     <div className={['fac activity-surface', className].filter(Boolean).join(' ')} data-mode={mode} role="group" aria-label={label}>
       <header className="fac-bar">
-        <span className="fac-bar-title">
-          <span aria-hidden="true">↺</span> Facilitation guide
-        </span>
+        <span className="fac-bar-title">{title}</span>
         {bar}
       </header>
 
       <div className="fac-screen">
-        <GuideJourney act={act} step={step} onSelect={onSelectAct} />
+        {act !== undefined && step !== undefined && <GuideJourney act={act} step={step} onSelect={onSelectAct} />}
         <div className="fac-desk">{children}</div>
       </div>
 

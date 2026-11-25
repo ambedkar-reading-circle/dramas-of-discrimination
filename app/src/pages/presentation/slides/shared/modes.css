@@ -108,7 +108,8 @@
     border-bottom: 1px solid var(--activity-line);
   }
 
-  .modes-tab {
+  /* Under .fac, so a tab that is a button outranks the guide's button reset. */
+  .fac .modes-tab {
     padding: 0.5rem 1rem;
     margin-bottom: -1px;
     border: 1px solid transparent;
@@ -120,7 +121,16 @@
     opacity: 0.45;
   }
 
-  .modes-tab[data-active] {
+  /* A tab that can be chosen answers the pointer. */
+  .fac button.modes-tab {
+    transition: opacity 180ms ease;
+  }
+
+  .fac button.modes-tab:hover:not([data-active]) {
+    opacity: 0.7;
+  }
+
+  .fac .modes-tab[data-active] {
     border-color: var(--activity-line);
     background: var(--activity-card);
     opacity: 1;
