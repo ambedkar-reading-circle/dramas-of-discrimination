@@ -1,74 +1,8 @@
-/* The facilitation guide. Navy chrome around a cream screen, as the real
-   app has it; the act lies open on it as the same facilitation sheet the
-   method uses (cotton paper, blue ink, taped stickers). Every region has a
-   fixed size, so moving between steps never shifts the layout. Fixed colours
-   in either theme: it stands for a screen the room will see. */
+/* The facilitation guide on slide 06: the act lies open on the shared shell
+   (shared/guide.css) as the same facilitation sheet the method uses (cotton
+   paper, blue ink, taped stickers). Every region has a fixed size, so moving
+   between steps never shifts the layout. */
 @layer components {
-  .fac {
-    --fac-navy: var(--primary-blue);
-    --fac-cream: var(--primary-white);
-    --fac-red: #9d2f2f;
-    --fac-desk-height: 31rem;
-
-    display: grid;
-    gap: 0.375rem;
-    width: 100%;
-    max-width: 66rem;
-    margin-inline: auto;
-    padding: 0.375rem;
-    border-radius: 0.375rem;
-    background: var(--fac-navy);
-    color: var(--fac-cream);
-    box-shadow:
-      0 2px 4px rgb(19 24 87 / 0.15),
-      0 24px 48px -16px rgb(19 24 87 / 0.4);
-  }
-
-  /* The app sets its own type, off the notebook's ruled rows. */
-  .fac :where(p, h3, h4, figure, figcaption) {
-    top: 0;
-    margin: 0;
-  }
-
-  .fac button {
-    font: inherit;
-    color: inherit;
-    background: none;
-    border: 0;
-    padding: 0;
-    text-align: inherit;
-    cursor: pointer;
-  }
-
-  .fac button:focus-visible {
-    outline: 2px solid var(--fac-red);
-    outline-offset: 2px;
-  }
-
-  .fac-label {
-    font: 10px/1.5 var(--font-logo);
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--activity-ink);
-    opacity: 0.75;
-  }
-
-  /* Navy bars, top and foot */
-  .fac-bar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-height: 2.75rem;
-    padding: 0.25rem 0.375rem 0.25rem 0.75rem;
-    font: 12px/1.4 var(--font-logo);
-  }
-
-  .fac-bar-title {
-    display: inline-flex;
-    gap: 0.5rem;
-    font-size: 13px;
-  }
-
   .fac-bar-room {
     margin-inline-start: auto;
   }
@@ -99,14 +33,6 @@
     border-radius: 50%;
     background: var(--fac-red);
     animation: fac-breathe 2.4s ease-in-out infinite;
-  }
-
-  .fac-bar--foot {
-    gap: 0.75rem;
-  }
-
-  .fac-wordmark {
-    flex: none;
   }
 
   .fac-pace {
@@ -188,156 +114,6 @@
   .fac-btn:disabled {
     opacity: 0.35;
     cursor: default;
-  }
-
-  .fac-logo {
-    height: 2.125rem;
-    padding: 0.1875rem 0.5rem;
-    border-radius: 0.25rem;
-    background: var(--fac-cream);
-  }
-
-  /* The cream screen between the bars */
-  .fac-screen {
-    display: grid;
-    gap: 0.75rem;
-    padding: 0.875rem 0.875rem 0;
-    border-radius: 0.25rem;
-    background: var(--fac-cream);
-    color: var(--fac-navy);
-  }
-
-  /* Journey: five acts, each as wide as its share of the day */
-  .fac-journey ol {
-    display: flex;
-    gap: 0.625rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .fac-journey li {
-    display: grid;
-    gap: 0.375rem;
-    flex-basis: 0;
-    min-width: 7.25rem;
-  }
-
-  .fac-journey button {
-    display: flex;
-    align-items: baseline;
-    gap: 0.375rem;
-    padding: 0.25rem 0.375rem;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--ink-faint);
-    font: 12px/1.4 var(--font-logo);
-    white-space: nowrap;
-    transition:
-      background 220ms ease,
-      color 220ms ease,
-      box-shadow 220ms ease;
-  }
-
-  .fac-journey button:hover {
-    background: var(--ink-scrim);
-  }
-
-  .fac-journey [data-state='now'] button {
-    background: var(--fac-navy);
-    color: var(--fac-cream);
-    box-shadow: none;
-  }
-
-  .fac-journey [data-state='next'] button {
-    color: color-mix(in srgb, var(--fac-navy) 60%, var(--fac-cream));
-  }
-
-  .fac-journey-num {
-    font-size: 9px;
-    opacity: 0.55;
-  }
-
-  .fac-journey-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .fac-journey-time {
-    margin-inline-start: auto;
-    font-size: 10px;
-    opacity: 0.65;
-  }
-
-  .fac-journey-track {
-    position: relative;
-    height: 3px;
-    margin-inline: 0.125rem;
-    border-radius: 999px;
-    background: var(--ink-faint);
-  }
-
-  .fac-journey-notch {
-    position: absolute;
-    top: -2px;
-    width: 1px;
-    height: 7px;
-    background: color-mix(in srgb, var(--fac-navy) 35%, transparent);
-  }
-
-  .fac-journey-fill {
-    position: absolute;
-    inset: 0 auto 0 0;
-    border-radius: inherit;
-    background: var(--fac-navy);
-  }
-
-  .fac-journey-here {
-    position: absolute;
-    top: 50%;
-    width: 0.625rem;
-    height: 0.625rem;
-    margin: -0.3125rem 0 0 -0.3125rem;
-    border: 2px solid var(--fac-cream);
-    border-radius: 50%;
-    background: var(--fac-red);
-    box-shadow: 0 0 0 1px var(--fac-red);
-  }
-
-  .fac-journey-here::after {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    border-radius: 50%;
-    border: 1px solid var(--fac-red);
-    animation: fac-ripple 2.4s ease-out infinite;
-  }
-
-  /* The desk: a fixed stage the sheets slide on and off */
-  .fac-desk {
-    position: relative;
-    height: var(--fac-desk-height);
-    margin-inline: -0.875rem;
-    padding: 0.25rem 0.875rem 0.875rem;
-    overflow: hidden;
-  }
-
-  .fac-sheet {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 1rem;
-    width: 100%;
-    height: 100%;
-    padding: 1.125rem 1.375rem 1.25rem;
-    color: var(--activity-ink);
-    background: var(--activity-paper) url('/manual-cotton-paper.svg') repeat;
-    background-size: 420px;
-    border: 1px solid #2b448e2b;
-    border-radius: 4px 8px 8px 4px;
-    box-shadow:
-      0 2px 3px #13185712,
-      0 8px 20px #13185717,
-      inset 4px 0 5px #a58c5d0c;
   }
 
   .fac-sheet-head {
@@ -651,23 +427,6 @@
     font: 14px/1.35 var(--font-body);
   }
 
-  @keyframes fac-breathe {
-    50% {
-      opacity: 0.25;
-    }
-  }
-
-  @keyframes fac-ripple {
-    from {
-      opacity: 0.7;
-      scale: 0.6;
-    }
-    to {
-      opacity: 0;
-      scale: 1.6;
-    }
-  }
-
   @keyframes fac-drift {
     from {
       scale: 1;
@@ -679,21 +438,8 @@
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .fac *,
-    .fac *::before,
-    .fac *::after {
-      animation: none !important;
-      transition: none !important;
-    }
-  }
-
   /* Narrow screens: the sheet stacks and grows to its content. */
   @media (max-width: 760px) {
-    .fac-desk {
-      height: auto;
-    }
-
     .fac-stickers {
       flex-wrap: wrap;
     }
@@ -726,35 +472,12 @@
     }
 
     .fac-bar-room,
-    .fac-pace,
-    .fac-wordmark,
-    .fac-logo {
+    .fac-pace {
       display: none;
     }
 
     .fac-nav {
       margin-inline-start: auto;
-    }
-
-    .fac-journey ol {
-      gap: 0.25rem;
-    }
-
-    /* Too narrow to size acts by length: each takes an equal share. */
-    .fac-journey li {
-      flex-grow: 1 !important;
-      min-width: 0;
-    }
-
-    .fac-journey-num,
-    .fac-journey-time {
-      display: none;
-    }
-
-    .fac-journey button {
-      justify-content: center;
-      font-size: 10px;
-      padding-inline: 0.125rem;
     }
   }
 }

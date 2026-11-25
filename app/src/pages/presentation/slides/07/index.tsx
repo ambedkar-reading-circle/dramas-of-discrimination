@@ -9,7 +9,7 @@ export const slide = {
   speakerNoteTabs: [
     {
       label: 'Local mode',
-      speakerNotes: ['Both modes run the same facilitation guide. What changes is where the data lives, and that is for the Community to decide.', 'Local mode is about data sovereignty. The guide is only a shell: it runs in one browser on the room’s shared screen, with no account, and the Rehearsal never leaves that device.', 'On screen, one cursor fills the Actor map. The room talks it through, and one person writes it down.', 'When the Rehearsal is done, Local mode turns its tables into a prompt the Community can take to an LLM of its own choosing. The platform never sees it.'],
+      speakerNotes: ['Both modes run the same facilitation guide. What changes is where the data lives, and that is for the Community to decide.', 'Local mode is about data sovereignty. The guide is only a shell: it runs in one browser on the room’s shared screen, with no account, and the Group’s worksheets never leave that device.', 'On screen, one cursor fills the Actor map. The room talks it through, and one person writes it down.', 'When the worksheets are done, Local mode turns them into a prompt the Community can take to an LLM of its own choosing. The platform never sees it.'],
     },
     {
       label: 'Cloud mode',

@@ -1,8 +1,9 @@
 import { motion } from 'motion/react'
-import type { Transition } from 'motion/react'
 import { twoDigit } from '#/lib/format'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
+import { motionUnlessReduced } from './motion'
+import './guide.css'
 
 type StepState = 'done' | 'now' | 'next'
 
@@ -12,13 +13,6 @@ export function stateOf(index: number, current: number): StepState {
 
 /** How full an act's track is: done and upcoming acts are settled, the current one fills by step. */
 const settledFill: Partial<Record<StepState, number>> = { done: 1, next: 0 }
-
-export const guideSpring: Transition = { type: 'spring', stiffness: 260, damping: 30 }
-
-/** The given transition, or an instant one when the viewer prefers reduced motion. */
-export function motionUnlessReduced(reducedMotion: boolean, transition: Transition = guideSpring): Transition {
-  return reducedMotion ? { duration: 0 } : transition
-}
 
 type GuideJourneyProps = {
   act: number

@@ -138,33 +138,35 @@ const failures = (...indexes: number[]) =>
   indexes.map((index) => actorRows[index].failures)
 
 /** Cloud mode: four Members of one Group, each on their own device, splitting the sheet between them. */
-export const members: ReadonlyArray<Writer> = [
-  {
+export const memberById = {
+  asha: {
     id: 'asha',
     name: 'Asha',
     color: '#b23a48',
     queue: filled([scenarioCell, ...actorRows.map((row) => row.actor)]),
     pace: 1.2,
   },
-  {
+  ravi: {
     id: 'ravi',
     name: 'Ravi',
     color: '#1f7a6d',
     queue: filled([...ideal(0, 1, 2), ...failures(3, 4)]),
     pace: 0.9,
   },
-  {
+  meena: {
     id: 'meena',
     name: 'Meena',
     color: '#b0701c',
     queue: filled(failures(0, 1, 5)),
     pace: 0.8,
   },
-  {
+  imran: {
     id: 'imran',
     name: 'Imran',
     color: '#6a3fa0',
     queue: filled([...categories, ...ideal(3, 4, 5)]),
     pace: 1,
   },
-]
+} as const satisfies Record<string, Writer>
+
+export const members: ReadonlyArray<Writer> = Object.values(memberById)

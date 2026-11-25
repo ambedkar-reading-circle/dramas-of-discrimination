@@ -1,9 +1,9 @@
 import { useEffect, useReducer } from 'react'
-import { allCells, fullLength } from '../content/actorMap'
-import type { Writer } from '../content/actorMap'
+import { allCells, fullLength } from '../../shared/content/actorMap'
+import type { Writer } from '../../shared/content/actorMap'
+import { beatMs, jitter } from '../../shared/motion'
+import type { CursorAt } from '../../shared/WriterCursors'
 
-/** One beat of the simulation. Every writer moves, types or rests once per beat. */
-const beatMs = 45
 /** Beats a cursor takes to travel to its next cell before it starts typing. */
 const travelBeats = 9
 /** Beats a writer lingers on a finished cell. */
@@ -62,12 +62,6 @@ function finishedSheet(writers: ReadonlyArray<Writer>): SheetState {
   }
 }
 
-/** A steady wobble in typing speed, the same on every run. */
-function jitter(beat: number, writer: number) {
-  const x = Math.sin(beat * 12.9898 + writer * 78.233) * 43758.5453
-  return 0.45 + (x - Math.floor(x)) * 1.1
-}
-
 function advance(
   sheet: SheetState,
   writers: ReadonlyArray<Writer>,
@@ -109,11 +103,8 @@ function advance(
   return { beat: sheet.beat + 1, typed, writers: progress, hold: 0 }
 }
 
-export type WriterAt = Readonly<{
-  writer: Writer
-  cell: string
-  phase: Phase | 'idle'
-}>
+/** A writer's cursor, and the cell it is in. */
+export type WriterAt = CursorAt<Phase> & Readonly<{ cell: string }>
 
 /**
  * Plays the writers filling in the sheet, each down their own queue of cells,

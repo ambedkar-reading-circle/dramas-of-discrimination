@@ -1,133 +1,10 @@
-/* Local & Cloud modes. The facilitation guide's chrome (slide 06), opened on
-   PartTime's Actor map instead of its steps. A switch in the top bar flips
-   between one cursor on a shared screen and every Member's named cursor
-   writing at once. Fixed colours in either theme, like the guide itself. */
+/* Local & Cloud modes on slide 07: the guide (shared/guide.css,
+   shared/modes.css) opened on PartTime's Actor map instead of its steps. One
+   cursor fills it on a shared screen, or every Member's named cursor writes
+   at once. Fixed colours in either theme, like the guide itself. */
 @layer components {
-  .modes {
+  .actor-fill {
     --fac-desk-height: 34.5rem;
-  }
-
-  /* The footer carries only the two marks, one at each end. */
-  .modes .fac-logo {
-    margin-inline-start: auto;
-  }
-
-  /* Mode switch: a cream thumb slides under the chosen mode */
-  .modes-switch {
-    display: inline-flex;
-    margin-inline-start: auto;
-    padding: 0.1875rem;
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px rgb(255 255 238 / 0.4);
-  }
-
-  .modes-switch button {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.875rem;
-    border-radius: 999px;
-    font: 12px/1 var(--font-logo);
-    transition: color 220ms ease;
-  }
-
-  .modes-switch button > :not(.modes-switch-thumb) {
-    position: relative;
-  }
-
-  .modes-switch button[aria-pressed='true'] {
-    color: var(--fac-navy);
-  }
-
-  .modes-switch button[aria-pressed='false']:hover {
-    background: rgb(255 255 238 / 0.08);
-  }
-
-  .modes-switch-thumb {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--fac-cream);
-  }
-
-  /* Who is in the sheet */
-  .modes-presence {
-    display: inline-flex;
-  }
-
-  .modes-avatars {
-    display: inline-flex;
-  }
-
-  .modes-avatar {
-    display: grid;
-    place-items: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-inline-start: -0.375rem;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px var(--fac-navy);
-    color: #fff;
-    font: 11px/1 var(--font-logo);
-  }
-
-  .modes-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 11.5rem;
-    justify-content: center;
-    padding: 0.4375rem 0.875rem;
-    border-radius: 0.25rem;
-    background: var(--fac-cream);
-    color: var(--fac-navy);
-    font: 12px/1 var(--font-logo);
-  }
-
-  .modes-chip-dot {
-    width: 0.4375rem;
-    height: 0.4375rem;
-    border-radius: 50%;
-    background: var(--fac-navy);
-  }
-
-  .modes-chip[data-mode='cloud'] .modes-chip-dot {
-    background: #1f7a6d;
-    animation: fac-breathe 2.4s ease-in-out infinite;
-  }
-
-  /* The sheet: the guide's tabs, then the scenario and the Actor map */
-  .modes-sheet {
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 1rem;
-    padding: 0 1.75rem 1.25rem;
-  }
-
-  .modes-tabs {
-    display: flex;
-    gap: 0.25rem;
-    margin-inline: -1.75rem;
-    padding: 0.75rem 1.75rem 0;
-    border-bottom: 1px solid var(--activity-line);
-  }
-
-  .modes-tab {
-    padding: 0.5rem 1rem;
-    margin-bottom: -1px;
-    border: 1px solid transparent;
-    border-bottom: 0;
-    border-radius: 4px 4px 0 0;
-    font: 11px/1 var(--font-logo);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    opacity: 0.45;
-  }
-
-  .modes-tab[data-active] {
-    border-color: var(--activity-line);
-    background: var(--activity-card);
-    opacity: 1;
   }
 
   .modes-sheet-body {
@@ -139,7 +16,7 @@
   }
 
   /* What a writer is in: a ring in their colour */
-  .modes [data-writer] {
+  .actor-fill [data-writer] {
     border-radius: 3px;
     box-shadow: inset 0 0 0 1.5px var(--who);
     background: color-mix(in srgb, var(--who) 7%, transparent);
@@ -257,79 +134,7 @@
     opacity: 0.4;
   }
 
-  /* A writer's caret: solid while typing, blinking while they pause */
-  .modes-caret {
-    display: inline-block;
-    width: 1.5px;
-    height: 1.05em;
-    margin-inline-start: 1px;
-    vertical-align: -0.15em;
-    background: var(--who);
-  }
-
-  .modes-caret[data-phase='travel'],
-  .modes-caret[data-phase='rest'] {
-    animation: modes-blink 1s steps(1) infinite;
-  }
-
-  .modes-caret[data-phase='idle'] {
-    visibility: hidden;
-  }
-
-  /* Cursors ride over the sheet, each to its writer's caret */
-  .modes-cursors {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .modes-cursor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    /* Tip just under the caret, so it never covers the letters going in. */
-    margin: 1rem 0 0 -0.1875rem;
-    filter: drop-shadow(0 1px 1.5px rgb(19 24 87 / 0.35));
-  }
-
-  .modes-cursor svg {
-    display: block;
-  }
-
-  .modes-flag {
-    position: absolute;
-    top: 1.0625rem;
-    left: 0.75rem;
-    padding: 0.1875rem 0.4375rem;
-    border-radius: 2px 8px 8px 8px;
-    background: var(--who);
-    color: #fff;
-    font: 11px/1.2 var(--font-logo);
-    white-space: nowrap;
-  }
-
-  @keyframes modes-blink {
-    50% {
-      opacity: 0;
-    }
-  }
-
   @media (max-width: 760px) {
-    .modes .fac-bar-title,
-    .modes-presence {
-      display: none;
-    }
-
-    .modes-switch {
-      margin-inline-start: 0;
-    }
-
-    .modes-chip {
-      min-width: 0;
-      margin-inline-start: auto;
-    }
-
     .modes-sheet-body {
       overflow-x: auto;
       padding-bottom: 2.5rem;

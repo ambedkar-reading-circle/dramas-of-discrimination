@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Variants } from 'motion/react'
-import DodLogo from '#/components/DodLogo'
 import { twoDigit } from '#/lib/format'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
 import { recordedExamples } from './content/recordedExamples'
-import { GuideJourney, motionUnlessReduced, stateOf } from './GuideJourney'
+import { GuideFrame } from '../shared/GuideFrame'
+import { stateOf } from '../shared/GuideJourney'
+import { motionUnlessReduced } from '../shared/motion'
 import './FacilitationGuideMockup.css'
 
 /** Every step of the workshop in order, so Back and Next walk the whole journey. */
@@ -80,135 +81,129 @@ export function FacilitationGuideMockup() {
   const stickers = [...activity.manual.map((excerpt) => ({ label: excerpt.part ? `Manual · ${excerpt.part}` : 'Manual', detail: `p. ${excerpt.pages.join('–')}` })), ...(activity.worksheets ?? []).map((sheet) => ({ label: sheet.label, detail: sheet.kind === 'photo' ? 'example' : 'to print' }))]
 
   return (
-    <div className="fac activity-surface" role="group" aria-label="Mockup: the facilitation guide, walking the room through the workshop">
-      <header className="fac-bar">
-        <span className="fac-bar-title">
-          <span aria-hidden="true">↺</span> Facilitation guide
-        </span>
-        <span className="fac-bar-room">
-          <span className="fac-hl">Community-led</span>
-        </span>
-        <span className="fac-clock" aria-label="Time elapsed">
-          <span className="fac-clock-dot" aria-hidden="true" />
-          {clock(elapsed)}
-        </span>
-      </header>
-
-      <div className="fac-screen">
-        <GuideJourney act={act} step={step} onSelect={(index) => goTo(index, 0)} />
-
-        <div className="fac-desk">
-          <AnimatePresence initial={false} mode="popLayout" custom={direction}>
-            <motion.article key={act} className="fac-sheet" aria-label={`${activity.name}, act ${act + 1}`} {...swapMotion} variants={sheetVariants}>
-              <header className="fac-sheet-head">
-                <div>
-                  <div className="fac-topline">
-                    workshop activity · {twoDigit(act + 1)} / {twoDigit(workshopActivities.length)}
-                  </div>
-                  <h3 className="fac-sheet-title">{activity.name}</h3>
-                  <p className="fac-sheet-subtitle">{activity.title}</p>
-                </div>
-                <div className="fac-stickers">
-                  {stickers.map((sticker, index) => (
-                    <motion.span key={sticker.label} className="method-taped fac-sticker" style={{ '--sticker-tilt': `${stickerTilts[index % stickerTilts.length]}deg`, '--tape-tilt': `${-stickerTilts[(index + 1) % stickerTilts.length] * 2}deg` } as CSSProperties} initial={reducedMotion ? false : { opacity: 0, y: -10, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.25 + index * 0.07, duration: 0.4, ease }}>
-                      <span className="fac-sticker-label">{sticker.label}</span>
-                      <span className="fac-sticker-detail">{sticker.detail}</span>
-                    </motion.span>
-                  ))}
-                </div>
-              </header>
-
-              <div className="fac-columns">
-                <section className="fac-guide" aria-labelledby={`fac-steps-${act}`}>
-                  <h4 className="fac-label" id={`fac-steps-${act}`}>
-                    steps
-                  </h4>
-                  <ol className="fac-steps">
-                    {activity.steps.map((item, index) => {
-                      const state = stateOf(index, step)
-                      return (
-                        <li key={item.text} data-state={state}>
-                          {state === 'now' && (
-                            <motion.span layoutId={`fac-now-${act}`} className="fac-step-slip" aria-hidden="true" transition={motionUnlessReduced(reducedMotion)}>
-                              <span className="fac-step-tape" />
-                            </motion.span>
-                          )}
-                          <button type="button" onClick={() => goTo(act, index)} aria-current={state === 'now' ? 'step' : undefined}>
-                            <span className="fac-step-num">{state === 'done' ? '✓' : twoDigit(index + 1)}</span>
-                            <span className="fac-step-text">{item.text}</span>
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ol>
-                  <div className="fac-prompt">
-                    <h4 className="fac-label">a prompt to begin</h4>
-                    <p>
-                      <span className="fac-quote" aria-hidden="true">
-                        “
-                      </span>
-                      {activity.prompt}
-                    </p>
-                  </div>
-                </section>
-
-                <aside className="fac-media" aria-label="Recorded example">
-                  <h4 className="fac-label">recorded example · step {twoDigit(step + 1)}</h4>
-                  <div className="fac-print-stage">
-                    <AnimatePresence initial={false} mode="popLayout" custom={direction}>
-                      <motion.figure key={position} className="fac-print" {...swapMotion} variants={printVariants}>
-                        <div className="fac-video" data-spread={example.srcs.length > 1 ? '' : undefined}>
-                          <span className="fac-video-still" role="img" aria-label={example.alt}>
-                            {example.srcs.map((src) => (
-                              <img key={src} src={src} alt="" style={example.focus ? { objectPosition: example.focus } : undefined} />
-                            ))}
-                          </span>
-                          <span className="fac-video-shade" aria-hidden="true" />
-                          <span className="fac-video-play" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="20" height="20">
-                              <path d="M8 5v14l11-7z" fill="currentColor" />
-                            </svg>
-                          </span>
-                          <span className="fac-video-bar" aria-hidden="true">
-                            <span className="fac-video-scrub">
-                              <motion.span initial={{ width: '0%' }} animate={{ width: '34%' }} transition={{ delay: 0.3, duration: reducedMotion ? 0 : 1.2, ease }} />
-                            </span>
-                            <span className="fac-video-time">0:48 / {clipLengths[step % clipLengths.length]}</span>
-                            <span className="fac-video-cc">CC · EN हिं मराठी</span>
-                          </span>
-                        </div>
-                        <figcaption>{example.caption}</figcaption>
-                      </motion.figure>
-                    </AnimatePresence>
-                  </div>
-                </aside>
+    <GuideFrame
+      label="Mockup: the facilitation guide, walking the room through the workshop"
+      act={act}
+      step={step}
+      onSelectAct={(index) => goTo(index, 0)}
+      bar={
+        <>
+          <span className="fac-bar-room">
+            <span className="fac-hl">Community-led</span>
+          </span>
+          <span className="fac-clock" aria-label="Time elapsed">
+            <span className="fac-clock-dot" aria-hidden="true" />
+            {clock(elapsed)}
+          </span>
+        </>
+      }
+      foot={
+        <>
+          <span className="fac-pace">
+            <span className="method-clock" aria-hidden="true" />
+            about {activity.duration} min · take the time you need
+          </span>
+          <span className="fac-nav">
+            <button type="button" className="fac-btn" onClick={() => moveTo(position - 1)} disabled={position === 0}>
+              <span aria-hidden="true">←</span> Back
+            </button>
+            <button type="button" className="fac-btn fac-btn--primary" onClick={() => moveTo(position + 1)} disabled={isLast}>
+              {isLast ? 'Complete' : "We're ready"}{' '}
+              <span className="fac-btn-arrow" aria-hidden="true">
+                →
+              </span>
+            </button>
+          </span>
+        </>
+      }
+    >
+      <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+        <motion.article key={act} className="fac-sheet" aria-label={`${activity.name}, act ${act + 1}`} {...swapMotion} variants={sheetVariants}>
+          <header className="fac-sheet-head">
+            <div>
+              <div className="fac-topline">
+                workshop activity · {twoDigit(act + 1)} / {twoDigit(workshopActivities.length)}
               </div>
-            </motion.article>
-          </AnimatePresence>
-        </div>
-      </div>
+              <h3 className="fac-sheet-title">{activity.name}</h3>
+              <p className="fac-sheet-subtitle">{activity.title}</p>
+            </div>
+            <div className="fac-stickers">
+              {stickers.map((sticker, index) => (
+                <motion.span key={sticker.label} className="method-taped fac-sticker" style={{ '--sticker-tilt': `${stickerTilts[index % stickerTilts.length]}deg`, '--tape-tilt': `${-stickerTilts[(index + 1) % stickerTilts.length] * 2}deg` } as CSSProperties} initial={reducedMotion ? false : { opacity: 0, y: -10, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.25 + index * 0.07, duration: 0.4, ease }}>
+                  <span className="fac-sticker-label">{sticker.label}</span>
+                  <span className="fac-sticker-detail">{sticker.detail}</span>
+                </motion.span>
+              ))}
+            </div>
+          </header>
 
-      <footer className="fac-bar fac-bar--foot">
-        <span className="fac-wordmark">
-          <DodLogo variant="inline" />
-        </span>
-        <span className="fac-pace">
-          <span className="method-clock" aria-hidden="true" />
-          about {activity.duration} min · take the time you need
-        </span>
-        <span className="fac-nav">
-          <button type="button" className="fac-btn" onClick={() => moveTo(position - 1)} disabled={position === 0}>
-            <span aria-hidden="true">←</span> Back
-          </button>
-          <button type="button" className="fac-btn fac-btn--primary" onClick={() => moveTo(position + 1)} disabled={isLast}>
-            {isLast ? 'Complete' : "We're ready"}{' '}
-            <span className="fac-btn-arrow" aria-hidden="true">
-              →
-            </span>
-          </button>
-        </span>
-        <img className="fac-logo" src="/ARCLogo-blue.png" alt="Ambedkar Reading Circle" />
-      </footer>
-    </div>
+          <div className="fac-columns">
+            <section className="fac-guide" aria-labelledby={`fac-steps-${act}`}>
+              <h4 className="fac-label" id={`fac-steps-${act}`}>
+                steps
+              </h4>
+              <ol className="fac-steps">
+                {activity.steps.map((item, index) => {
+                  const state = stateOf(index, step)
+                  return (
+                    <li key={item.text} data-state={state}>
+                      {state === 'now' && (
+                        <motion.span layoutId={`fac-now-${act}`} className="fac-step-slip" aria-hidden="true" transition={motionUnlessReduced(reducedMotion)}>
+                          <span className="fac-step-tape" />
+                        </motion.span>
+                      )}
+                      <button type="button" onClick={() => goTo(act, index)} aria-current={state === 'now' ? 'step' : undefined}>
+                        <span className="fac-step-num">{state === 'done' ? '✓' : twoDigit(index + 1)}</span>
+                        <span className="fac-step-text">{item.text}</span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ol>
+              <div className="fac-prompt">
+                <h4 className="fac-label">a prompt to begin</h4>
+                <p>
+                  <span className="fac-quote" aria-hidden="true">
+                    “
+                  </span>
+                  {activity.prompt}
+                </p>
+              </div>
+            </section>
+
+            <aside className="fac-media" aria-label="Recorded example">
+              <h4 className="fac-label">recorded example · step {twoDigit(step + 1)}</h4>
+              <div className="fac-print-stage">
+                <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+                  <motion.figure key={position} className="fac-print" {...swapMotion} variants={printVariants}>
+                    <div className="fac-video" data-spread={example.srcs.length > 1 ? '' : undefined}>
+                      <span className="fac-video-still" role="img" aria-label={example.alt}>
+                        {example.srcs.map((src) => (
+                          <img key={src} src={src} alt="" style={example.focus ? { objectPosition: example.focus } : undefined} />
+                        ))}
+                      </span>
+                      <span className="fac-video-shade" aria-hidden="true" />
+                      <span className="fac-video-play" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                          <path d="M8 5v14l11-7z" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <span className="fac-video-bar" aria-hidden="true">
+                        <span className="fac-video-scrub">
+                          <motion.span initial={{ width: '0%' }} animate={{ width: '34%' }} transition={{ delay: 0.3, duration: reducedMotion ? 0 : 1.2, ease }} />
+                        </span>
+                        <span className="fac-video-time">0:48 / {clipLengths[step % clipLengths.length]}</span>
+                        <span className="fac-video-cc">CC · EN हिं मराठी</span>
+                      </span>
+                    </div>
+                    <figcaption>{example.caption}</figcaption>
+                  </motion.figure>
+                </AnimatePresence>
+              </div>
+            </aside>
+          </div>
+        </motion.article>
+      </AnimatePresence>
+    </GuideFrame>
   )
 }
