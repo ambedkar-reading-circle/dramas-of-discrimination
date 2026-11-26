@@ -19,7 +19,7 @@ export const slide = {
   layout: 'fill',
   speakerNotes: [
     'To make this less abstract, let me show you a short film of the workshop.',
-    'It also shows who we are. The Ambedkar Reading Circle is an informal collective.',
+    'It also shows who we are. The Ambedkar Reading Circle is an informal collective. [[video:play wait=video]]',
     'Our work is rooted in the values of the Constitution. Liberty, equality, fraternity, and justice.',
     "Above all, it is rooted in Babasaheb's vision of fraternity.",
   ],

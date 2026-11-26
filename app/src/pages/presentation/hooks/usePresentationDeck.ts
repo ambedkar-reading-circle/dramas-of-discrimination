@@ -19,6 +19,7 @@ function clampSlide(value: number): number {
  * Owns all deck state. The URL search param (`?slide=n`, 1-based) is the single
  * source of truth: every change is written back with `replace` so the history
  * stack never grows per slide, and out-of-range values are clamped on read.
+ * Moving keeps the other params, so `?play=1` survives a slide change.
  */
 export function usePresentationDeck() {
   const { slide: requested } = useSearch({ from: '/approach' })
@@ -28,7 +29,7 @@ export function usePresentationDeck() {
   // Normalize a stale or out-of-range URL (deep links like ?slide=99) in place.
   useEffect(() => {
     if (requested !== slide) {
-      void navigate({ search: { slide }, replace: true })
+      void navigate({ search: (search) => ({ ...search, slide }), replace: true })
     }
   }, [requested, slide, navigate])
 
@@ -36,7 +37,7 @@ export function usePresentationDeck() {
     (target: number) => {
       const next = clampSlide(target)
       if (next === slide) return
-      void navigate({ search: { slide: next }, replace: true })
+      void navigate({ search: (search) => ({ ...search, slide: next }), replace: true })
     },
     [slide, navigate],
   )

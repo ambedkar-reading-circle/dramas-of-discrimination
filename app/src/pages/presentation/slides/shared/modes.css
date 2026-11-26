@@ -8,9 +8,16 @@
     margin-inline-start: auto;
   }
 
+  /* The top bar wraps rather than squeezing the switch or the chip. */
+  .modes .fac-bar:not(.fac-bar--foot) {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
   /* Mode switch: a cream thumb slides under the chosen mode */
   .modes-switch {
     display: inline-flex;
+    flex: none;
     margin-inline-start: auto;
     padding: 0.1875rem;
     border-radius: 999px;
@@ -25,6 +32,7 @@
     padding: 0.375rem 0.875rem;
     border-radius: 999px;
     font: 12px/1 var(--font-logo);
+    white-space: nowrap;
     transition: color 220ms ease;
   }
 
@@ -70,6 +78,8 @@
 
   .modes-chip {
     display: inline-flex;
+    flex: none;
+    white-space: nowrap;
     align-items: center;
     gap: 0.5rem;
     min-width: 11.5rem;
@@ -139,7 +149,10 @@
   /* Actions at the far end of the tab row */
   .modes-tab-actions {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 0.5rem;
+    max-width: 100%;
     margin: 0 0 0.375rem auto;
     align-self: center;
   }
@@ -202,10 +215,14 @@
     }
   }
 
+  /* Small screens: the bar and the sheet's actions centre on their rows. */
   @media (max-width: 760px) {
-    .modes .fac-bar-title,
-    .modes-presence {
+    .modes .fac-bar-title {
       display: none;
+    }
+
+    .modes .fac-bar:not(.fac-bar--foot) {
+      justify-content: center;
     }
 
     .modes-switch {
@@ -214,7 +231,11 @@
 
     .modes-chip {
       min-width: 0;
-      margin-inline-start: auto;
+    }
+
+    .modes-tab-actions {
+      justify-content: center;
+      margin-inline: auto;
     }
   }
 }

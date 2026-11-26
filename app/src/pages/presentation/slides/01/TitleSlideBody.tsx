@@ -1,6 +1,7 @@
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
+import { useRevealCue } from '../../playback/useSlideCue'
 import ApproachReveal from './components/approach/ApproachReveal'
 import TitleWordmark from './components/TitleWordmark'
 import { approachPhotos } from './content/approachPhotos'
@@ -8,9 +9,12 @@ import { subtitle } from './content/titleCopy'
 import { ApproachRevealContext } from './hooks/useApproachReveal'
 import type { ApproachSide } from './types'
 
+const approachSides = Object.keys(approachPhotos) as ReadonlyArray<ApproachSide>
+
 export function TitleSlideBody() {
   const host = useSlideStageHost()
   const reveal = useReveal<ApproachSide>()
+  useRevealCue(reveal, approachSides)
 
   return (
     <ApproachRevealContext value={reveal}>

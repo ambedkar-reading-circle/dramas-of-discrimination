@@ -49,6 +49,7 @@
     background: var(--fac-navy);
     color: var(--fac-cream);
     font: 12px/1 var(--font-logo);
+    white-space: nowrap;
     transition:
       background 180ms ease,
       color 180ms ease,

@@ -1,8 +1,10 @@
+import { useRef } from 'react'
 import { motion } from 'motion/react'
 import type { Variants } from 'motion/react'
 import TabletVideoFrame from '#/components/TabletVideoFrame'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { useSlideDirection } from '../../hooks/useSlideDirection'
+import { useFilmCue } from './useFilmCue'
 
 // The tablet slides in from beyond the viewport's edge and out past the other,
 // following the reader: forward it enters from the right and leaves to the
@@ -36,10 +38,12 @@ const fade: Variants = {
 export function VideoEmbed() {
   const reducedMotion = usePrefersReducedMotion()
   const direction = useSlideDirection()
+  const film = useRef<HTMLIFrameElement>(null)
+  useFilmCue(film)
   return (
     <div className="presentation-video">
       <motion.div className="presentation-video-motion" custom={direction} variants={reducedMotion ? fade : swing}>
-        <TabletVideoFrame />
+        <TabletVideoFrame ref={film} />
       </motion.div>
     </div>
   )

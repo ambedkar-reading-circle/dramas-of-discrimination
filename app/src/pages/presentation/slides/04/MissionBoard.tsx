@@ -7,6 +7,7 @@ import type { Reveal } from '#/components/Reveal'
 import { cardSpring, hoverLift } from '#/lib/card-motion'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
+import { useRevealCue } from '../../playback/useSlideCue'
 import { riseVariants } from '../shared/motion'
 import { cards, missionLabel, missionPhotos, missionResult, missionResultFinding, missionResultNote, missionSource } from './content/mission'
 import type { MissionCard, MissionPhotoKey } from './content/mission'
@@ -69,10 +70,13 @@ function MissionCardView({ card, order, reveal }: MissionCardViewProps) {
   )
 }
 
+const missionPhotoKeys = Object.keys(missionPhotos) as ReadonlyArray<MissionPhotoKey>
+
 export function MissionBoard() {
   const reduce = usePrefersReducedMotion()
   const host = useSlideStageHost()
   const reveal = useReveal<MissionPhotoKey>()
+  useRevealCue(reveal, missionPhotoKeys)
   const resultTrigger = useRevealTrigger(reveal, 'result')
   return (
     <figure className="mission-board" aria-label={missionLabel}>

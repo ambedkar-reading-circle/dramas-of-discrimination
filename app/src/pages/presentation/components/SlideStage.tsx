@@ -1,34 +1,28 @@
-import { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
-import type { Ref } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { SlideDirectionContext } from '../hooks/useSlideDirection'
 import { SlideStageHostContext } from '../hooks/useSlideStageHost'
 import SlideAssetPlaceholder from './SlideAssetPlaceholder'
+import { SlideIdContext, controlSelector, typingSelector, usePlayback } from '../playback/playback'
 import type { Slide } from '../types'
 
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28 }
-
-export type SlideStageHandle = {
-  focusHeading: () => void
-}
 
 interface SlideStageProps {
   slide: Slide
   index: number
   total: number
-  ref?: Ref<SlideStageHandle>
 }
 
-export default function SlideStage({ slide, index, total, ref }: SlideStageProps) {
+export default function SlideStage({ slide, index, total }: SlideStageProps) {
   const reducedMotion = usePrefersReducedMotion()
   const stage = useRef<HTMLDivElement>(null)
-  // The stage as state as well as a ref, so slide bodies re-render once it mounts.
+  // The overlay host sits over the stage but outside its scroll, so a photo
+  // flies to the centre of what is in view, not of the slide's first screenful.
+  // State, not a ref, so slide bodies re-render once it mounts.
   const [host, setHost] = useState<HTMLDivElement | null>(null)
-  const stageRef = useCallback((element: HTMLDivElement | null) => {
-    stage.current = element
-    setHost(element)
-  }, [])
   const fit = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement | null>(null)
   const [scale, setScale] = useState(1)
@@ -39,7 +33,6 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
     const target = named ?? heading.current
     target?.focus({ preventScroll: true })
   }, [])
-  useImperativeHandle(ref, () => ({ focusHeading }), [focusHeading])
 
   // Direction of travel for the slide transition, derived during render so the
   // entering variant sees the correct side on its first frame.
@@ -100,38 +93,60 @@ export default function SlideStage({ slide, index, total, ref }: SlideStageProps
 
   // A fill slide's frame holds still: its content brings its own entrance
   // and exit (the same variant names), and a frame fade would wash it out.
-  const variants = fills && !reducedMotion
-    ? { enter: { opacity: 1, x: '0%' }, center: { opacity: 1, x: '0%' }, exit: { opacity: 1, x: '0%', transition: { when: 'afterChildren' } } }
-    : {
-        enter: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${6 * dir}%` }),
-        center: { opacity: 1, x: '0%' },
-        exit: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${-6 * dir}%` }),
-      }
+  const variants =
+    fills && !reducedMotion
+      ? { enter: { opacity: 1, x: '0%' }, center: { opacity: 1, x: '0%' }, exit: { opacity: 1, x: '0%', transition: { when: 'afterChildren' } } }
+      : {
+          enter: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${6 * dir}%` }),
+          center: { opacity: 1, x: '0%' },
+          exit: (dir: number) => (reducedMotion ? { opacity: 0 } : { opacity: 0, x: `${-6 * dir}%` }),
+        }
 
   const ownsHeading = slide.ownsHeading === true
 
+  // Reaching into the slide while it plays pauses playback, so the room can
+  // explore; play picks up on the same caption. Keys only count when they
+  // work a control, so arrows and Space on the stage still drive the deck.
+  const playback = usePlayback()
+  const playing = playback?.playing === true
+  const pause = playback?.pause
+  const pauseOnClick = () => {
+    if (playing) pause?.()
+  }
+  const pauseOnKey = (event: KeyboardEvent<HTMLElement>) => {
+    if (!playing || !(event.target instanceof Element)) return
+    const typing = event.target.closest(typingSelector)
+    const pressing = (event.key === 'Enter' || event.key === ' ') && event.target.closest(controlSelector)
+    if (typing || pressing) pause?.()
+  }
+
   return (
-    <div ref={stageRef} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
-      <SlideStageHostContext value={host}>
-        <SlideDirectionContext value={direction}>
-        <AnimatePresence initial={false} custom={direction}>
-          <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
-            <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
-              {!ownsHeading && (
-                <h2 ref={heading} className="slide-heading" tabIndex={-1}>
-                  {slide.heading}
-                </h2>
-              )}
-              {slide.body != null && <div className="slide-body">{slide.body}</div>}
-              {slide.interactive && <div className="slide-interactive">{slide.interactive}</div>}
-              {slide.assets?.map((asset) => (
-                <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-        </SlideDirectionContext>
-      </SlideStageHostContext>
+    <div className="slide-stage-shell" onClickCapture={pauseOnClick} onKeyDownCapture={pauseOnKey}>
+      <div ref={stage} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
+        <SlideStageHostContext value={host}>
+          <SlideDirectionContext value={direction}>
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
+                <SlideIdContext value={slide.id}>
+                <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
+                  {!ownsHeading && (
+                    <h2 ref={heading} className="slide-heading" tabIndex={-1}>
+                      {slide.heading}
+                    </h2>
+                  )}
+                  {slide.body != null && <div className="slide-body">{slide.body}</div>}
+                  {slide.interactive && <div className="slide-interactive">{slide.interactive}</div>}
+                  {slide.assets?.map((asset) => (
+                    <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />
+                  ))}
+                </div>
+                </SlideIdContext>
+              </motion.div>
+            </AnimatePresence>
+          </SlideDirectionContext>
+        </SlideStageHostContext>
+      </div>
+      <div ref={setHost} className="slide-stage-overlay" />
     </div>
   )
 }

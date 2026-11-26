@@ -7,7 +7,7 @@ import { workshopActivities } from '#/pages/home/workshop-method'
 import { actorRows, categories, members, scenarioCell, scribe } from '../shared/content/actorMap'
 import type { SheetCell, Writer } from '../shared/content/actorMap'
 import { GuideFrame } from '../shared/GuideFrame'
-import { ModeBar } from '../shared/ModeControls'
+import { ModeBar, useModeCue } from '../shared/ModeControls'
 import type { Mode } from '../shared/ModeControls'
 import { SheetTabs } from '../shared/SheetTabs'
 import { WriterCaret, WriterCursors } from '../shared/WriterCursors'
@@ -31,6 +31,7 @@ const sheetTabs = ['Steps', 'Example', 'Actor map']
  */
 export function ModesMockup() {
   const [mode, setMode] = useState<Mode>('local')
+  useModeCue(setMode)
 
   return (
     <GuideFrame label="Mockup: in Local mode the Actor map is filled on one device and its data stays there; in Cloud mode the data is shared with the platform and several Members fill it at once" className="modes actor-fill" mode={mode} act={act} step={step} bar={<ModeBar mode={mode} onChange={setMode} />}>

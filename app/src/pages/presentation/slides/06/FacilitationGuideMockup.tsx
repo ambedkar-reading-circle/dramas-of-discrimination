@@ -9,10 +9,15 @@ import { recordedExamples } from './content/recordedExamples'
 import { GuideFrame } from '../shared/GuideFrame'
 import { stateOf } from '../shared/GuideJourney'
 import { motionUnlessReduced } from '../shared/motion'
+import { parseCue, warnCue } from '../../playback/cues'
+import { useSlideCue } from '../../playback/useSlideCue'
 import './FacilitationGuideMockup.css'
 
 /** Every step of the workshop in order, so Back and Next walk the whole journey. */
 const journey = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
+
+/** Where a step sits in the journey, or -1 for a step the workshop does not have. */
+const positionOf = (act: number, step: number) => journey.findIndex((stop) => stop.act === act && stop.step === step)
 
 /** Stand-in clip lengths for the recorded examples, one per step slot. */
 const clipLengths = ['2:10', '1:45', '2:30']
@@ -57,7 +62,21 @@ export function FacilitationGuideMockup() {
   const isLast = position === journey.length - 1
 
   const moveTo = (target: number) => setMove({ position: target, direction: target >= position ? 1 : -1 })
-  const goTo = (targetAct: number, targetStep: number) => moveTo(journey.findIndex((stop) => stop.act === targetAct && stop.step === targetStep))
+  const moveToStop = (target: number) => {
+    if (target >= 0 && target !== position) moveTo(target)
+  }
+  const goTo = (targetAct: number, targetStep: number) => moveToStop(positionOf(targetAct, targetStep))
+
+  // `guide:<act>.<step>` walks the room on, as if it had pressed We're ready.
+  useSlideCue((cue) => {
+    const parsed = parseCue(cue)
+    if (parsed?.verb !== 'guide') return
+    const [targetAct, targetStep] = parsed.arg.split('.').map(Number)
+    if (!Number.isInteger(targetAct) || !Number.isInteger(targetStep)) return warnCue(cue ?? '', 'expected guide:<act>.<step>')
+    const target = positionOf(targetAct, targetStep)
+    if (target < 0) return warnCue(cue ?? '', 'no such step in the journey')
+    moveToStop(target)
+  })
 
   // `towards` is the direction of travel: 1 forward, -1 back.
   const fadeVariants: Variants = { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } }

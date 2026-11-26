@@ -1,8 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import type { Slide } from '../types'
-import MarkButton, { MarkGlyph } from '#/components/MarkButton'
-import { twoDigit } from '#/lib/format'
+import { motion } from 'motion/react'
+import type { Transition } from 'motion/react'
+import MarkButton, { Mark, MarkGlyph } from '#/components/MarkButton'
+import { usePlayback } from '../playback/playback'
+import { canSpeak } from '../playback/speech'
+import Captions from './Captions'
+import PageStrip, { PageChip, slideLabel } from './PageStrip'
+import type { CurrentPage } from './PageStrip'
 
 interface SlideNavProps {
   slides: ReadonlyArray<Slide>
@@ -11,129 +17,162 @@ interface SlideNavProps {
   next: () => void
   prev: () => void
   onSelect: (slide: number) => void
-  onOpenOverview: () => void
+  /** Deck tools that always sit at the bar's right end, such as fullscreen. */
+  tools?: ReactNode
 }
 
-type StripEntry = { kind: 'page'; number: number } | { kind: 'gap'; from: number; to: number }
+/**
+ * The deck's player, docked across the bottom of the window like a music
+ * player's: the transport (previous, play/pause, next) on the left; across
+ * the middle, the current slide's number and its caption while captions
+ * play, or else every slide's number to jump to; and on the right the caption and voice
+ * switches, then the deck's tools (fullscreen). In self-facilitation the
+ * current slide's number carries the step it is in.
+ * The progress line runs along its top edge.
+ */
+export default function SlideNav({ slides, slide, total, next, prev, onSelect, tools }: SlideNavProps) {
+  const playback = usePlayback()
+  const selfMode = playback?.selfMode === true
+  const bar = useRef<HTMLDivElement>(null)
 
-/** Pages that fit in `slots` chips: the full run, or the ends with a window around the current page. */
-function stripEntries(total: number, current: number, slots: number): StripEntry[] {
-  const pages = (from: number, to: number): StripEntry[] => Array.from({ length: to - from + 1 }, (_, index) => ({ kind: 'page', number: from + index }))
-
-  if (total <= slots) return pages(1, total)
-  if (slots < 5) {
-    const from = Math.max(1, Math.min(current - Math.floor((slots - 1) / 2), total - slots + 1))
-    return pages(from, from + slots - 1)
-  }
-
-  const lead = slots - 2
-  const windowSize = slots - 4
-  const start = current - Math.floor((windowSize - 1) / 2)
-  const end = start + windowSize - 1
-
-  if (start <= 3) return [...pages(1, lead), { kind: 'gap', from: lead + 1, to: total - 1 }, { kind: 'page', number: total }]
-  if (end >= total - 2) {
-    const first = total - lead + 1
-    return [{ kind: 'page', number: 1 }, { kind: 'gap', from: 2, to: first - 1 }, ...pages(first, total)]
-  }
-
-  return [
-    { kind: 'page', number: 1 },
-    { kind: 'gap', from: 2, to: start - 1 },
-    ...pages(start, end),
-    { kind: 'gap', from: end + 1, to: total - 1 },
-    { kind: 'page', number: total },
-  ]
-}
-
-function gapLabel(from: number, to: number): string {
-  const slides = from === to ? `Slide ${from}` : `Slides ${from} to ${to}`
-  return `${slides}, show all slides`
-}
-
-/** Previous / next, with a page window between the arrows. */
-export default function SlideNav({ slides, slide, total, next, prev, onSelect, onOpenOverview }: SlideNavProps) {
-  const chips = useRef<Array<HTMLButtonElement | null>>([])
-  const stripRef = useRef<HTMLDivElement>(null)
-  const pendingFocus = useRef<number | null>(null)
-  const [slots, setSlots] = useState(total)
-  const entries = stripEntries(total, slide, slots)
-
-  // Fit the window to the strip. The chip width comes from the rendered control,
-  // so a media-query change in min-width is picked up with the next resize.
+  // The bar floats over the bottom of the window, so the deck keeps room for
+  // it: its height, as a custom property, whatever the caption wraps to.
   useLayoutEffect(() => {
-    const strip = stripRef.current
-    if (!strip) return
-
-    const measure = () => {
-      const chip = strip.querySelector<HTMLElement>('.slide-index-chip:not(.slide-index-gap)')
-      if (!chip) return
-      const gap = Number.parseFloat(getComputedStyle(strip).columnGap) || 0
-      const chipWidth = chip.getBoundingClientRect().width
-      if (chipWidth <= 0 || strip.clientWidth <= 0) return
-      const next = Math.max(1, Math.floor((strip.clientWidth + gap) / (chipWidth + gap)))
-      setSlots((current) => (current === next ? current : next))
-    }
-
+    const element = bar.current
+    const deck = element?.closest<HTMLElement>('.presentation-deck')
+    if (!element || !deck) return
+    const measure = () => deck.style.setProperty('--player-height', `${element.offsetHeight}px`)
     measure()
     const observer = new ResizeObserver(measure)
-    observer.observe(strip)
-    return () => observer.disconnect()
+    observer.observe(element)
+    return () => {
+      observer.disconnect()
+      deck.style.removeProperty('--player-height')
+    }
   }, [])
 
-  // The destination chip may not be mounted until the window re-renders.
-  useEffect(() => {
-    if (pendingFocus.current !== slide) return
-    pendingFocus.current = null
-    chips.current[slide - 1]?.focus()
-  }, [slide, slots])
-
-  const onStripKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    // Arrows inside the strip move between pages. The deck's own arrow
-    // handling must not also fire for the same keystroke.
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-    event.stopPropagation()
-    event.preventDefault()
-    const delta = event.key === 'ArrowLeft' ? -1 : 1
-    const index = Math.min(Math.max(slide - 1 + delta, 0), slides.length - 1)
-    if (index === slide - 1) return
-    pendingFocus.current = index + 1
-    onSelect(index + 1)
-  }
+  const captioning = selfMode && playback.captions
+  // In self-facilitation the current slide's number also carries the step the
+  // slide is in (4.2: slide 4, second state), so no separate readout is needed.
+  const steps = selfMode ? { now: playback.current.step, of: playback.beats.at(-1)?.step ?? 1 } : null
+  const currentPage: CurrentPage = steps ? { label: `${slide}.${steps.now}`, note: `, step ${steps.now} of ${steps.of}` } : { label: String(slide), note: '' }
 
   return (
-    <div className="slide-nav">
-      <nav className="slide-nav-controls" aria-label="Change slides">
-        <MarkButton label="Previous slide" disabled={slide <= 1} onClick={prev} mark={<MarkGlyph>←</MarkGlyph>} />
-        <div ref={stripRef} className="slide-index-strip" role="group" aria-label="Jump to a slide" data-lenis-prevent="" onKeyDown={onStripKeyDown}>
-          {entries.map((entry) =>
-            entry.kind === 'gap' ? (
-              <button key={`gap-${entry.from}`} className="slide-index-chip slide-index-gap" type="button" tabIndex={-1} aria-label={gapLabel(entry.from, entry.to)} onClick={onOpenOverview}>
-                …
-              </button>
-            ) : (
-              <button
-                key={slides[entry.number - 1].id}
-                className="slide-index-chip"
-                type="button"
-                ref={(element) => {
-                  chips.current[entry.number - 1] = element
-                }}
-                tabIndex={entry.number === slide ? 0 : -1}
-                aria-current={entry.number === slide ? 'true' : undefined}
-                aria-label={`Slide ${entry.number}: ${slides[entry.number - 1].heading}`}
-                onClick={() => onSelect(entry.number)}
-              >
-                {twoDigit(entry.number)}
-              </button>
-            ),
-          )}
+    <div ref={bar} className="slide-nav">
+      <DeckProgress slide={slide} total={total} />
+      <div className="slide-nav-controls">
+        <nav className="slide-nav-change" aria-label="Change slides">
+        <div className="slide-transport">
+          <MarkButton label="Previous slide" disabled={slide <= 1} onClick={prev} mark={<MarkGlyph>←</MarkGlyph>} />
+          {playback && <MarkButton label={playback.playing ? 'Pause' : 'Play the deck with captions'} className="slide-play" onClick={playback.toggle} mark={playback.playing ? <PauseMark /> : <PlayMark />} />}
+          <MarkButton label="Next slide" disabled={slide >= total} onClick={next} mark={<MarkGlyph>→</MarkGlyph>} />
         </div>
-        <MarkButton label="Next slide" disabled={slide >= total} onClick={next} mark={<MarkGlyph>→</MarkGlyph>} />
-      </nav>
-      <div className="slide-progress" aria-hidden="true">
-        <div className="slide-progress-fill" style={{ inlineSize: `${(slide / total) * 100}%` }} />
+        </nav>
+        {captioning ? (
+          // The current slide stays in view beside the caption; pressing it puts
+          // the caption away and brings back every slide's number.
+          <div className="slide-nav-captioned">
+            <PageChip current aria-label={`${slideLabel(slide, slides[slide - 1].heading, ` of ${total}${currentPage.note}`)}. Hide captions to show all slides`} title="Slide . step: each step is something the slide opens, switches or plays" onClick={() => playback.setCaptions(false)}>
+              {currentPage.label}
+            </PageChip>
+            <Captions />
+          </div>
+        ) : (
+          <PageStrip slides={slides} slide={slide} onSelect={onSelect} current={currentPage} />
+        )}
+        <div className="slide-nav-extras">
+          {playback && selfMode && (
+            <>
+              <MarkButton label="Captions" pressed={playback.captions} onClick={() => playback.setCaptions(!playback.captions)} mark={<CaptionsMark />} />
+              {canSpeak && <MarkButton label="Read captions aloud" pressed={playback.voice} onClick={() => playback.setVoice(!playback.voice)} mark={<VoiceMark on={playback.voice} />} />}
+            </>
+          )}
+          {tools}
+        </div>
       </div>
+      <CaptionTime />
     </div>
+  )
+}
+
+/**
+ * The current caption's own time, along the bar's bottom edge: it fills
+ * across the caption's hold and starts over with the next. The voice and the
+ * film set their own pace, so it stays empty for them, and while paused.
+ */
+function CaptionTime() {
+  const playback = usePlayback()
+  if (!playback?.selfMode) return null
+  const { current, holdRunning, token } = playback
+  return (
+    <div className="caption-time" aria-hidden="true">
+      <motion.div key={token} className="caption-time-fill" initial={{ scaleX: 0 }} animate={{ scaleX: holdRunning ? 1 : 0 }} transition={holdTransition(holdRunning, current.holdMs)} />
+    </div>
+  )
+}
+
+/**
+ * How far through the deck we are. In self-facilitation it also runs through
+ * each slide's captions, filling across a caption's hold as it plays, the way a
+ * music player's line runs through a track.
+ */
+function DeckProgress({ slide, total }: { slide: number; total: number }) {
+  const playback = usePlayback()
+  const percent = (part: number) => `${(part / total) * 100}%`
+  if (!playback?.selfMode) {
+    return (
+      <div className="slide-progress" aria-hidden="true">
+        <div className="slide-progress-fill" style={{ inlineSize: percent(slide) }} />
+      </div>
+    )
+  }
+  const { beat, beats, current, holdRunning, token } = playback
+  const from = percent(slide - 1 + beat / beats.length)
+  const to = percent(slide - 1 + (beat + 1) / beats.length)
+  // The voice and the film set their own pace, so the line waits at the caption's start.
+  return (
+    <div className="slide-progress" aria-hidden="true">
+      <motion.div key={token} className="slide-progress-fill slide-progress-fill--beats" initial={{ width: from }} animate={{ width: holdRunning ? to : from }} transition={holdTransition(holdRunning, current.holdMs)} />
+    </div>
+  )
+}
+
+/** A line that runs across a caption's hold while it plays, and settles quickly otherwise. */
+function holdTransition(running: boolean, holdMs: number): Transition {
+  return running ? { duration: holdMs / 1000, ease: 'linear' } : { duration: 0.2 }
+}
+
+function PlayMark() {
+  return (
+    <Mark>
+      <path d="M5 3.25v9.5L12.5 8z" />
+    </Mark>
+  )
+}
+
+function PauseMark() {
+  return (
+    <Mark>
+      <path d="M5.5 3.5v9M10.5 3.5v9" />
+    </Mark>
+  )
+}
+
+/** "CC" in a frame: closed captions. */
+function CaptionsMark() {
+  return (
+    <Mark>
+      <rect x="1.75" y="3.5" width="12.5" height="9" rx="1" />
+      <path d="M7 6.75a1.75 1.75 0 1 0 0 2.5M11.5 6.75a1.75 1.75 0 1 0 0 2.5" />
+    </Mark>
+  )
+}
+
+function VoiceMark({ on }: { on: boolean }) {
+  return (
+    <Mark>
+      <path d="M2.5 6v4h2.5l3.5 3V3L5 6z" />
+      {on ? <path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.75 3.75a6 6 0 0 1 0 8.5" /> : <path d="m11 6 3 4M14 6l-3 4" />}
+    </Mark>
   )
 }

@@ -1,36 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { KeyboardEvent } from 'react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { slides } from './slides'
 import MarkButton, { Mark } from '#/components/MarkButton'
 import { usePresentationDeck } from './hooks/usePresentationDeck'
-import SlideIndex, { SlideOverviewControl } from './components/SlideIndex'
 import SlideNav from './components/SlideNav'
-import SpeakerNotes, { SpeakerNotesControl } from './components/SpeakerNotes'
 import SlideStage from './components/SlideStage'
-import type { SlideStageHandle } from './components/SlideStage'
+import { PlaybackContext, controlSelector, usePlaybackState } from './playback/playback'
 import './PresentationDeck.css'
 import { twoDigit } from '#/lib/format'
 
 export default function PresentationDeck() {
   const { slide, total, goTo, next, prev, onDeckKeyDown, stageSwipeHandlers } = usePresentationDeck()
   const current = slides[slide - 1]
-  const [overviewOpen, setOverviewOpen] = useState(false)
-  const [notesOpen, setNotesOpen] = useState(false)
+  const { play: playOnOpen } = useSearch({ from: '/approach' })
+  const playback = usePlaybackState({ slides, slide, goTo }, playOnOpen === true)
+  const navigate = useNavigate({ from: '/approach' })
+  // The URL says whether the deck is playing, so a refresh mid-playback carries on, and one after pausing stays paused.
+  useEffect(() => {
+    if ((playOnOpen === true) === playback.playing) return
+    void navigate({ search: (search) => ({ slide: search.slide, ...(playback.playing ? { play: true as const } : {}) }), replace: true })
+  }, [playOnOpen, playback.playing, navigate])
   const [fullscreen, setFullscreen] = useState(false)
   const deck = useRef<HTMLElement>(null)
-  const stage = useRef<SlideStageHandle>(null)
-  const focusStage = useCallback(() => {
-    stage.current?.focusHeading()
-  }, [])
 
   const notebook = () => deck.current?.closest<HTMLElement>('.notebook-surface') ?? null
-
-  const selectSlide = useCallback(
-    (target: number) => {
-      setOverviewOpen(false)
-      goTo(target)
-    },
-    [goTo],
-  )
 
   useEffect(() => {
     const sync = () => setFullscreen(document.fullscreenElement === notebook())
@@ -50,8 +44,29 @@ export default function PresentationDeck() {
     }
   }, [])
 
+  // Space plays and pauses, as on any player. In self-facilitation, Shift with
+  // an arrow steps one caption. Space on a control inside a slide still works that control.
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      const onControl = event.target instanceof Element && event.target.closest(controlSelector)
+      if (event.key === ' ' && !onControl) {
+        event.preventDefault()
+        playback.toggle()
+        return
+      }
+      if (playback.selfMode && event.shiftKey && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        event.preventDefault()
+        if (event.key === 'ArrowRight') playback.nextBeat()
+        else playback.prevBeat()
+        return
+      }
+    }
+    onDeckKeyDown(event)
+  }
+
   return (
-    <section ref={deck} className="presentation-deck page-wrap" onKeyDown={onDeckKeyDown} {...stageSwipeHandlers}>
+    <PlaybackContext value={playback}>
+    <section ref={deck} className="presentation-deck page-wrap" onKeyDown={onKeyDown} {...stageSwipeHandlers}>
       <header className="presentation-meta">
         <p className="eyebrow" title={current.ownsHeading ? undefined : current.kicker}>
           <span>
@@ -59,25 +74,17 @@ export default function PresentationDeck() {
           </span>
           {current.ownsHeading ? null : <> {current.kicker}</>}
         </p>
-        <div className="presentation-tools">
-          <SpeakerNotesControl open={notesOpen} onOpen={() => setNotesOpen(true)} />
-          <SlideOverviewControl open={overviewOpen} onOpen={() => setOverviewOpen(true)} />
-          <MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />
-        </div>
       </header>
 
-      <SlideStage ref={stage} slide={current} index={slide} total={total} />
+      <SlideStage slide={current} index={slide} total={total} />
 
-      <SlideNav slides={slides} slide={slide} total={total} next={next} prev={prev} onSelect={goTo} onOpenOverview={() => setOverviewOpen(true)} />
-
-      <SlideIndex slides={slides} current={slide} open={overviewOpen} onOpenChange={setOverviewOpen} onSelect={selectSlide} onFocusStage={focusStage} />
-
-      <SpeakerNotes slide={current} open={notesOpen} onOpenChange={setNotesOpen} />
+      <SlideNav slides={slides} slide={slide} total={total} next={next} prev={prev} onSelect={goTo} tools={<MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />} />
 
       <p className="slide-sr" aria-live="polite">
         Slide {slide} of {total}: {current.heading}
       </p>
     </section>
+    </PlaybackContext>
   )
 }
 
