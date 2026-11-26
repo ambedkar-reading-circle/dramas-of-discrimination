@@ -3,10 +3,11 @@ import NotebookSurface from '#/components/NotebookSurface'
 import PresentationDeck from '#/pages/presentation'
 
 export const Route = createFileRoute('/approach')({
-  // Keep the presenter's place across refresh and deep links: /approach?slide=7
+  // Keep the presenter's place across refresh and deep links: /approach?slide=7&point=3
   // ?play=1 opens the deck in self-facilitation, already playing.
-  validateSearch: (search: Record<string, unknown>): { slide: number; play?: true } => ({
+  validateSearch: (search: Record<string, unknown>): { slide: number; point?: number; play?: true } => ({
     slide: typeof search.slide === 'number' ? search.slide : 1,
+    ...(typeof search.point === 'number' ? { point: search.point } : {}),
     ...(search.play === 1 || search.play === true || search.play === '1' ? { play: true as const } : {}),
   }),
   head: () => ({

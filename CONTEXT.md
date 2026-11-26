@@ -108,6 +108,10 @@ _Avoid_: audience, class
 A Room running the workshop, or the Approach deck, by itself with no Facilitator: the facilitation guide or the deck's playback leads, with captions and an optional voice.
 _Avoid_: autoplay, unfacilitated mode, kiosk mode
 
+**Point**:
+One entry of a slide's speaker notes, a line or a cue, numbered after its slide (4.3); the unit the deck's arrows step through. The slide shows every cue in effect at its point, however the deck got there.
+_Avoid_: step, beat, pointer
+
 **Caption**:
-One line of a slide's speaker notes as playback shows it, with the cues woven into it; the unit the deck's playback steps through.
-_Avoid_: prompt (that is Prompt export), subtitle, cue (that is what a caption carries)
+A line of a slide's speaker notes as playback shows it, cut into pieces short enough for the player; a cue's point keeps the caption before it.
+_Avoid_: prompt (that is Prompt export), subtitle, cue (that is what a point carries)

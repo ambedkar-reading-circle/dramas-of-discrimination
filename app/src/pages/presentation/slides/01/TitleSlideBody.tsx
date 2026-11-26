@@ -1,7 +1,7 @@
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
-import { useRevealCue } from '../../playback/useSlideCue'
+import { useCueTarget } from '../../playback/targets'
 import ApproachReveal from './components/approach/ApproachReveal'
 import TitleWordmark from './components/TitleWordmark'
 import { approachPhotos } from './content/approachPhotos'
@@ -9,12 +9,17 @@ import { subtitle } from './content/titleCopy'
 import { ApproachRevealContext } from './hooks/useApproachReveal'
 import type { ApproachSide } from './types'
 
-const approachSides = Object.keys(approachPhotos) as ReadonlyArray<ApproachSide>
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 01: the side of the approach diagram whose photo is open. */
+    approach: ApproachSide | null
+  }
+}
 
 export function TitleSlideBody() {
   const host = useSlideStageHost()
   const reveal = useReveal<ApproachSide>()
-  useRevealCue(reveal, approachSides)
+  useCueTarget('approach', (side) => (side ? reveal.open(side) : reveal.close()), { rest: null, value: reveal.active })
 
   return (
     <ApproachRevealContext value={reveal}>

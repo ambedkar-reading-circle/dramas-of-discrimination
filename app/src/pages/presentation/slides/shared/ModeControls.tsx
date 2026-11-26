@@ -1,28 +1,15 @@
 import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
 import { members } from './content/actorMap'
-import { parseCue } from '../../playback/cues'
-import type { ParsedCue } from '../../playback/cues'
-import { useSlideCue } from '../../playback/useSlideCue'
 import './modes.css'
 
 export type Mode = 'local' | 'cloud'
 
-/** The modes in the order their speaker-note tabs come: tab 0 is Local mode, tab 1 Cloud mode. */
-const modeTabs: ReadonlyArray<Mode> = ['local', 'cloud']
-
-/**
- * Plays each speaker-note tab over its mode: tab 0 Local, tab 1 Cloud.
- * `modeFor` can name the mode the slide's own cues belong to. A beat with
- * neither keeps the Room's last choice.
- */
-export function useModeCue(setMode: (mode: Mode) => void, modeFor?: (cue: ParsedCue) => Mode | null) {
-  useSlideCue((cue) => {
-    const parsed = parseCue(cue)
-    if (!parsed) return
-    const mode = parsed.verb === 'tab' ? (modeTabs[Number(parsed.arg)] ?? null) : (modeFor?.(parsed) ?? null)
-    if (mode) setMode(mode)
-  })
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slides 07 and 08: Local or Cloud mode, set by each tab of notes. */
+    mode: Mode
+  }
 }
 
 /** The mode switch's thumb snaps across quickly. */

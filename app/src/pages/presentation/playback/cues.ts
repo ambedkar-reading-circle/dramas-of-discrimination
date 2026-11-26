@@ -1,66 +1,43 @@
 /**
- * The grammar of a slide cue, in one place: what `beats.ts` writes into a
- * beat and what slides read back out of it. A cue is `<verb>` or
- * `<verb>:<arg>`, such as `reveal:systems`, `tab:1` or `generate`.
+ * Slide cues: a cue sets one of the slide's named targets to a value, such
+ * as `{ set: 'approach', to: 'forum' }`. Speaker notes carry them between
+ * their lines; slides read the targets with `useCueTarget`.
  */
 
-/** The verbs a cue can start with. A marker with any other verb is a typo in the notes. */
-export const cueVerbs = ['reveal', 'tab', 'guide', 'video', 'generate', 'edit'] as const
-export type CueVerb = (typeof cueVerbs)[number]
+/**
+ * Every cue target, with the values it takes. Each slide adds its own by
+ * module augmentation, next to the component that reads it:
+ *
+ *     declare module '../../playback/cues' {
+ *       interface CueTargets { approach: ApproachSide | null }
+ *     }
+ */
+export interface CueTargets {}
 
-/** A cue split into its verb and its argument: `reveal:systems` is `{ verb: 'reveal', arg: 'systems' }`. */
-export type ParsedCue = Readonly<{ verb: CueVerb; arg: string }>
+export type CueTarget = keyof CueTargets
+
+/**
+ * Sets one target to a value, from its point on until another cue sets it.
+ * `wait: 'video'` holds its point until the film ends, and sets the target
+ * for that point only.
+ */
+/** What a cue's point can wait on before the deck moves on. */
+export type CueWait = 'video'
+
+export type Cue = { [K in CueTarget]: Readonly<{ set: K; to: CueTargets[K]; wait?: CueWait }> }[CueTarget]
+
+/** Every target a cue has set by some point of a slide, and the value it holds there. */
+export type CueState = Readonly<Partial<CueTargets>>
 
 const warned = new Set<string>()
 
 /**
- * Flags a cue the slide cannot act on, so a typo in the notes shows in
- * development instead of doing nothing. Once per cue, however many handlers
- * read it or however often it replays.
+ * Flags a cue the slide cannot act on, so a mistake in the notes shows in
+ * development instead of doing nothing. Once per cue, however often it replays.
  */
-export function warnCue(cue: string, why: string) {
-  if (!import.meta.env.DEV || warned.has(cue)) return
-  warned.add(cue)
-  console.warn(`Slide cue "${cue}" ignored: ${why}`)
-}
-
-function isCueVerb(verb: string): verb is CueVerb {
-  return (cueVerbs as ReadonlyArray<string>).includes(verb)
-}
-
-/** Splits a cue such as `reveal:systems` into its verb and its argument; null for no cue or an unknown verb. */
-export function parseCue(cue: string | null): ParsedCue | null {
-  if (!cue) return null
-  const at = cue.indexOf(':')
-  const verb = at < 0 ? cue : cue.slice(0, at)
-  if (!isCueVerb(verb)) {
-    warnCue(cue, `unknown verb; expected one of ${cueVerbs.join(', ')}`)
-    return null
-  }
-  return { verb, arg: at < 0 ? '' : cue.slice(at + 1) }
-}
-
-/** The verb of a cue, or null for no cue or an unknown verb. */
-export function verbOf(cue: string | null): CueVerb | null {
-  return parseCue(cue)?.verb ?? null
-}
-
-/** The cue a speaker-note tab plays its points under. */
-export function tabCue(index: number): string {
-  return `tab:${index}`
-}
-
-/** Whether a cue names a speaker-note tab. Quiet about other verbs, unlike `parseCue`. */
-export function isTabCue(cue: string | null): boolean {
-  return cue?.startsWith('tab:') === true
-}
-
-/** The tab index a `tab:<n>` cue names, or null. */
-export function tabOf(cue: string | null): number | null {
-  const parsed = parseCue(cue)
-  if (parsed?.verb !== 'tab') return null
-  const index = Number(parsed.arg)
-  if (Number.isInteger(index)) return index
-  if (cue) warnCue(cue, 'the tab is not a whole number')
-  return null
+export function warnCue(cue: Cue, why: string) {
+  const name = JSON.stringify(cue)
+  if (!import.meta.env.DEV || warned.has(name)) return
+  warned.add(name)
+  console.warn(`Slide cue ${name} ignored: ${why}`)
 }

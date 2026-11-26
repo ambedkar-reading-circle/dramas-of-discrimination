@@ -4,7 +4,7 @@ import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
 import { members } from '../shared/content/actorMap'
 import { GuideFrame } from '../shared/GuideFrame'
-import { ModeBar, useModeCue } from '../shared/ModeControls'
+import { ModeBar } from '../shared/ModeControls'
 import type { Mode } from '../shared/ModeControls'
 import { SheetTabs } from '../shared/SheetTabs'
 import { useCopyText } from '../shared/useCopyText'
@@ -14,9 +14,15 @@ import { draft, prompt } from './content/manifesto'
 import type { DraftBlock } from './content/manifesto'
 import { useManifestoDraft } from './hooks/useManifestoDraft'
 import type { Segment } from './hooks/useManifestoDraft'
-import { verbOf } from '../../playback/cues'
-import { useSlideCue } from '../../playback/useSlideCue'
+import { useCueTarget } from '../../playback/targets'
 import './ManifestoMockup.css'
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 08: the Facilitator's two presses on the Manifesto draft. */
+    manifesto: 'generate' | 'edit'
+  }
+}
 
 /** The journey's position past its last act: the workshop is done, and the Manifesto comes next. */
 const afterLastAct = workshopActivities.length
@@ -33,16 +39,18 @@ const tabs: Record<Mode, ReadonlyArray<string>> = {
  */
 export function ManifestoMockup() {
   const [mode, setMode] = useState<Mode>('local')
-  // Generating and editing happen in Cloud mode.
-  useModeCue(setMode, ({ verb }) => (verb === 'generate' || verb === 'edit' ? 'cloud' : null))
+  useCueTarget('mode', setMode, { value: mode })
   // The draft lives here, above the mode switch, so a trip to Local mode and back keeps it.
   const reducedMotion = usePrefersReducedMotion()
   const manifesto = useManifestoDraft(reducedMotion)
-  // The Facilitator's two presses, played on their points.
-  useSlideCue((cue) => {
-    const verb = verbOf(cue)
-    if (verb === 'generate') manifesto.generate()
-    else if (verb === 'edit') manifesto.edit()
+  // The Facilitator's two presses, played on their points. A press runs once
+  // when the deck reaches it, not again at each point it stays in effect.
+  const pressed = useRef<'generate' | 'edit' | null>(null)
+  useCueTarget('manifesto', (press) => {
+    if (pressed.current === press) return
+    pressed.current = press
+    if (press === 'generate') manifesto.generate()
+    else manifesto.edit()
   })
 
   return (

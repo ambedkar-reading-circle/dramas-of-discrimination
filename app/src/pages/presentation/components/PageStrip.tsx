@@ -12,10 +12,10 @@ interface PageStripProps {
   focusOnMount?: boolean
 }
 
-/** The current slide's square: what it shows, such as its number with the step it is in (4.2), and what its accessible name adds, such as ", step 2 of 4". */
+/** The current slide's square: what it shows, such as its number with the point the deck is on (4.2), and what its accessible name adds, such as ", point 2 of 9". */
 export type CurrentPage = Readonly<{ label: string; note: string }>
 
-/** A slide's accessible name: its number, anything the square adds (such as its step), and its heading. */
+/** A slide's accessible name: its number, anything the square adds (such as its point), and its heading. */
 export function slideLabel(number: number, heading: string, note = ''): string {
   return `Slide ${number}${note}: ${heading}`
 }

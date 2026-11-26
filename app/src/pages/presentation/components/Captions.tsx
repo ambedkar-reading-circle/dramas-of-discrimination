@@ -3,16 +3,17 @@ import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { usePlayback } from '../playback/playback'
 
 /**
- * The middle of the player while captions play: the current beat's caption,
- * framed like the buttons. While the slide carries a beat alone, such as the
- * film on slide 02, it says so.
+ * The middle of the player while captions are on: the current caption,
+ * framed like the buttons. While the slide carries a point alone, such as the
+ * film on slide 02, it says so, and how to start it when the deck is not playing.
  */
 export default function Captions() {
   const playback = usePlayback()
   const reduced = usePrefersReducedMotion()
   if (!playback) return null
-  const film = playback.current.waitFor === 'video'
-  const text = film ? 'The film is playing. The captions pick up when it ends.' : playback.current.say
+  const film = playback.current.wait === 'video'
+  const filmNote = playback.playing ? 'The film is playing. The captions pick up when it ends.' : 'Press play to watch the film, or step on past it.'
+  const text = film ? filmNote : playback.caption.say
 
   return (
     <div className="deck-captions" aria-live="polite">

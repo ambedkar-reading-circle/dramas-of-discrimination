@@ -9,12 +9,19 @@ import { recordedExamples } from './content/recordedExamples'
 import { GuideFrame } from '../shared/GuideFrame'
 import { stateOf } from '../shared/GuideJourney'
 import { motionUnlessReduced } from '../shared/motion'
-import { parseCue, warnCue } from '../../playback/cues'
-import { useSlideCue } from '../../playback/useSlideCue'
+import { warnCue } from '../../playback/cues'
+import { useCueTarget } from '../../playback/targets'
 import './FacilitationGuideMockup.css'
 
 /** Every step of the workshop in order, so Back and Next walk the whole journey. */
 const journey = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 06: the step of the journey the guide is on. */
+    guide: Readonly<{ act: number; step: number }>
+  }
+}
 
 /** Where a step sits in the journey, or -1 for a step the workshop does not have. */
 const positionOf = (act: number, step: number) => journey.findIndex((stop) => stop.act === act && stop.step === step)
@@ -67,16 +74,17 @@ export function FacilitationGuideMockup() {
   }
   const goTo = (targetAct: number, targetStep: number) => moveToStop(positionOf(targetAct, targetStep))
 
-  // `guide:<act>.<step>` walks the room on, as if it had pressed We're ready.
-  useSlideCue((cue) => {
-    const parsed = parseCue(cue)
-    if (parsed?.verb !== 'guide') return
-    const [targetAct, targetStep] = parsed.arg.split('.').map(Number)
-    if (!Number.isInteger(targetAct) || !Number.isInteger(targetStep)) return warnCue(cue ?? '', 'expected guide:<act>.<step>')
-    const target = positionOf(targetAct, targetStep)
-    if (target < 0) return warnCue(cue ?? '', 'no such step in the journey')
-    moveToStop(target)
-  })
+  // A cue on `guide` walks the room on, as if it had pressed We're ready; a
+  // step chosen by hand moves the deck to the point that shows it.
+  useCueTarget(
+    'guide',
+    (stop) => {
+      const target = positionOf(stop.act, stop.step)
+      if (target < 0) return warnCue({ set: 'guide', to: stop }, 'no such step in the journey')
+      moveToStop(target)
+    },
+    { value: journey[position] },
+  )
 
   // `towards` is the direction of travel: 1 forward, -1 back.
   const fadeVariants: Variants = { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } }

@@ -17,7 +17,11 @@ export const slide = {
     'Others step in and try to change the ending. And we see who pushes back.',
     'So it is a place to rehearse. An idea that sounds easy from an armchair gets tested here.',
     'What comes out depends on who is in the room. The more varied the group, the richer it gets.',
-    '[[reveal:systems]] Systems thinking can feel abstract. [[reveal:forum]] Theatre feels real, but it can shrink a big problem into one bad person.',
-    '[[reveal:result]] So we took the best of both, and left their limits behind.',
+    { set: 'approach', to: 'systems' },
+    'Systems thinking can feel abstract.',
+    { set: 'approach', to: 'forum' },
+    'Theatre feels real, but it can shrink a big problem into one bad person.',
+    { set: 'approach', to: 'result' },
+    'So we took the best of both, and left their limits behind.',
   ],
 } satisfies Slide

@@ -1,48 +1,47 @@
-import { createContext, use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { Slide } from '../types'
-import { beatsOf } from './beats'
-import type { PlayBeat } from './beats'
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLatest } from '#/lib/use-latest'
+import { knownMs, paceOf, runPace } from './pace'
+import type { Pace } from './pace'
+import type { Caption, Point, SlidePoints } from './points'
 import { speech } from './speech'
 
-/** What a key press inside the slide works, rather than the deck. */
-export const controlSelector = 'button, a[href], input, textarea, select, [role="button"], [role="tab"]'
-
-/** Where a key press is typing, not working a control. */
-export const typingSelector = 'input, textarea, select, [contenteditable="true"]'
-
-/** A short breath after the voice finishes, before the next caption. */
-const afterSpeechMs = 400
-
-export type Playback = Readonly<{
-  /** Self-facilitation has started (play was pressed): the slide number carries its step, and captions and voice are on offer. */
-  selfMode: boolean
+export type Playback = SlidePoints &
+  Readonly<{
+  /** The deck plays itself, point after point. */
   playing: boolean
+  /**
+   * The deck is not playing, but the current point's captions run through
+   * once (read aloud if the voice is on) and stop at its end. It starts on
+   * arrival at each point, so a visitor stepping by hand still reads and
+   * hears every caption.
+   */
+  narrating: boolean
   /** Captions are read aloud, and the voice sets the pace. */
   voice: boolean
-  /** Captions show in the player bar while self-facilitation is on. */
+  /** Captions show in the player bar, from arrival, whether or not the deck plays. */
   captions: boolean
-  /** The id of the slide the beats belong to. */
+  /** The id of the slide the points belong to. */
   slideId: string
-  beat: number
-  beats: ReadonlyArray<PlayBeat>
-  current: PlayBeat
-  /** The current beat's hold is running on the timer: playing, with neither the voice nor a film setting the pace. */
-  holdRunning: boolean
-  /** Changes each time a beat is applied: on arrival, and again on play. */
-  token: number
+  /** The point the deck is on. */
+  current: Point
+  /** Which of the current point's captions is on screen, and that caption. */
+  captionIndex: number
+  caption: Caption
+  /** What sets the current caption's length, and plays it. */
+  pace: Pace
+  /** How long the current caption runs, while playing or narrating and when its pace knows its length ahead; null otherwise. */
+  runningMs: number | null
+  /** Counts each time a caption is applied: on arrival, on each caption, and again on play. */
+  captionsApplied: number
   /**
-   * The beat was brought on by playback (playing, stepping a caption, or play
-   * pressed), not by someone moving the deck while paused. Slides act on a
-   * beat's cue only then, so presenting by hand leaves them alone.
+   * Counts each time the cues are applied: when the deck moves to a point, or play is pressed. The
+   * slide then shows that point's cues again, so a change made by hand inside
+   * it lasts only until the deck moves.
    */
-  byPlayback: boolean
-  /** The beat's cue differs from the beat played just before, or the beat was applied afresh. */
-  cueChanged: boolean
+  cuesApplied: number
   play: () => void
   pause: () => void
   toggle: () => void
-  nextBeat: () => void
-  prevBeat: () => void
   setVoice: (on: boolean) => void
   setCaptions: (on: boolean) => void
   /** The slide reports the film it was waiting on has ended. */
@@ -51,82 +50,69 @@ export type Playback = Readonly<{
 
 export const PlaybackContext = createContext<Playback | null>(null)
 
-/** The id of the slide a component renders in, so an exiting slide ignores the next slide's cues. */
-export const SlideIdContext = createContext<string | null>(null)
-
 export function usePlayback(): Playback | null {
   return use(PlaybackContext)
 }
 
+/** Where the deck stands, and how it moves: what playback reads and drives. */
 interface DeckPosition {
-  /** The deck's slides, whose speaker notes the beats are woven from. */
-  slides: ReadonlyArray<Slide>
   slide: number
-  goTo: (slide: number) => void
+  point: number
+  slideId: string
+  points: ReadonlyArray<Point>
+  atEnd: boolean
+  /** Steps the deck one point on, into the next slide after the last. */
+  next: () => void
+  goTo: (slide: number, point: number) => void
 }
 
 /**
- * Self-facilitated playback over the deck: which beat of the current slide is
- * on screen, and the timer (or voice, or film) that moves it on. Reaching a
- * slide's last beat moves the deck to the next slide, through the same
- * `goTo` the slide strip and arrows use, so the URL stays the source of truth
- * for the slide and the beat follows it.
+ * Self-facilitated playback over the deck. The deck owns the position (slide
+ * and point, in the URL); playback owns the captions within a point and the
+ * pace (see `pace.ts`) that moves it on, through the same `next` the arrows
+ * use.
  */
-export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialPlay: boolean): Playback {
-  const total = slides.length
-  // Every slide's beats, worked out once per deck: the notes do not change while it runs.
-  const deckBeats = useMemo(() => slides.map(beatsOf), [slides])
-  const [selfMode, setSelfMode] = useState(initialPlay)
+export function usePlaybackState({ slide, point, slideId, points, atEnd, next, goTo }: DeckPosition, initialPlay: boolean): Playback {
   const [playing, setPlaying] = useState(initialPlay)
+  const [narrating, setNarrating] = useState(!initialPlay)
   const [voice, setVoiceState] = useState(false)
   const [captions, setCaptions] = useState(true)
-  // `previousBeat` is the beat stepped from, or null when the beat was applied afresh (arrival, play).
-  const [pos, setPos] = useState<{ slide: number; beat: number; token: number; byPlayback: boolean; previousBeat: number | null }>({ slide, beat: 0, token: 1, byPlayback: initialPlay, previousBeat: null })
-  // How playback crosses into the next slide: stepping back from a slide's
-  // first beat lands on the previous slide's last, and a step is live.
-  const [entry, setEntry] = useState<{ at: 'start' | 'end'; live: boolean } | null>(null)
-
-  const beats = deckBeats[slide - 1]
-  // A new slide, from anywhere (selector, arrows, keys, swipe, playback), starts its beats over.
-  if (pos.slide !== slide) {
-    setPos({ slide, beat: entry?.at === 'end' ? beats.length - 1 : 0, token: pos.token + 1, byPlayback: entry?.live === true || playing, previousBeat: null })
-    if (entry) setEntry(null)
+  const [progress, setProgress] = useState({ slide, point, caption: 0, captionsApplied: 1, cuesApplied: 1 })
+  // A new point, from anywhere (arrows, keys, swipe, strip, playback), starts at its first caption and shows its cues.
+  // Stepped onto by hand, it narrates its own captions.
+  if (progress.slide !== slide || progress.point !== point) {
+    setProgress({ slide, point, caption: 0, captionsApplied: progress.captionsApplied + 1, cuesApplied: progress.cuesApplied + 1 })
+    if (!playing) setNarrating(true)
   }
-  const beat = Math.min(pos.beat, beats.length - 1)
-  const current = beats[beat]
 
-  const nextBeat = useCallback(() => {
-    // A first step after moving the paused deck by hand applies its cue afresh: the slide may not show the cue before it.
-    if (beat < beats.length - 1) setPos((p) => ({ ...p, beat: beat + 1, token: p.token + 1, byPlayback: true, previousBeat: p.byPlayback ? beat : null }))
-    else if (slide < total) {
-      setEntry({ at: 'start', live: true })
-      goTo(slide + 1)
-    } else setPlaying(false)
-  }, [beat, beats.length, slide, total, goTo])
+  const current = points[point - 1]
+  const captionIndex = Math.min(progress.caption, current.captions.length - 1)
+  const caption = current.captions[captionIndex]
 
-  const prevBeat = useCallback(() => {
-    if (beat > 0) setPos((p) => ({ ...p, beat: beat - 1, token: p.token + 1, byPlayback: true, previousBeat: p.byPlayback ? beat : null }))
-    else if (slide > 1) {
-      setEntry({ at: 'end', live: true })
-      goTo(slide - 1)
-    }
-  }, [beat, slide, goTo])
+  /** Moves playback on: the point's next caption, else (narrating) a stop, else the next point, else the end of the deck. */
+  const advance = useCallback(() => {
+    if (captionIndex < current.captions.length - 1) setProgress((p) => ({ ...p, caption: captionIndex + 1, captionsApplied: p.captionsApplied + 1 }))
+    else if (!playing) setNarrating(false)
+    else if (atEnd) setPlaying(false)
+    else next()
+  }, [captionIndex, current.captions.length, playing, atEnd, next])
 
-  /** Applies the current beat again, so a resume re-plays its cue and restarts its hold. */
-  const replay = useCallback(() => setPos((p) => ({ ...p, token: p.token + 1, byPlayback: true, previousBeat: null })), [])
+  /** Applies the current point again, so a resume re-plays its cues and restarts its hold. */
+  const replay = useCallback(() => setProgress((p) => ({ ...p, captionsApplied: p.captionsApplied + 1, cuesApplied: p.cuesApplied + 1 })), [])
 
-  // The film can end just after Pause. Its beat is then done: play moves on from it rather than starting the film over.
+  // The film can end just after Pause. Its point is then done: play moves on from it rather than starting the film over.
   const endedWhilePaused = useRef<number | null>(null)
 
   const play = useCallback(() => {
-    setSelfMode(true)
     setPlaying(true)
-    if (endedWhilePaused.current === pos.token) nextBeat()
+    setNarrating(false)
+    if (endedWhilePaused.current === progress.captionsApplied) advance()
     else replay()
     endedWhilePaused.current = null
-  }, [replay, nextBeat, pos.token])
+  }, [replay, advance, progress.captionsApplied])
   const pause = useCallback(() => {
     setPlaying(false)
+    setNarrating(false)
     speech()?.cancel()
   }, [])
   const toggle = useCallback(() => (playing ? pause() : play()), [playing, pause, play])
@@ -135,59 +121,42 @@ export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialP
       setVoiceState(on)
       if (!on) speech()?.cancel()
       else if (playing) replay()
+      else {
+        // Not playing: read the caption on screen, and the rest of its point, without moving the deck.
+        setNarrating(true)
+        setProgress((p) => ({ ...p, captionsApplied: p.captionsApplied + 1 }))
+      }
     },
     [playing, replay],
   )
 
-  const waiting = current.waitFor !== undefined
+  const waiting = current.wait !== undefined
   const resolveWait = useCallback(() => {
     if (!waiting) return
-    if (playing) nextBeat()
-    else endedWhilePaused.current = pos.token
-  }, [waiting, playing, nextBeat, pos.token])
+    if (playing) advance()
+    else endedWhilePaused.current = progress.captionsApplied
+  }, [waiting, playing, advance, progress.captionsApplied])
 
-  // The latest step, so the timer below restarts only when a beat is applied.
-  const advance = useRef(nextBeat)
-  useLayoutEffect(() => {
-    advance.current = nextBeat
-  })
+  const pace = useMemo(() => paceOf(caption, current, voice), [caption, current, voice])
+  const running = playing || narrating
+
+  // The latest advance, so the pace below restarts only when a caption is applied.
+  const latestAdvance = useLatest(advance)
 
   useEffect(() => {
-    if (!playing || current.waitFor) return
-    const synth = voice && current.speak !== '' ? speech() : null
-    const timers: Array<ReturnType<typeof setTimeout>> = []
-    const later = (ms: number) => timers.push(setTimeout(() => advance.current(), ms))
-    let utterance: SpeechSynthesisUtterance | null = null
-    if (synth) {
-      synth.cancel()
-      utterance = new SpeechSynthesisUtterance(current.speak)
-      utterance.lang = 'en-IN'
-      utterance.onend = () => later(afterSpeechMs)
-      synth.speak(utterance)
-      // A voice that never reports its end must not stall the deck.
-      later(current.holdMs * 3)
-    } else {
-      later(current.holdMs)
-    }
-    return () => {
-      timers.forEach(clearTimeout)
-      if (utterance) {
-        utterance.onend = null
-        synth?.cancel()
-      }
-    }
-  }, [playing, voice, pos.token, current])
+    if (!running) return
+    return runPace(pace, () => latestAdvance.current())
+    // A caption applied again (on play, or the voice turned on) runs its pace afresh.
+  }, [running, pace, progress.captionsApplied])
 
   // Leaving the deck silences the voice.
   useEffect(() => () => speech()?.cancel(), [])
 
-  // A cue that holds across captions fires once, where it starts. Arriving, or
-  // pressing play, applies the current cue again.
-  const cueChanged = pos.previousBeat === null || beats[pos.previousBeat]?.cue !== current.cue
-  const holdRunning = playing && !voice && !current.waitFor
-  const slideId = slides[slide - 1].id
+  const goToPoint = useCallback((target: number) => goTo(slide, target), [goTo, slide])
+
+  const runningMs = running ? knownMs(pace) : null
   return useMemo(
-    () => ({ selfMode, playing, voice, captions, slideId, beat, beats, current, holdRunning, token: pos.token, byPlayback: pos.byPlayback, cueChanged, play, pause, toggle, nextBeat, prevBeat, setVoice, setCaptions, resolveWait }),
-    [selfMode, playing, voice, captions, slideId, beat, beats, current, holdRunning, pos.token, pos.byPlayback, cueChanged, play, pause, toggle, nextBeat, prevBeat, setVoice, setCaptions, resolveWait],
+    () => ({ playing, narrating, voice, captions, slideId, points, point, current, goToPoint, captionIndex, caption, pace, runningMs, captionsApplied: progress.captionsApplied, cuesApplied: progress.cuesApplied, play, pause, toggle, setVoice, setCaptions, resolveWait }),
+    [playing, narrating, voice, captions, slideId, points, point, current, goToPoint, captionIndex, caption, pace, runningMs, progress.captionsApplied, progress.cuesApplied, play, pause, toggle, setVoice, setCaptions, resolveWait],
   )
 }

@@ -45,5 +45,5 @@ export const slide = {
   kicker: 'The method',
   heading: 'The five acts of the Workshop',
   interactive: <MethodEmbed />,
-  speakerNoteTabs: workshopActivities.map((activity) => ({ label: activity.name, speakerNotes: notesByAct[activity.name] })),
+  speakerNoteTabs: workshopActivities.map((activity, index) => ({ label: activity.name, cue: { set: 'method', to: index }, speakerNotes: notesByAct[activity.name] })),
 } satisfies Slide

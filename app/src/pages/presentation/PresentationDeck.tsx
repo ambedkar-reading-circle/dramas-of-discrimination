@@ -3,23 +3,25 @@ import type { KeyboardEvent } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { slides } from './slides'
 import MarkButton, { Mark } from '#/components/MarkButton'
-import { usePresentationDeck } from './hooks/usePresentationDeck'
+import { deckPoints, usePresentationDeck } from './hooks/usePresentationDeck'
 import SlideNav from './components/SlideNav'
 import SlideStage from './components/SlideStage'
-import { PlaybackContext, controlSelector, usePlaybackState } from './playback/playback'
+import { controlSelector } from './keyTargets'
+import { PlaybackContext, usePlaybackState } from './playback/playback'
 import './PresentationDeck.css'
 import { twoDigit } from '#/lib/format'
 
 export default function PresentationDeck() {
-  const { slide, total, goTo, next, prev, onDeckKeyDown, stageSwipeHandlers } = usePresentationDeck()
+  const position = usePresentationDeck()
+  const { slide, point, total, goTo, onDeckKeyDown, stageSwipeHandlers } = position
   const current = slides[slide - 1]
   const { play: playOnOpen } = useSearch({ from: '/approach' })
-  const playback = usePlaybackState({ slides, slide, goTo }, playOnOpen === true)
+  const playback = usePlaybackState({ slide, point, slideId: current.id, points: deckPoints[slide - 1], atEnd: position.atEnd, next: position.next, goTo }, playOnOpen === true)
   const navigate = useNavigate({ from: '/approach' })
   // The URL says whether the deck is playing, so a refresh mid-playback carries on, and one after pausing stays paused.
   useEffect(() => {
     if ((playOnOpen === true) === playback.playing) return
-    void navigate({ search: (search) => ({ slide: search.slide, ...(playback.playing ? { play: true as const } : {}) }), replace: true })
+    void navigate({ search: (search) => ({ slide: search.slide, point: search.point, ...(playback.playing ? { play: true as const } : {}) }), replace: true })
   }, [playOnOpen, playback.playing, navigate])
   const [fullscreen, setFullscreen] = useState(false)
   const deck = useRef<HTMLElement>(null)
@@ -44,20 +46,13 @@ export default function PresentationDeck() {
     }
   }, [])
 
-  // Space plays and pauses, as on any player. In self-facilitation, Shift with
-  // an arrow steps one caption. Space on a control inside a slide still works that control.
+  // Space plays and pauses, as on any player. Space on a control inside a slide still works that control.
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.altKey) {
       const onControl = event.target instanceof Element && event.target.closest(controlSelector)
       if (event.key === ' ' && !onControl) {
         event.preventDefault()
         playback.toggle()
-        return
-      }
-      if (playback.selfMode && event.shiftKey && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
-        event.preventDefault()
-        if (event.key === 'ArrowRight') playback.nextBeat()
-        else playback.prevBeat()
         return
       }
     }
@@ -78,7 +73,7 @@ export default function PresentationDeck() {
 
       <SlideStage slide={current} index={slide} total={total} />
 
-      <SlideNav slides={slides} slide={slide} total={total} next={next} prev={prev} onSelect={goTo} tools={<MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />} />
+      <SlideNav slides={slides} deck={position} onSelect={goTo} tools={<MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />} />
 
       <p className="slide-sr" aria-live="polite">
         Slide {slide} of {total}: {current.heading}

@@ -1,9 +1,18 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 import { videoOrigin } from '#/components/TabletVideoFrame'
-import { parseCue } from '../../playback/cues'
+import { useLatest } from '#/lib/use-latest'
 import { usePlayback } from '../../playback/playback'
-import { useSlideCue } from '../../playback/useSlideCue'
+import { useCueTarget } from '../../playback/targets'
+
+type FilmState = 'playing' | 'stopped'
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 02: the film. Set it with `wait: 'video'` so the deck waits for its end. */
+    film: FilmState
+  }
+}
 
 /** YouTube's player states, as its iframe API reports them. Buffering, unstarted and cued do not mean the film is playing. */
 const ended = 0
@@ -31,9 +40,10 @@ function stateOf(data: unknown): number | null {
 }
 
 /**
- * Lets playback drive the film on slide 02: `video:play` starts it through
- * the YouTube iframe API, and its end moves the deck on. Pausing the deck
- * pauses the film; any other beat stops it.
+ * Lets playback drive the film on slide 02: its point sets `film` to
+ * `playing`, which starts it through the YouTube iframe API while the deck
+ * plays, and its end moves the deck on. Pausing the deck pauses the film;
+ * any other point stops it.
  */
 export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const playback = usePlayback()
@@ -41,10 +51,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   // The film has been seen playing since it was asked to.
   const confirmed = useRef(false)
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
-  const resolve = useRef(playback?.resolveWait)
-  useLayoutEffect(() => {
-    resolve.current = playback?.resolveWait
-  })
+  const resolve = useLatest(playback?.resolveWait)
 
   const post = (message: object) => frame.current?.contentWindow?.postMessage(JSON.stringify({ ...message, id: 1, channel: 'widget' }), videoOrigin)
   const command = (func: string) => {
@@ -78,11 +85,10 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
     }
   }, [frame])
 
-  useSlideCue((cue) => {
+  const setFilm = (state: FilmState) => {
     clearTimers()
-    const parsed = parseCue(cue)
-    // Stepping into the film while paused leaves it waiting: play applies the cue again and starts it then.
-    if (parsed?.verb === 'video' && parsed.arg === 'play' && playback?.playing === true) {
+    // Stepping onto the film's point while paused leaves it waiting: play applies the cue again and starts it then.
+    if (state === 'playing' && playback?.playing === true) {
       wanted.current = true
       confirmed.current = false
       command('playVideo')
@@ -101,7 +107,8 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
       wanted.current = false
       command('pauseVideo')
     }
-  })
+  }
+  useCueTarget('film', setFilm, { rest: 'stopped' })
 
   // The deck paused mid-film: hold the film too. Play re-applies the cue and resumes it.
   const paused = playback?.playing === false

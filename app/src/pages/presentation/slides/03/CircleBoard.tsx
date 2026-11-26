@@ -1,7 +1,7 @@
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
-import { useRevealCue } from '../../playback/useSlideCue'
+import { useCueTarget } from '../../playback/targets'
 import { CircleCard } from './CircleCard'
 import { CircleGroup } from './CircleGroup'
 import { PhoneLayer } from './PhoneLayer'
@@ -9,12 +9,17 @@ import { circles, circlesLabel, findByKey, values, valuesLabel } from './content
 import type { BoardKey } from './content/circles'
 import './CircleBoard.css'
 
-const boardKeys: ReadonlyArray<BoardKey> = [...values, ...circles].map((item) => item.key)
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 03: the value or circle whose photo or phone is open. */
+    circles: BoardKey | null
+  }
+}
 
 export function CircleBoard() {
   const host = useSlideStageHost()
   const reveal = useReveal<BoardKey>()
-  useRevealCue(reveal, boardKeys)
+  useCueTarget('circles', (key) => (key ? reveal.open(key) : reveal.close()), { rest: null, value: reveal.active })
 
   return (
     <div className="circle-board">

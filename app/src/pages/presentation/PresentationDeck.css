@@ -541,8 +541,8 @@
     background: color-mix(in srgb, var(--sea-ink) 55%, transparent);
   }
 
-  /* Framer Motion runs the line across each prompt; no CSS easing on top. */
-  .slide-progress-fill--beats {
+  /* Framer Motion runs the line across each caption; no CSS easing on top. */
+  .slide-progress-fill--points {
     transition: none;
   }
 

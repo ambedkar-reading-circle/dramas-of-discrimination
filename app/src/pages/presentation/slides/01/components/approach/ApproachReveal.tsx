@@ -2,7 +2,7 @@ import { useId, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import ApproachDiagram from './ApproachDiagram'
 import ApproachTrigger from './ApproachTrigger'
-import { useSlideCue } from '../../../../playback/useSlideCue'
+import { useCueTarget } from '../../../../playback/targets'
 
 function focusNextFrame(target: RefObject<HTMLElement | null>) {
   requestAnimationFrame(() => target.current?.focus({ preventScroll: true }))
@@ -14,8 +14,8 @@ export default function ApproachReveal() {
   const diagram = useRef<HTMLElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
 
-  // Playback opens the diagram for the beats that reveal its cells. Focus stays put.
-  useSlideCue((cue) => setOpen(cue !== null))
+  // The diagram is open at the points that reveal its cells. Focus stays put.
+  useCueTarget('approach', (side) => setOpen(side !== null), { rest: null })
 
   const show = () => {
     setOpen(true)

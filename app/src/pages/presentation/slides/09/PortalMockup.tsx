@@ -4,10 +4,17 @@ import { GuideFrame } from '../shared/GuideFrame'
 import { collection, kindLabels, manifestos, sharedPledges } from './content/portal'
 import type { CommunityKind, PledgeId, PortalManifesto } from './content/portal'
 import '../shared/modes.css'
-import { useTabCue } from '../../playback/useSlideCue'
+import { useCueTarget } from '../../playback/targets'
 import './PortalMockup.css'
 
 type View = 'explore' | 'common'
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    /** Slide 09: the portal's view. */
+    portal: View
+  }
+}
 
 const views: ReadonlyArray<{ value: View; label: string }> = [
   { value: 'explore', label: 'Explore' },
@@ -24,7 +31,7 @@ const count = new Intl.NumberFormat('en-IN')
 export function PortalMockup() {
   const [view, setView] = useState<View>('explore')
   // Each tab of notes plays over its view.
-  useTabCue((tab) => setView(views[tab]?.value ?? 'explore'))
+  useCueTarget('portal', setView, { value: view })
   const tabsId = useId()
 
   return (

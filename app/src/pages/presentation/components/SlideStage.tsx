@@ -5,7 +5,9 @@ import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { SlideDirectionContext } from '../hooks/useSlideDirection'
 import { SlideStageHostContext } from '../hooks/useSlideStageHost'
 import SlideAssetPlaceholder from './SlideAssetPlaceholder'
-import { SlideIdContext, controlSelector, typingSelector, usePlayback } from '../playback/playback'
+import { controlSelector, typingSelector } from '../keyTargets'
+import { usePlayback } from '../playback/playback'
+import { CueScope } from '../playback/targets'
 import type { Slide } from '../types'
 
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28 }
@@ -127,7 +129,7 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
           <SlideDirectionContext value={direction}>
             <AnimatePresence initial={false} custom={direction}>
               <motion.div key={slide.id} className={`slide-frame${scale < 1 ? ' slide-frame--scaled' : ''}`} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={reducedMotion ? { duration: 0 } : spring}>
-                <SlideIdContext value={slide.id}>
+                <CueScope slideId={slide.id}>
                 <div ref={fit} className={`slide slide--${slide.layout ?? 'default'}`} style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined}>
                   {!ownsHeading && (
                     <h2 ref={heading} className="slide-heading" tabIndex={-1}>
@@ -140,7 +142,7 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
                     <SlideAssetPlaceholder key={`${asset.role}-${asset.note ?? ''}`} role={asset.role} note={asset.note} />
                   ))}
                 </div>
-                </SlideIdContext>
+                </CueScope>
               </motion.div>
             </AnimatePresence>
           </SlideDirectionContext>
