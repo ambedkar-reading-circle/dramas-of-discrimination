@@ -60,7 +60,7 @@ export function usePresentationDeck() {
 
   const next = useCallback(() => {
     if (point < pointsIn(slide)) goTo(slide, point + 1)
-    else goTo(slide + 1)
+    else if (slide < TOTAL_SLIDES) goTo(slide + 1)
   }, [goTo, slide, point])
   const prev = useCallback(() => {
     if (point > 1) goTo(slide, point - 1)

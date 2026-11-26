@@ -23,6 +23,9 @@ declare module '../../playback/cues' {
   }
 }
 
+/** Where the guide opens, and what the points before the first `guide` cue show. */
+const opening = journey[journey.findIndex((stop) => stop.act === 1)]
+
 /** Where a step sits in the journey, or -1 for a step the workshop does not have. */
 const positionOf = (act: number, step: number) => journey.findIndex((stop) => stop.act === act && stop.step === step)
 
@@ -62,7 +65,7 @@ function useElapsed() {
 export function FacilitationGuideMockup() {
   const reducedMotion = usePrefersReducedMotion()
   const elapsed = useElapsed()
-  const [{ position, direction }, setMove] = useState({ position: journey.findIndex((stop) => stop.act === 1), direction: 1 })
+  const [{ position, direction }, setMove] = useState({ position: journey.indexOf(opening), direction: 1 })
   const { act, step } = journey[position]
   const activity = workshopActivities[act]
   const example = recordedExamples[activity.name][step]
@@ -83,7 +86,7 @@ export function FacilitationGuideMockup() {
       if (target < 0) return warnCue({ set: 'guide', to: stop }, 'no such step in the journey')
       moveToStop(target)
     },
-    { value: journey[position] },
+    { rest: opening, value: journey[position] },
   )
 
   // `towards` is the direction of travel: 1 forward, -1 back.

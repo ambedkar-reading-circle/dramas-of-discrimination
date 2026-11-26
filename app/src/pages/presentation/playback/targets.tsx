@@ -75,9 +75,14 @@ export function useCueTarget<TTarget extends CueTarget>(id: TTarget, set: (value
   const tracked = 'value' in options
   const value = options.value
   const latestScope = useLatest(scope)
+  // What the slide showed when this effect last ran. Only a change from it can be a hand change:
+  // on arrival the slide still shows its first value while the cues' first `set` is on its way.
+  const lastSeen = useRef<unknown>(options.value)
   useEffect(() => {
     const at = latestScope.current
-    if (!tracked || !at || deepEqual(value, lastCued.current)) return
+    if (!tracked || deepEqual(value, lastSeen.current)) return
+    lastSeen.current = value
+    if (!at || deepEqual(value, lastCued.current)) return
     lastCued.current = value
     if (hasRest && deepEqual(value, options.rest)) return
     const point = pointFor(at.points, at.point, id, value)

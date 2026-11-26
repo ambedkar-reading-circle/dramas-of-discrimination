@@ -52,11 +52,23 @@ export function ManifestoMockup() {
     if (press === 'generate') manifesto.generate()
     else manifesto.edit()
   })
+  // A press by hand counts as the latest press, so replaying the point's cue applies it to the draft as it now stands.
+  const byHand = {
+    ...manifesto,
+    generate: () => {
+      pressed.current = 'generate'
+      manifesto.generate()
+    },
+    edit: () => {
+      pressed.current = 'edit'
+      manifesto.edit()
+    },
+  }
 
   return (
     <GuideFrame label="Mockup: in Local mode the Group's worksheets become a prompt to copy into any LLM; in Cloud mode the platform generates the Manifesto of Inclusion and several Members edit it at once" className="modes mani" mode={mode} act={afterLastAct} step={0} bar={<ModeBar mode={mode} onChange={setMode} />}>
       <article className="fac-sheet modes-sheet" aria-label={mode === 'local' ? 'Prompt export' : 'Manifesto of Inclusion'}>
-        {mode === 'local' ? <PromptExport /> : <ManifestoDraft manifesto={manifesto} />}
+        {mode === 'local' ? <PromptExport /> : <ManifestoDraft manifesto={byHand} />}
       </article>
     </GuideFrame>
   )

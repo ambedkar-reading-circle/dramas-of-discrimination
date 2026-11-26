@@ -50,6 +50,8 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const wanted = useRef(false)
   // The film has been seen playing since it was asked to.
   const confirmed = useRef(false)
+  // The deck gave up on a start that never came. A play request may still be pending in the player: if it lands late, pause it.
+  const abandoned = useRef(false)
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
   const resolve = useLatest(playback?.resolveWait)
 
@@ -72,6 +74,10 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
       if (state === playingState) {
         confirmed.current = true
         clearTimers()
+        if (abandoned.current) {
+          abandoned.current = false
+          command('pauseVideo')
+        }
       }
       if (state === ended && wanted.current) {
         wanted.current = false
@@ -91,6 +97,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
     if (state === 'playing' && playback?.playing === true) {
       wanted.current = true
       confirmed.current = false
+      abandoned.current = false
       command('playVideo')
       timers.current.push(
         setTimeout(() => {
@@ -100,6 +107,8 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
         setTimeout(() => {
           if (confirmed.current || !wanted.current) return
           wanted.current = false
+          abandoned.current = true
+          command('pauseVideo')
           resolve.current?.()
         }, silentPlayerMs),
       )

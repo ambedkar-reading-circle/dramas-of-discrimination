@@ -89,13 +89,20 @@ export function usePlaybackState({ slide, point, slideId, points, atEnd, next, g
   const captionIndex = Math.min(progress.caption, current.captions.length - 1)
   const caption = current.captions[captionIndex]
 
-  /** Moves playback on: the point's next caption, else (narrating) a stop, else the next point, else the end of the deck. */
-  const advance = useCallback(() => {
-    if (captionIndex < current.captions.length - 1) setProgress((p) => ({ ...p, caption: captionIndex + 1, captionsApplied: p.captionsApplied + 1 }))
-    else if (!playing) setNarrating(false)
-    else if (atEnd) setPlaying(false)
-    else next()
-  }, [captionIndex, current.captions.length, playing, atEnd, next])
+  /**
+   * Moves playback on: the point's next caption, else (narrating) a stop, else the next point, else the end of the deck.
+   * Takes whether the deck plays, since play moves on before its own render sees `playing`.
+   */
+  const stepOn = useCallback(
+    (asPlaying: boolean) => {
+      if (captionIndex < current.captions.length - 1) setProgress((p) => ({ ...p, caption: captionIndex + 1, captionsApplied: p.captionsApplied + 1 }))
+      else if (!asPlaying) setNarrating(false)
+      else if (atEnd) setPlaying(false)
+      else next()
+    },
+    [captionIndex, current.captions.length, atEnd, next],
+  )
+  const advance = useCallback(() => stepOn(playing), [stepOn, playing])
 
   /** Applies the current point again, so a resume re-plays its cues and restarts its hold. */
   const replay = useCallback(() => setProgress((p) => ({ ...p, captionsApplied: p.captionsApplied + 1, cuesApplied: p.cuesApplied + 1 })), [])
@@ -106,10 +113,10 @@ export function usePlaybackState({ slide, point, slideId, points, atEnd, next, g
   const play = useCallback(() => {
     setPlaying(true)
     setNarrating(false)
-    if (endedWhilePaused.current === progress.captionsApplied) advance()
+    if (endedWhilePaused.current === progress.captionsApplied) stepOn(true)
     else replay()
     endedWhilePaused.current = null
-  }, [replay, advance, progress.captionsApplied])
+  }, [replay, stepOn, progress.captionsApplied])
   const pause = useCallback(() => {
     setPlaying(false)
     setNarrating(false)
