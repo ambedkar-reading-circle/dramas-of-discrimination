@@ -5,13 +5,13 @@ import { parseCue } from '../../playback/cues'
 import { usePlayback } from '../../playback/playback'
 import { useSlideCue } from '../../playback/useSlideCue'
 
-/** YouTube's player states, as its iframe API reports them. */
+/** YouTube's player states, as its iframe API reports them. Buffering, unstarted and cued do not mean the film is playing. */
 const ended = 0
-const started = new Set([1, 3])
+const playingState = 1
 
 /** Plays muted if the browser blocks sound this long after the play request. */
 const unmuteGraceMs = 2500
-/** Gives up on a player that never answers, so the deck is not stuck on a blank caption. */
+/** Gives up on a film that never starts playing, so the deck is not stuck on a blank caption. */
 const silentPlayerMs = 7000
 
 function stateOf(data: unknown): number | null {
@@ -38,7 +38,8 @@ function stateOf(data: unknown): number | null {
 export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const playback = usePlayback()
   const wanted = useRef(false)
-  const heard = useRef(false)
+  // The film has been seen playing since it was asked to.
+  const confirmed = useRef(false)
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
   const resolve = useRef(playback?.resolveWait)
   useLayoutEffect(() => {
@@ -61,8 +62,10 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
       if (event.origin !== videoOrigin || event.source !== frame.current?.contentWindow) return
       const state = stateOf(event.data)
       if (state === null) return
-      heard.current = true
-      if (started.has(state)) clearTimers()
+      if (state === playingState) {
+        confirmed.current = true
+        clearTimers()
+      }
       if (state === ended && wanted.current) {
         wanted.current = false
         resolve.current?.()
@@ -78,9 +81,10 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   useSlideCue((cue) => {
     clearTimers()
     const parsed = parseCue(cue)
-    if (parsed?.verb === 'video' && parsed.arg === 'play') {
+    // Stepping into the film while paused leaves it waiting: play applies the cue again and starts it then.
+    if (parsed?.verb === 'video' && parsed.arg === 'play' && playback?.playing === true) {
       wanted.current = true
-      heard.current = false
+      confirmed.current = false
       command('playVideo')
       timers.current.push(
         setTimeout(() => {
@@ -88,7 +92,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
           command('playVideo')
         }, unmuteGraceMs),
         setTimeout(() => {
-          if (heard.current || !wanted.current) return
+          if (confirmed.current || !wanted.current) return
           wanted.current = false
           resolve.current?.()
         }, silentPlayerMs),

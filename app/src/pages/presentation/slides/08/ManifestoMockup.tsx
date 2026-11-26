@@ -35,11 +35,20 @@ export function ManifestoMockup() {
   const [mode, setMode] = useState<Mode>('local')
   // Generating and editing happen in Cloud mode.
   useModeCue(setMode, ({ verb }) => (verb === 'generate' || verb === 'edit' ? 'cloud' : null))
+  // The draft lives here, above the mode switch, so a trip to Local mode and back keeps it.
+  const reducedMotion = usePrefersReducedMotion()
+  const manifesto = useManifestoDraft(reducedMotion)
+  // The Facilitator's two presses, played on their points.
+  useSlideCue((cue) => {
+    const verb = verbOf(cue)
+    if (verb === 'generate') manifesto.generate()
+    else if (verb === 'edit') manifesto.edit()
+  })
 
   return (
     <GuideFrame label="Mockup: in Local mode the Group's worksheets become a prompt to copy into any LLM; in Cloud mode the platform generates the Manifesto of Inclusion and several Members edit it at once" className="modes mani" mode={mode} act={afterLastAct} step={0} bar={<ModeBar mode={mode} onChange={setMode} />}>
       <article className="fac-sheet modes-sheet" aria-label={mode === 'local' ? 'Prompt export' : 'Manifesto of Inclusion'}>
-        {mode === 'local' ? <PromptExport /> : <ManifestoDraft />}
+        {mode === 'local' ? <PromptExport /> : <ManifestoDraft manifesto={manifesto} />}
       </article>
     </GuideFrame>
   )
@@ -83,15 +92,8 @@ const generateLabel = {
 } as const
 
 /** Cloud mode: the Facilitator generates the draft, then the Group's Members rework it together. */
-function ManifestoDraft() {
-  const reducedMotion = usePrefersReducedMotion()
-  const { stage, playing, segmentsOf, editors, generate, edit } = useManifestoDraft(reducedMotion)
-  // The Facilitator's two presses, played on their points.
-  useSlideCue((cue) => {
-    const verb = verbOf(cue)
-    if (verb === 'generate') generate()
-    else if (verb === 'edit') edit()
-  })
+function ManifestoDraft({ manifesto }: { manifesto: ReturnType<typeof useManifestoDraft> }) {
+  const { stage, playing, segmentsOf, editors, generate, edit } = manifesto
   const charter = useRef<HTMLDivElement>(null)
   const drafted = stage !== 'idle' && stage !== 'generate'
 

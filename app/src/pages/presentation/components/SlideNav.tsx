@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Slide } from '../types'
 import { motion } from 'motion/react'
@@ -34,6 +34,8 @@ export default function SlideNav({ slides, slide, total, next, prev, onSelect, t
   const playback = usePlayback()
   const selfMode = playback?.selfMode === true
   const bar = useRef<HTMLDivElement>(null)
+  // Hiding captions from the current slide's square removes that square, so focus moves to its place in the strip.
+  const [focusStrip, setFocusStrip] = useState(false)
 
   // The bar floats over the bottom of the window, so the deck keeps room for
   // it: its height, as a custom property, whatever the caption wraps to.
@@ -72,18 +74,24 @@ export default function SlideNav({ slides, slide, total, next, prev, onSelect, t
           // The current slide stays in view beside the caption; pressing it puts
           // the caption away and brings back every slide's number.
           <div className="slide-nav-captioned">
-            <PageChip current aria-label={`${slideLabel(slide, slides[slide - 1].heading, ` of ${total}${currentPage.note}`)}. Hide captions to show all slides`} title="Slide . step: each step is something the slide opens, switches or plays" onClick={() => playback.setCaptions(false)}>
+            <PageChip current aria-label={`${slideLabel(slide, slides[slide - 1].heading, ` of ${total}${currentPage.note}`)}. Hide captions to show all slides`} title="Slide . step: each step is something the slide opens, switches or plays" onClick={() => {
+                setFocusStrip(true)
+                playback.setCaptions(false)
+              }}>
               {currentPage.label}
             </PageChip>
             <Captions />
           </div>
         ) : (
-          <PageStrip slides={slides} slide={slide} onSelect={onSelect} current={currentPage} />
+          <PageStrip slides={slides} slide={slide} onSelect={onSelect} current={currentPage} focusOnMount={focusStrip} />
         )}
         <div className="slide-nav-extras">
           {playback && selfMode && (
             <>
-              <MarkButton label="Captions" pressed={playback.captions} onClick={() => playback.setCaptions(!playback.captions)} mark={<CaptionsMark />} />
+              <MarkButton label="Captions" pressed={playback.captions} onClick={() => {
+                  setFocusStrip(false)
+                  playback.setCaptions(!playback.captions)
+                }} mark={<CaptionsMark />} />
               {canSpeak && <MarkButton label="Read captions aloud" pressed={playback.voice} onClick={() => playback.setVoice(!playback.voice)} mark={<VoiceMark on={playback.voice} />} />}
             </>
           )}

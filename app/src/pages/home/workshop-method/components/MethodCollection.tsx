@@ -35,7 +35,7 @@ export function MethodCollection({ fitTo, hint = true, highlight = null }: Metho
       <div className="method-deck" ref={deck} style={{ height: geometry.height }}>
         <ol className="method-sheets" aria-label="Workshop activities">
           {workshopActivities.map((activity, index) => (
-            <ActivitySheet key={activity.name} activity={activity} index={index} total={workshopActivities.length} selected={lifted === index} geometry={geometry} reduceMotion={reduceMotion} transition={transition} onTrigger={setActive} />
+            <ActivitySheet key={activity.name} activity={activity} index={index} total={workshopActivities.length} selected={lifted === index} expanded={active === index} geometry={geometry} reduceMotion={reduceMotion} transition={transition} onTrigger={setActive} />
           ))}
         </ol>
       </div>

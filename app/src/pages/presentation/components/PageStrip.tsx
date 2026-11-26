@@ -8,6 +8,8 @@ interface PageStripProps {
   onSelect: (slide: number) => void
   /** How the current slide's square reads; its plain number when left out. */
   current?: CurrentPage
+  /** Focus the current slide's square on mount, for a control that removed itself to show the strip. */
+  focusOnMount?: boolean
 }
 
 /** The current slide's square: what it shows, such as its number with the step it is in (4.2), and what its accessible name adds, such as ", step 2 of 4". */
@@ -55,11 +57,11 @@ function stripEntries(total: number, current: number, slots: number): StripEntry
  * window around the current slide. Arrow keys move between pages; only the
  * current page is in the Tab order.
  */
-export default function PageStrip({ slides, slide, onSelect, current }: PageStripProps) {
+export default function PageStrip({ slides, slide, onSelect, current, focusOnMount = false }: PageStripProps) {
   const total = slides.length
   const chips = useRef<Array<HTMLButtonElement | null>>([])
   const strip = useRef<HTMLDivElement>(null)
-  const pendingFocus = useRef<number | null>(null)
+  const pendingFocus = useRef<number | null>(focusOnMount ? slide : null)
   const [slots, setSlots] = useState(total)
   const entries = stripEntries(total, slide, slots)
 

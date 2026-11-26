@@ -35,10 +35,12 @@ const markerPattern = /\s*\[\[\s*([^\]\s]+)((?:\s+[a-z]+=[^\]\s]+)*)\s*\]\]\s*/g
  * Takes the cue markers out of a speaker note: the note as it is read, and
  * each marker with the place in that text where it fires.
  */
-export function parseNote(note: string): { text: string; markers: ReadonlyArray<Marker> } {
+export function parseNote(raw: string): { text: string; markers: ReadonlyArray<Marker> } {
   const markers: Array<Marker> = []
   let text = ''
   let cursor = 0
+  // One space between words, so a caption packed back from its pieces is still found in the text.
+  const note = raw.replace(/\s+/g, ' ')
   for (const match of note.matchAll(markerPattern)) {
     text += note.slice(cursor, match.index)
     // The marker and the spaces around it become one space, or none at either end.
@@ -102,7 +104,9 @@ function notesOf(slide: Slide): ReadonlyArray<{ note: string; cue: string | null
  * holds until the next marker or the end of its note.
  */
 export function beatsOf(slide: Slide): ReadonlyArray<PlayBeat> {
-  return withSteps(notesOf(slide).flatMap(({ note, cue }) => beatsOfNote(note, cue)))
+  const beats = notesOf(slide).flatMap(({ note, cue }) => beatsOfNote(note, cue))
+  // Notes that read as nothing (no tabs, or blank points) still leave the slide one beat: its heading.
+  return withSteps(beats.length > 0 ? beats : [{ say: slide.heading, speak: slide.heading, cue: null, holdMs: readingMs(slide.heading) }])
 }
 
 function beatsOfNote(note: string, defaultCue: string | null): ReadonlyArray<Omit<PlayBeat, 'step'>> {

@@ -96,7 +96,8 @@ export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialP
   const current = beats[beat]
 
   const nextBeat = useCallback(() => {
-    if (beat < beats.length - 1) setPos((p) => ({ ...p, beat: beat + 1, token: p.token + 1, byPlayback: true, previousBeat: beat }))
+    // A first step after moving the paused deck by hand applies its cue afresh: the slide may not show the cue before it.
+    if (beat < beats.length - 1) setPos((p) => ({ ...p, beat: beat + 1, token: p.token + 1, byPlayback: true, previousBeat: p.byPlayback ? beat : null }))
     else if (slide < total) {
       setEntry({ at: 'start', live: true })
       goTo(slide + 1)
@@ -104,7 +105,7 @@ export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialP
   }, [beat, beats.length, slide, total, goTo])
 
   const prevBeat = useCallback(() => {
-    if (beat > 0) setPos((p) => ({ ...p, beat: beat - 1, token: p.token + 1, byPlayback: true, previousBeat: beat }))
+    if (beat > 0) setPos((p) => ({ ...p, beat: beat - 1, token: p.token + 1, byPlayback: true, previousBeat: p.byPlayback ? beat : null }))
     else if (slide > 1) {
       setEntry({ at: 'end', live: true })
       goTo(slide - 1)
@@ -114,11 +115,16 @@ export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialP
   /** Applies the current beat again, so a resume re-plays its cue and restarts its hold. */
   const replay = useCallback(() => setPos((p) => ({ ...p, token: p.token + 1, byPlayback: true, previousBeat: null })), [])
 
+  // The film can end just after Pause. Its beat is then done: play moves on from it rather than starting the film over.
+  const endedWhilePaused = useRef<number | null>(null)
+
   const play = useCallback(() => {
     setSelfMode(true)
     setPlaying(true)
-    replay()
-  }, [replay])
+    if (endedWhilePaused.current === pos.token) nextBeat()
+    else replay()
+    endedWhilePaused.current = null
+  }, [replay, nextBeat, pos.token])
   const pause = useCallback(() => {
     setPlaying(false)
     speech()?.cancel()
@@ -135,8 +141,10 @@ export function usePlaybackState({ slides, slide, goTo }: DeckPosition, initialP
 
   const waiting = current.waitFor !== undefined
   const resolveWait = useCallback(() => {
-    if (waiting) nextBeat()
-  }, [waiting, nextBeat])
+    if (!waiting) return
+    if (playing) nextBeat()
+    else endedWhilePaused.current = pos.token
+  }, [waiting, playing, nextBeat, pos.token])
 
   // The latest step, so the timer below restarts only when a beat is applied.
   const advance = useRef(nextBeat)
