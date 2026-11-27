@@ -16,18 +16,26 @@ export interface CueTargets {}
 
 export type CueTarget = keyof CueTargets
 
+/** What a cue's point can wait on before the deck moves on. */
+export type CueWait = 'video'
+
 /**
  * Sets one target to a value, from its point on until another cue sets it.
  * `wait: 'video'` holds its point until the film ends, and sets the target
  * for that point only.
  */
-/** What a cue's point can wait on before the deck moves on. */
-export type CueWait = 'video'
-
 export type Cue = { [K in CueTarget]: Readonly<{ set: K; to: CueTargets[K]; wait?: CueWait }> }[CueTarget]
 
 /** Every target a cue has set by some point of a slide, and the value it holds there. */
 export type CueState = Readonly<Partial<CueTargets>>
+
+/**
+ * The cues of one target, for notes that set it again and again:
+ * `const method = cuesOf('method')`, then `method('IntroTime')` between the lines.
+ */
+export function cuesOf<TTarget extends CueTarget>(set: TTarget) {
+  return (to: CueTargets[TTarget]): Readonly<{ set: TTarget; to: CueTargets[TTarget] }> => ({ set, to })
+}
 
 const warned = new Set<string>()
 

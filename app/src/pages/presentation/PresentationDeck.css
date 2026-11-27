@@ -1,3 +1,5 @@
+@reference '../../styles.css';
+
 @property --stage-fade-top {
   syntax: '<length>';
   inherits: false;
@@ -363,6 +365,13 @@
   min-width: 0;
 }
 
+/* Slide 05's notes open each act's sheet, so the sheet stops above the
+   player: its captions stay in view while the sheet is up. */
+.presentation-method .method-dialog:popover-open {
+  bottom: var(--player-height, 0px);
+  height: auto;
+}
+
 .presentation-manual-book {
   display: grid;
   min-width: 0;
@@ -500,24 +509,28 @@
    SlideNav). The caption takes most of its width. */
 @layer components {
   .presentation-deck {
-    padding-bottom: calc(var(--player-height, 3.25rem) + var(--notebook-row) / 2);
+    padding-bottom: calc(var(--player-height, calc(var(--spacing-control) + --spacing(2))) + var(--notebook-row) / 2);
   }
 
-  .slide-nav {
+  /* A torn sheet, like the footer: .paper-tear gives the paper and its shadow.
+     Doubled class so fixed outranks .paper-tear's relative whatever the load order. */
+  .slide-nav.slide-nav {
+    /* How far the progress line sits below the torn edge. */
+    --slide-progress-inset: 2px;
+    /* Both lines, as thin as the squares' rings below them. */
+    --slide-line-width: 1px;
     z-index: calc(var(--layer-site-foreground) - 1);
     position: fixed;
     inset-inline: 0;
     bottom: 0;
-    border-top: 1px solid var(--sea-ink);
-    background: var(--bg-base);
-    box-shadow: 0 -6px 18px -12px color-mix(in srgb, var(--sea-ink) 45%, transparent);
   }
 
+  /* Below the deepest notch of the tear, so the line rides on solid paper. */
   .slide-nav .slide-progress {
     position: absolute;
     inset-inline: 0;
-    top: -1px;
-    height: 3px;
+    top: var(--slide-progress-inset);
+    height: var(--slide-line-width);
     border-radius: 0;
     background: transparent;
   }
@@ -531,7 +544,7 @@
     position: absolute;
     inset-inline: 0;
     bottom: 0;
-    height: 3px;
+    height: var(--slide-line-width);
     pointer-events: none;
   }
 
@@ -553,22 +566,25 @@
     align-items: center;
     /* As compact as the controls: one button high, a hair from each edge,
        and the same hair between every square and the caption. */
-    gap: 0.25rem;
-    padding: 0.25rem;
+    gap: --spacing(1);
+    padding: --spacing(1);
+    /* The top line sits inset below the tear; push the squares down by the
+       same amount, so they clear it as far as they clear the bottom line. */
+    padding-top: calc(--spacing(1) + var(--slide-progress-inset, 0px));
   }
 
   .slide-nav-change {
     grid-area: change;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: --spacing(1);
   }
 
   .slide-transport,
   .slide-nav-extras {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: --spacing(1);
   }
 
   .slide-nav-extras {
@@ -582,7 +598,7 @@
 
   /* Every control is the same square. */
   .slide-nav .mark-button {
-    width: 2.75rem;
+    width: var(--spacing-control);
     padding: 0;
   }
 
@@ -603,14 +619,14 @@
       box-shadow 120ms ease;
   }
 
-  .slide-nav-controls .mark-button:not(:disabled, .slide-play, [aria-pressed='true']):hover,
+  .slide-nav-controls .mark-button:not([aria-disabled='true'], .slide-play, [aria-pressed='true']):hover,
   .slide-nav-controls .slide-index-chip:not(.slide-index-gap, [aria-current='true']):hover {
     background: var(--hl-bg);
     color: var(--hl-text);
   }
 
-  .slide-nav-controls .slide-play:not(:disabled):hover,
-  .slide-nav-controls .mark-button[aria-pressed='true']:not(:disabled):hover,
+  .slide-nav-controls .slide-play:not([aria-disabled='true']):hover,
+  .slide-nav-controls .mark-button[aria-pressed='true']:not([aria-disabled='true']):hover,
   .slide-nav-controls .slide-index-chip[aria-current='true']:hover {
     background: var(--bg-base);
     color: var(--sea-ink);
@@ -625,7 +641,7 @@
     flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
+    gap: --spacing(1);
     min-width: 0;
     overflow: hidden;
   }
@@ -635,11 +651,11 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--spacing-control);
+    height: var(--spacing-control);
     padding: 0;
     border: 0;
-    border-radius: 0.125rem;
+    border-radius: var(--radius-control);
     box-shadow: inset 0 0 0 1px var(--line);
     background: transparent;
     color: var(--sea-ink);
@@ -663,7 +679,7 @@
     grid-area: caption;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: --spacing(1);
     min-width: 0;
   }
 
@@ -675,15 +691,17 @@
      bar. Two lines of caption fit; long notes are already split into short
      captions, so the bar never changes height on desktop. */
   .deck-captions {
-    --caption-line: 1.35;
     display: grid;
     align-items: center;
     justify-items: center;
     min-width: 0;
-    min-height: 2.75rem;
-    padding: 0 0.75rem;
-    border-radius: 0.125rem;
+    min-height: var(--spacing-control);
+    padding: 0 --spacing(3);
+    border-radius: var(--radius-control);
     box-shadow: inset 0 0 0 1px var(--line);
+    /* Set on the frame, not the caption, so the frame's lh is a caption line. */
+    font-size: 1rem;
+    line-height: 1.35;
   }
 
   /* Centred in its frame, not offset onto the notebook's ruled baseline. */
@@ -692,8 +710,8 @@
     max-width: 100ch;
     margin: 0;
     color: var(--sea-ink);
-    font-size: 1rem;
-    line-height: var(--caption-line);
+    font-size: inherit;
+    line-height: inherit;
     text-align: center;
     text-wrap: pretty;
   }
@@ -703,22 +721,63 @@
     font-style: italic;
   }
 
-  /* Narrow: the caption takes its own row above the controls. */
-  @media (max-width: 760px) {
+  /* Narrow: the bar flows instead of holding fixed columns. The caption (or
+     the strip of slide numbers) takes the whole top row; below it sit the
+     transport, the current slide's number and the switches, and the switches
+     wrap onto a row of their own when the three do not fit side by side.
+     Nothing is ever squeezed into a column narrower than its buttons. */
+  @variant max-md {
     .slide-nav-controls {
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas:
-        'caption caption'
-        'change extras';
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
+    /* The caption's wrapper steps aside so its two children join the flow:
+       the caption moves up to the top row, the number stays with the buttons. */
+    .slide-nav-captioned {
+      display: contents;
+    }
+
+    .slide-index-strip,
+    .slide-nav-captioned .deck-captions {
+      order: -1;
+      flex: 1 0 100%;
+    }
+
+    /* The two button sets grow equally from either side, so the slide's
+       number between them sits in the true centre of the bar. Each still
+       keeps its buttons' width, so the switches wrap below when crowded. */
+    .slide-nav-change,
+    .slide-nav-extras {
+      flex: 1 1 0;
+    }
+
+    /* Three caption lines tall, whatever the type size. */
     .deck-captions {
-      min-height: calc(0.9375rem * var(--caption-line) * 3 + 0.5rem);
-      padding-block: 0.25rem;
+      min-height: calc(3lh + --spacing(2));
+      padding-block: --spacing(1);
+      font-size: 0.9375rem;
+    }
+  }
+
+  /* Narrower than one row of controls (three squares, the number, three
+     squares, with their gaps: about 340px, under the xs stop): stop sharing
+     the row and centre each set on its own, the transport with the number,
+     the switches below. CSS cannot tell when a flex item has wrapped, so the
+     width is named. */
+  @variant max-xs {
+    .slide-nav-controls {
+      justify-content: center;
     }
 
-    .deck-caption {
-      font-size: 0.9375rem;
+    .slide-nav-change {
+      flex: none;
+    }
+
+    .slide-nav-extras {
+      flex: 1 0 100%;
+      justify-content: center;
     }
   }
 }

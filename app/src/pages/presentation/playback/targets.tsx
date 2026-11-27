@@ -1,18 +1,12 @@
-import { createContext, use, useEffect, useMemo, useRef } from 'react'
+import { createContext, use, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
+import type { Reveal } from '#/components/Reveal'
 import { useLatest } from '#/lib/use-latest'
-import type { CueState, CueTarget, CueTargets } from './cues'
-import type { Point, SlidePoints } from './points'
+import type { CueTarget, CueTargets } from './cues'
+import type { Point, SlideCues } from './points'
 import { usePlayback } from './playback'
 
-/** The deck at one slide: where it stands among the points, the cues in effect there, and how many times they have been applied. */
-type Scope = SlidePoints &
-  Readonly<{
-    cues: CueState
-    cuesApplied: number
-  }>
-
-const ScopeContext = createContext<Scope | null>(null)
+const ScopeContext = createContext<SlideCues | null>(null)
 
 type Options<TValue> = Readonly<{
   /** What the target shows at a point no cue has set it yet. */
@@ -91,15 +85,22 @@ export function useCueTarget<TTarget extends CueTarget>(id: TTarget, set: (value
   }, [tracked, value])
 }
 
+/** The targets that hold a key or null: those a reveal (a photo, a phone) can follow. */
+type RevealTarget = { [K in CueTarget]: null extends CueTargets[K] ? K : never }[CueTarget]
+
+/**
+ * Links a slide's reveal to a target: a cue's key opens that photo, null
+ * closes it, and the points no cue has reached show it closed. Opening one
+ * by hand moves the deck to the point that shows it.
+ */
+export function useRevealCue<TTarget extends RevealTarget>(id: TTarget, reveal: Reveal<NonNullable<CueTargets[TTarget]>>) {
+  type Value = CueTargets[TTarget]
+  useCueTarget(id, (key: Value) => (key === null ? reveal.close() : reveal.open(key as NonNullable<Value>)), { rest: null as Value, value: reveal.active as Value })
+}
+
 /** The cues of one slide: the current point's while the deck is on it, none while it leaves. */
 export function CueScope({ slideId, children }: { slideId: string; children: ReactNode }) {
-  const playback = usePlayback()
-  const active = playback !== null && playback.slideId === slideId
-  const cues = active ? playback.current.cues : null
-  const cuesApplied = active ? playback.cuesApplied : 0
-  const points = active ? playback.points : null
-  const point = active ? playback.point : 0
-  const goToPoint = playback?.goToPoint
-  const scope = useMemo(() => (cues === null || points === null || !goToPoint ? null : { cues, cuesApplied, points, point, goToPoint }), [cues, cuesApplied, points, point, goToPoint])
+  const slideCues = usePlayback()?.slideCues
+  const scope = slideCues?.slideId === slideId ? slideCues : null
   return <ScopeContext value={scope}>{children}</ScopeContext>
 }

@@ -1,10 +1,8 @@
-import type { SpeakerNote, Slide } from '../types'
+import type { Slide } from '../types'
 import type { Cue, CueState, CueWait } from './cues'
 
-/** One caption on screen: its name, what it says, what is read aloud, and how long it holds when read. */
+/** One caption on screen: what it says, what is read aloud, and how long it holds when read. */
 export type Caption = Readonly<{
-  /** A short hash of what is read aloud. A recording is named after it, so it stays matched to its words however the notes around them change. */
-  id: string
   say: string
   /** Empty for a cue's point, which keeps the caption before it on screen and says nothing. */
   speak: string
@@ -34,6 +32,20 @@ export type SlidePoints = Readonly<{
   goToPoint: (point: number) => void
 }>
 
+/** The deck at one slide, as the slide's cue targets read it: its points, the cues in effect at the current one, and how many times they have been applied. */
+export type SlideCues = SlidePoints &
+  Readonly<{
+    /** The id of the slide the points belong to. */
+    slideId: string
+    cues: CueState
+    /**
+     * Counts each time the cues are applied: when the deck moves to a point, or play is pressed. The
+     * slide then shows that point's cues again, so a change made by hand inside
+     * it lasts only until the deck moves.
+     */
+    cuesApplied: number
+  }>
+
 /** A cue's point holds the caption before it this long while the slide acts. */
 const cueMs = 1200
 
@@ -62,18 +74,8 @@ export function chunksOf(text: string): ReadonlyArray<string> {
   return sentences.flatMap((sentence) => (sentence.length <= chunkChars ? [sentence] : packed(sentence.split(/(?<=[,;:][”’"]?)\s+/))))
 }
 
-/** A caption's id: the FNV-1a hash of what it reads aloud, in hex. */
-export function captionId(speak: string): string {
-  let hash = 0x811c9dc5
-  for (let i = 0; i < speak.length; i++) {
-    hash ^= speak.charCodeAt(i)
-    hash = Math.imul(hash, 0x01000193)
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0')
-}
-
 /** A caption that shows and reads the same words, held for their reading time. */
-const spoken = (text: string): Caption => ({ id: captionId(text), say: text, speak: text, holdMs: readingMs(text) })
+const spoken = (text: string): Caption => ({ say: text, speak: text, holdMs: readingMs(text) })
 
 /** Reading time at a calm pace, so long quotes are not rushed and short lines do not linger. */
 export function readingMs(text: string): number {
@@ -81,40 +83,34 @@ export function readingMs(text: string): number {
   return Math.min(Math.max(1800 + words * 330, 2500), 14000)
 }
 
-/** The slide's notes as parts in reading order: the whole notes, or one part per tab with the cue its lines play under. */
-function partsOf(slide: Slide): ReadonlyArray<{ notes: ReadonlyArray<SpeakerNote>; cue: Cue | null }> {
-  if (slide.speakerNoteTabs) {
-    return slide.speakerNoteTabs.map((tab) => ({ notes: tab.speakerNotes?.length ? tab.speakerNotes : [tab.label], cue: tab.cue ?? null }))
-  }
-  return [{ notes: slide.speakerNotes?.length ? slide.speakerNotes : [slide.heading], cue: null }]
-}
-
 const withCue = (state: CueState, cue: Cue): CueState => ({ ...state, [cue.set]: cue.to })
 
 /**
  * Every point of a slide, one per entry of its speaker notes. A cue holds
- * from its point on, until another cue sets the same target; a tab's cue
- * holds over that tab's points. A film cue holds its own point only.
+ * from its point on, until another cue sets the same target; cues before the
+ * first line set how the slide opens, and take no point of their own. A film
+ * cue holds its own point only.
  */
 export function pointsOf(slide: Slide): ReadonlyArray<Point> {
   const points: Array<Point> = []
   let state: CueState = {}
   const lastSay = () => points.at(-1)?.captions.at(-1)?.say ?? ''
-  for (const { notes, cue: tabCue } of partsOf(slide)) {
-    if (tabCue) state = withCue(state, tabCue)
-    for (const note of notes) {
-      if (typeof note !== 'string') {
-        const cues = withCue(state, note)
-        points.push({ captions: [{ id: captionId(''), say: lastSay(), speak: '', holdMs: cueMs }], cues, wait: note.wait })
-        if (!note.wait) state = cues
+  for (const note of slide.speakerNotes ?? []) {
+    if (typeof note !== 'string') {
+      const cues = withCue(state, note)
+      if (points.length === 0 && !note.wait) {
+        state = cues
         continue
       }
-      // One space between words, so a caption packed back from its pieces reads as written.
-      const text = note.replace(/\s+/g, ' ').trim()
-      if (text === '') continue
-      points.push({ captions: chunksOf(text).map(spoken), cues: state })
+      points.push({ captions: [{ say: lastSay(), speak: '', holdMs: cueMs }], cues, wait: note.wait })
+      if (!note.wait) state = cues
+      continue
     }
+    // One space between words, so a caption packed back from its pieces reads as written.
+    const text = note.replace(/\s+/g, ' ').trim()
+    if (text === '') continue
+    points.push({ captions: chunksOf(text).map(spoken), cues: state })
   }
   // Notes that read as nothing (blank lines) still leave the slide one point: its heading.
-  return points.length > 0 ? points : [{ captions: [spoken(slide.heading)], cues: {} }]
+  return points.length > 0 ? points : [{ captions: [spoken(slide.heading)], cues: state }]
 }

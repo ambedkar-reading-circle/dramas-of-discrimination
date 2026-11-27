@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import { slides } from '../slides'
 import { pointsOf } from '../playback/points'
+import { keyName, plainKey, pressedOn, typingSelector } from '../keyTargets'
 
 export const TOTAL_SLIDES = slides.length
 
@@ -28,12 +29,17 @@ const pointsIn = (slide: number) => deckPoints[slide - 1].length
  * history stack never grows, and out-of-range values are clamped on read.
  * Moving keeps the other params, so `?play=1` survives it.
  *
+ * It owns `?play` too: whether the deck opened playing, and
+ * `rememberPlaying` to write it back, so a refresh mid-playback carries on,
+ * and one after pausing stays paused.
+ *
  * The arrows, their keys and a swipe step one point, crossing into the next
- * slide's first point or the previous slide's last. Shift with an arrow,
+ * slide's first point or the previous slide's last. Shift with one of them,
  * Home and End, and the slide strip jump whole slides, to their first point.
  */
 export function usePresentationDeck() {
-  const { slide: requestedSlide, point: requestedPoint = 1 } = useSearch({ from: '/approach' })
+  const { slide: requestedSlide, point: requestedPoint = 1, play } = useSearch({ from: '/approach' })
+  const playOnOpen = play === true
   const navigate = useNavigate({ from: '/approach' })
   const slide = clamp(requestedSlide, TOTAL_SLIDES)
   const point = clamp(requestedPoint, pointsIn(slide))
@@ -55,6 +61,14 @@ export function usePresentationDeck() {
     [slide, point, navigate],
   )
 
+  const rememberPlaying = useCallback(
+    (playing: boolean) => {
+      if (playOnOpen === playing) return
+      void navigate({ search: (search) => ({ slide: search.slide, point: search.point, ...(playing ? { play: true as const } : {}) }), replace: true })
+    },
+    [playOnOpen, navigate],
+  )
+
   const atStart = slide === 1 && point === 1
   const atEnd = slide === TOTAL_SLIDES && point === pointsIn(slide)
 
@@ -67,21 +81,26 @@ export function usePresentationDeck() {
     else if (slide > 1) goTo(slide - 1, pointsIn(slide - 1))
   }, [goTo, slide, point])
 
-  /** Bound on the deck container so keys work wherever focus sits inside it. */
+  /**
+   * The deck's keys, for a listener on the document, so they work wherever
+   * focus sits, even on the page itself. A key typed into a field (slide 9's
+   * search) stays with the field.
+   */
   const onDeckKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLElement>) => {
-      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return
-      const forward = event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === 'n'
-      const back = event.key === 'ArrowLeft' || event.key === 'PageUp' || event.key === 'p'
+    (event: KeyboardEvent) => {
+      if (!plainKey(event) || pressedOn(event, typingSelector)) return
+      const key = keyName(event)
+      const forward = key === 'ArrowRight' || key === 'PageDown' || key === 'n'
+      const back = key === 'ArrowLeft' || key === 'PageUp' || key === 'p'
       if (forward || back) {
         event.preventDefault()
         if (event.shiftKey) goTo(slide + (forward ? 1 : -1))
         else if (forward) next()
         else prev()
-      } else if (event.key === 'Home') {
+      } else if (key === 'Home') {
         event.preventDefault()
         goTo(1)
-      } else if (event.key === 'End') {
+      } else if (key === 'End') {
         event.preventDefault()
         goTo(TOTAL_SLIDES)
       }
@@ -115,6 +134,8 @@ export function usePresentationDeck() {
     slide,
     point,
     total: TOTAL_SLIDES,
+    playOnOpen,
+    rememberPlaying,
     atStart,
     atEnd,
     goTo,

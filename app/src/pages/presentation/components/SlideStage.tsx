@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { observeResize } from '#/lib/observe-resize'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { SlideDirectionContext } from '../hooks/useSlideDirection'
 import { SlideStageHostContext } from '../hooks/useSlideStageHost'
 import SlideAssetPlaceholder from './SlideAssetPlaceholder'
-import { controlSelector, typingSelector } from '../keyTargets'
+import { controlSelector, pressedOn, typingSelector } from '../keyTargets'
 import { usePlayback } from '../playback/playback'
 import { CueScope } from '../playback/targets'
+import { slideLabel } from '../slideLabel'
 import type { Slide } from '../types'
 
 const spring = { type: 'spring' as const, stiffness: 220, damping: 28 }
@@ -73,23 +75,26 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     }
 
     measure()
-    const observer = new ResizeObserver(() => {
+    const stop = observeResize([stageEl, fitEl], () => {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(measure)
     })
-    observer.observe(stageEl)
-    observer.observe(fitEl)
     return () => {
       cancelAnimationFrame(frame)
-      observer.disconnect()
+      stop()
     }
   }, [index, slide.id, fills])
 
   // Move focus to the new slide's heading so keyboard users are never stranded
   // inside the previous slide's embed; reset the stage scroll for each slide.
+  // Only focus that was in the slide (or nowhere: the page, its <main>) moves.
+  // Focus on the player stays there, so Next can be pressed again, and
+  // playback crossing a slide does not take a control from under the room.
   useEffect(() => {
-    if (mounted.current) focusHeading()
-    else mounted.current = true
+    const active = document.activeElement
+    const stranded = !active || active === document.body || active.matches('main') || stage.current?.contains(active) === true
+    if (!mounted.current) mounted.current = true
+    else if (stranded) focusHeading()
     stage.current?.scrollTo({ top: 0, behavior: 'instant' })
   }, [focusHeading, index])
 
@@ -116,15 +121,14 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     if (playing) pause?.()
   }
   const pauseOnKey = (event: KeyboardEvent<HTMLElement>) => {
-    if (!playing || !(event.target instanceof Element)) return
-    const typing = event.target.closest(typingSelector)
-    const pressing = (event.key === 'Enter' || event.key === ' ') && event.target.closest(controlSelector)
-    if (typing || pressing) pause?.()
+    if (!playing) return
+    const pressing = (event.key === 'Enter' || event.key === ' ') && pressedOn(event, controlSelector)
+    if (pressing || pressedOn(event, typingSelector)) pause?.()
   }
 
   return (
     <div className="slide-stage-shell" onClickCapture={pauseOnClick} onKeyDownCapture={pauseOnKey}>
-      <div ref={stage} className="slide-stage" role="group" aria-roledescription="slide" aria-label={`Slide ${index} of ${total}: ${slide.heading}`}>
+      <div ref={stage} className="slide-stage" role="group" aria-roledescription="slide" aria-label={slideLabel(index, slide.heading, ` of ${total}`)}>
         <SlideStageHostContext value={host}>
           <SlideDirectionContext value={direction}>
             <AnimatePresence initial={false} custom={direction}>

@@ -8,6 +8,10 @@ interface MarkButtonProps {
   mark: ReactNode
   onClick: () => void
   pressed?: boolean
+  /**
+   * Shown and announced as unavailable, but left focusable (`aria-disabled`),
+   * so a keyboard user pressing it to its last step keeps their place.
+   */
   disabled?: boolean
   title?: string
   expanded?: boolean
@@ -26,7 +30,7 @@ interface MarkButtonProps {
  */
 export default function MarkButton({ label, mark, onClick, pressed, disabled, title, expanded, controls, popup, className, ref }: MarkButtonProps) {
   return (
-    <button ref={ref} className={className ? `mark-button ${className}` : 'mark-button'} type="button" aria-label={label} aria-pressed={pressed} aria-expanded={expanded} aria-controls={controls} aria-haspopup={popup} disabled={disabled} title={title} onClick={onClick}>
+    <button ref={ref} className={className ? `mark-button ${className}` : 'mark-button'} type="button" aria-label={label} aria-pressed={pressed} aria-expanded={expanded} aria-controls={controls} aria-haspopup={popup} aria-disabled={disabled || undefined} title={title} onClick={disabled ? undefined : onClick}>
       <span className="mark-button-mark" aria-hidden="true">
         {mark}
       </span>

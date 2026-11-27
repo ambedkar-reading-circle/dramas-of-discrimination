@@ -6,7 +6,10 @@
   --font-logo: 'Cascadia Mono', ui-monospace, SFMono-Regular, monospace;
 
   /* Breakpoints mirror the notebook media-query boundaries exactly:
-     max-sm: is width < 481px, max-md: is width < 701px, max-lg: is width < 1001px. */
+     max-sm: is width < 481px, max-md: is width < 701px, max-lg: is width < 1001px.
+     xs is the narrowest phone: under it, a bar of seven controls no longer fits
+     on one row. */
+  --breakpoint-xs: 352px;
   --breakpoint-sm: 481px;
   --breakpoint-md: 701px;
   --breakpoint-lg: 1001px;
@@ -15,6 +18,13 @@
   --spacing-row: var(--notebook-row);
   --spacing-section: var(--notebook-section-space);
   --spacing-gutter: var(--notebook-gutter);
+
+  /* The one square every small control shares: the 44px touch target,
+     Tailwind's step 11. size-control in JSX, var(--spacing-control) in CSS. */
+  --spacing-control: calc(var(--spacing) * 11);
+
+  /* The corner of every boxed control and frame. */
+  --radius-control: var(--radius-xs);
 
   /* Color aliases over theme custom properties so dark mode keeps flipping
      without dark: variants. */

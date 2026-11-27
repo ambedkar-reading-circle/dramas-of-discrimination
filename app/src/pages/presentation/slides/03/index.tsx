@@ -1,5 +1,8 @@
+import { cuesOf } from '../../playback/cues'
 import type { Slide } from '../../types'
 import { CircleBoard } from './CircleBoard'
+
+const circles = cuesOf('circles')
 
 export const slide = {
   id: '03',
@@ -8,30 +11,28 @@ export const slide = {
   body: <CircleBoard />,
   layout: 'centered',
   speakerNotes: [
-    { set: 'circles', to: 'bangalore' },
     'The Ambedkar Reading Circle started in Cubbon Park, Bangalore, in 2023.',
+    circles('bangalore'),
     "Reading circles like ours are inspired by, and founded on, Babasaheb's call:",
-    { set: 'circles', to: 'educate' },
-    'Educate,',
-    { set: 'circles', to: 'agitate' },
-    'Agitate,',
-    { set: 'circles', to: 'organize' },
-    'Organize.',
-    { set: 'circles', to: null },
+    circles(null),
+    'Educate, Agitate, Organize.',
+    circles('agitate'),
     'We wanted to take anti-caste literature and anti-caste iconography into public spaces. To occupy those spaces with them.',
     'And to invite others to sit with this literature and these images, and to talk back to them.',
+    circles('organize'),
     'For Dalits who have migrated to the city, we wanted the circle to feel like belonging. Like home.',
     'It is open to other liberals too, who come looking for solidarity and allyship.',
+    circles('educate'),
     'Since then we have met about once a month. A circle usually draws twenty to forty people.',
     'Roughly half are coming back, and half are there for the first time. We see that split almost every time.',
     'Other circles were inspired by us and stay in touch.',
-    { set: 'circles', to: 'mumbai' },
+    circles('mumbai'),
     'ARC Mumbai,',
-    { set: 'circles', to: 'delhi' },
+    circles('delhi'),
     'ARC Delhi,',
-    { set: 'circles', to: 'chennai' },
+    circles('chennai'),
     'ARC Chennai,',
-    { set: 'circles', to: 'hyderabad' },
+    circles('hyderabad'),
     'BARC Hyderabad, among others.',
   ],
 } satisfies Slide

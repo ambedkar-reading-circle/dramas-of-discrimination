@@ -304,7 +304,8 @@
   --method-dialog-inset: clamp(12px, 4vmin, 48px);
   --method-dialog-pad: clamp(18px, 3.5vmin, 36px);
 }
-.method-dialog[open] {
+/* Open as a modal, or as a popover where the page around stays live. */
+.method-dialog:is([open], :popover-open) {
   position: fixed;
   inset: 0;
   display: grid;
@@ -456,7 +457,7 @@
   }
 }
 /* Keep the page still behind the modal. */
-html:has(.method-dialog[open]) {
+html:has(.method-dialog:is([open], :popover-open)) {
   overflow: hidden;
   scrollbar-gutter: stable;
 }

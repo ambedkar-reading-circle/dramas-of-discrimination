@@ -1,7 +1,7 @@
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
-import { useCueTarget } from '../../playback/targets'
+import { useRevealCue } from '../../playback/targets'
 import ApproachReveal from './components/approach/ApproachReveal'
 import TitleWordmark from './components/TitleWordmark'
 import { approachPhotos } from './content/approachPhotos'
@@ -19,7 +19,7 @@ declare module '../../playback/cues' {
 export function TitleSlideBody() {
   const host = useSlideStageHost()
   const reveal = useReveal<ApproachSide>()
-  useCueTarget('approach', (side) => (side ? reveal.open(side) : reveal.close()), { rest: null, value: reveal.active })
+  useRevealCue('approach', reveal)
 
   return (
     <ApproachRevealContext value={reveal}>

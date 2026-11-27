@@ -1,48 +1,18 @@
 import { Merge } from 'lucide-react'
 import { motion } from 'motion/react'
-import type { Variants } from 'motion/react'
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal, useRevealTrigger } from '#/components/Reveal'
 import type { Reveal } from '#/components/Reveal'
-import { cardSpring, hoverLift } from '#/lib/card-motion'
+import { hoverLift } from '#/lib/card-motion'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
-import { useCueTarget } from '../../playback/targets'
+import { useRevealCue } from '../../playback/targets'
 import { riseVariants } from '../shared/motion'
-import { cards, missionLabel, missionPhotos, missionResult, missionResultFinding, missionResultNote, missionSource } from './content/mission'
-import type { MissionCard, MissionPhotoKey } from './content/mission'
+import { cards, missionLabel, missionPhotos, missionResult, missionResultFinding, missionResultNote, missionSources } from './content/mission'
+import type { MissionCard, MissionExcerpt, MissionPhotoKey, MissionSource } from './content/mission'
 import './MissionBoard.css'
 
 const arrow = { size: 18, strokeWidth: 1.5 }
-
-// The marks settle onto the spectrum after their card lands.
-function readingVariants(reduce: boolean): Variants {
-  return {
-    enter: reduce ? { opacity: 0 } : { opacity: 0, scale: 0 },
-    center: (delay: number) => ({
-      opacity: 1,
-      scale: 1,
-      transition: reduce ? { duration: 0.15 } : { ...cardSpring, delay },
-    }),
-  }
-}
-
-function MissionScale({ card, order }: { card: MissionCard; order: number }) {
-  const reduce = usePrefersReducedMotion()
-  return (
-    <div className="mission-scale" aria-hidden="true">
-      <div className="mission-track">
-        {card.readings.map((reading, index) => (
-          <motion.span key={reading} className="mission-reading" style={{ left: `${reading * 100}%` }} custom={0.55 + order * 0.12 + index * 0.06} variants={readingVariants(reduce)} />
-        ))}
-      </div>
-      <div className="mission-ends">
-        <span>{card.from}</span>
-        <span>{card.to}</span>
-      </div>
-    </div>
-  )
-}
 
 interface MissionCardViewProps {
   card: MissionCard
@@ -65,14 +35,42 @@ function MissionCardView({ card, order, reveal }: MissionCardViewProps) {
           </div>
         ))}
       </dl>
-      <MissionScale card={card} order={order} />
     </motion.article>
+  )
+}
+
+function MissionExcerptView({ excerpt, number, reveal }: { excerpt: MissionExcerpt; number: number; reveal: Reveal<MissionPhotoKey> }) {
+  const trigger = useRevealTrigger(reveal, excerpt.key)
+  return (
+    <span className="mission-source-excerpt" aria-label={`Show passage ${number}: ${excerpt.label}`} {...trigger}>
+      <span className="mission-source-excerpt-number">{number}</span> {excerpt.label}
+    </span>
+  )
+}
+
+function MissionSourceView({ source, reveal }: { source: MissionSource; reveal: Reveal<MissionPhotoKey> }) {
+  const trigger = useRevealTrigger(reveal, source.clip)
+  return (
+    <span className="mission-source-entry">
+      {source.mark && <span aria-hidden="true">{source.mark} </span>}
+      <span className="mission-source-clip" aria-label={`${source.text} Show the article`} {...trigger}>
+        {source.text}
+      </span>{' '}
+      <a href={source.href} target="_blank" rel="noreferrer">
+        <cite>{source.journal}</cite>
+      </a>{' '}
+      <span className="mission-source-excerpts">
+        {source.excerpts.map((excerpt, index) => (
+          <MissionExcerptView key={excerpt.key} excerpt={excerpt} number={index + 1} reveal={reveal} />
+        ))}
+      </span>
+    </span>
   )
 }
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 04: the mission card whose photo is open. */
+    /** Slide 04: the mission card whose photo is open, or the source clipping. */
     mission: MissionPhotoKey | null
   }
 }
@@ -81,7 +79,7 @@ export function MissionBoard() {
   const reduce = usePrefersReducedMotion()
   const host = useSlideStageHost()
   const reveal = useReveal<MissionPhotoKey>()
-  useCueTarget('mission', (key) => (key ? reveal.open(key) : reveal.close()), { rest: null, value: reveal.active })
+  useRevealCue('mission', reveal)
   const resultTrigger = useRevealTrigger(reveal, 'result')
   return (
     <figure className="mission-board" aria-label={missionLabel}>
@@ -103,11 +101,9 @@ export function MissionBoard() {
         </span>
       </motion.div>
       <motion.figcaption className="mission-source" custom={cards.length + 2} variants={riseVariants(reduce)}>
-        <span aria-hidden="true">* </span>
-        {missionSource.text}{' '}
-        <a href={missionSource.href} target="_blank" rel="noreferrer">
-          <cite>{missionSource.journal}</cite>
-        </a>
+        {missionSources.map((source) => (
+          <MissionSourceView key={source.clip} source={source} reveal={reveal} />
+        ))}
       </motion.figcaption>
     </figure>
   )

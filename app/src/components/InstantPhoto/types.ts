@@ -6,6 +6,8 @@ export interface InstantPhotoData {
   src: string
   alt: string
   caption?: string
+  /** Where the caption links to, such as the article a clipping is cut from. Opens in a new tab. */
+  href?: string
   direction: Direction
   tilt?: number
 }

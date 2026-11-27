@@ -1,3 +1,5 @@
+@reference '../../styles.css';
+
 /* Shared look for MarkButton: a small square, mark-only control on the
    notebook line. Placement belongs to the feature that uses it. */
 @layer components {
@@ -5,12 +7,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    padding: 0 0.625rem;
+    gap: --spacing(2);
+    min-width: var(--spacing-control);
+    min-height: var(--spacing-control);
+    padding: 0 --spacing(2.5);
     border: 0;
-    border-radius: 0.125rem;
+    border-radius: var(--radius-control);
     box-shadow: inset 0 0 0 1px var(--line);
     background: transparent;
     color: var(--sea-ink);
@@ -24,14 +26,14 @@
   .mark-button-mark {
     display: grid;
     flex: none;
-    width: 1rem;
-    height: 1rem;
+    width: --spacing(4);
+    height: --spacing(4);
     place-items: center;
   }
 
   .mark-button-mark svg {
-    width: 1rem;
-    height: 1rem;
+    width: --spacing(4);
+    height: --spacing(4);
   }
 
   .mark-button-glyph {
@@ -39,7 +41,7 @@
     line-height: 1;
   }
 
-  .mark-button:hover:not(:disabled) {
+  .mark-button:hover:not([aria-disabled='true']) {
     background: var(--link-bg-hover);
   }
 
@@ -48,7 +50,7 @@
     color: var(--hl-text);
   }
 
-  .mark-button:disabled {
+  .mark-button[aria-disabled='true'] {
     opacity: 0.5;
     cursor: not-allowed;
   }

@@ -4,6 +4,7 @@ import { twoDigit } from '#/lib/format'
 import type { WorkshopActivity } from '../content/workshopActivities'
 import { ActivityDrawing } from '../content/activityDrawings'
 import { resolveOverlay } from '../content/sheetOverlay'
+import type { OverlayTarget } from '../content/sheetOverlay'
 import { useSheetOverlay } from '../hooks/useSheetOverlay'
 import { WorksheetStickers, ManualStickers } from './ActivityStickers'
 import { ActivityStepList } from './ActivityStepList'
@@ -12,8 +13,18 @@ import { SheetOverlay } from './SheetOverlay'
 interface ActivityDialogProps {
   activities: WorkshopActivity[]
   active: number | null
+  /** What lies over the open sheet: one of its stickers' pages or prints. */
+  shown: OverlayTarget | null
+  onShow: (target: OverlayTarget | null) => void
   onSelect: (index: number) => void
   onClose: () => void
+  /**
+   * Opens over the page without taking it over, as the /approach deck's
+   * speaker notes open and close the sheet: the player below stays usable,
+   * the page still hears its keys, and focus stays where it was unless the
+   * sheet was opened from the collection itself.
+   */
+  modeless?: boolean
 }
 
 export const activityDialogId = 'workshop-activity-dialog'
@@ -24,27 +35,29 @@ const overlayId = 'workshop-activity-overlay'
  * puts it in the top layer, so it escapes every host's transforms, clipping
  * and stacking (the home section, the /approach slide stage) and sits above
  * the site header. The page behind is inert, so the sheet carries its own
- * previous/next controls. Its stickers lay manual pages or photographs over
+ * previous/next controls. Modeless, it is a manual popover instead: in the top
+ * layer all the same, but the page behind stays live. Its stickers lay manual pages or photographs over
  * it; while they are out, Escape and the backdrop put them away first.
  */
-export function ActivityDialog({ activities, active, onSelect, onClose }: ActivityDialogProps) {
+export function ActivityDialog({ activities, active, shown, onShow, onSelect, onClose, modeless = false }: ActivityDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const open = active !== null
   const activity = active === null ? null : activities[active]
-  const overlay = useSheetOverlay(active, overlayId)
-  const overlayContent = activity ? resolveOverlay(activity, overlay.shown) : null
+  const overlay = useSheetOverlay(shown, onShow, overlayId)
+  const overlayContent = activity ? resolveOverlay(activity, shown) : null
   const overlayOpen = overlayContent !== null
 
   useEffect(() => {
     const element = dialog.current
     if (!element || !open) return
+    if (modeless) return showModeless(element)
     if (!element.open) element.showModal()
     return () => {
       // close() restores focus to whatever opened the sheet.
       if (element.open) element.close()
     }
-  }, [open])
+  }, [open, modeless])
 
   // A new act starts at its top.
   useEffect(() => {
@@ -63,6 +76,7 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
       aria-labelledby={activity ? 'method-dialog-title' : undefined}
       data-lenis-prevent=""
       onClose={onClose}
+      popover={modeless ? 'manual' : undefined}
       onCancel={(event) => {
         if (!overlayOpen) return
         event.preventDefault()
@@ -74,8 +88,16 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
         if (overlayOpen) overlay.close()
         else onClose()
       }}
-      // Keep keys here: the /approach deck turns slides on arrow keys.
-      onKeyDown={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        // A popover has no cancel event, so Escape is heard here.
+        if (modeless && event.key === 'Escape') {
+          event.preventDefault()
+          if (overlayOpen) overlay.close()
+          else onClose()
+        }
+        // Keep keys here, unless the page around drives the sheet with them.
+        if (!modeless) event.stopPropagation()
+      }}
     >
       {activity && active !== null && (
         <article className="method-dialog-sheet" key={active} inert={overlayOpen}>
@@ -137,4 +159,23 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
       {activity && <SheetOverlay id={overlayId} content={overlayContent} onClose={overlay.close} />}
     </dialog>
   )
+}
+
+/**
+ * Shows the sheet as a popover, and returns what hides it again. Opened from
+ * the collection (a card or the index), focus moves to the sheet, as a modal
+ * would move it; opened from elsewhere (the deck's player, or the page itself
+ * as the deck plays), it stays put.
+ * Hidden with focus inside, focus goes back where it came from.
+ */
+function showModeless(element: HTMLDialogElement) {
+  const from = document.activeElement
+  if (!element.matches(':popover-open')) element.showPopover()
+  // A dialog shown as a popover still focuses its first control; hand focus back unless the collection opened it.
+  if (from instanceof HTMLElement && !element.parentElement?.contains(from)) from.focus({ preventScroll: true })
+  return () => {
+    const hadFocus = element.contains(document.activeElement)
+    if (element.matches(':popover-open')) element.hidePopover()
+    if (hadFocus && from instanceof HTMLElement && from.isConnected) from.focus({ preventScroll: true })
+  }
 }

@@ -29,19 +29,8 @@ export type Slide = Readonly<{
    * Speaker notes: what to say over this slide, as lines read in order, with
    * the slide's cues between them. Each entry is a point the arrows step
    * through, and the lines play as the slide's captions in self-facilitation.
+   * Cues before the first line set how the slide opens, without a point of
+   * their own.
    */
-  speakerNotes?: ReadonlyArray<SpeakerNote>
-  /**
-   * Speaker notes split into parts, one per part of the slide. Takes the
-   * place of `speakerNotes`.
-   */
-  speakerNoteTabs?: ReadonlyArray<SpeakerNoteTab>
-}>
-
-export type SpeakerNoteTab = Readonly<{
-  label: string
-  /** Set over every point of this part, so the slide shows the part its notes are on. */
-  cue?: Cue
-  /** Left out until written; the part then plays its label as its only caption. */
   speakerNotes?: ReadonlyArray<SpeakerNote>
 }>

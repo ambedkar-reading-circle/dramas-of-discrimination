@@ -1,14 +1,14 @@
 @layer components {
   .instant-photo {
     --rim: clamp(0.4rem, 2cqmin, 0.9rem);
-    --lip: clamp(1.5rem, 5cqmin, 2.25rem);
-    --caption-gap: calc(var(--notebook-row) / 4);
-    --rim-v: calc(var(--rim) * 1.7 + var(--caption-gap) + var(--lip));
+    --lip: clamp(1.2rem, 3.5cqmin, 1.6rem);
+    --caption-gap: calc(var(--rim) * 0.4);
+    --rim-v: calc(var(--rim) * 1.5 + var(--caption-gap) + var(--lip));
     grid-area: 1 / 1;
     display: grid;
     gap: var(--caption-gap);
     margin: 0;
-    padding: var(--rim) var(--rim) calc(var(--rim) * 0.7);
+    padding: var(--rim) var(--rim) calc(var(--rim) * 0.5);
     cursor: pointer;
     background:
       linear-gradient(160deg, var(--photo-sheen), transparent 45%),
@@ -35,9 +35,24 @@
     display: grid;
     place-items: center;
     min-height: var(--lip);
+    /* Take no width of its own, so the photo sets the width and a long caption wraps under it. */
+    width: 0;
+    min-width: 100%;
+    text-wrap: balance;
+    line-height: 1.2;
     font-family: var(--font-body);
     font-size: clamp(0.95rem, 3cqmin, 1.25rem);
     color: var(--photo-ink);
     text-align: center;
+  }
+
+  .instant-photo figcaption a {
+    color: inherit;
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+  }
+
+  .instant-photo figcaption a:hover {
+    text-decoration-style: solid;
   }
 }

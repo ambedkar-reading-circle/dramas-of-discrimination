@@ -6,10 +6,12 @@ import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
 import MarkButton, { Mark, MarkGlyph } from '#/components/MarkButton'
 import { revealKeep } from '#/components/Reveal'
+import { observeResize } from '#/lib/observe-resize'
 import { usePlayback } from '../playback/playback'
 import { canSpeak } from '../playback/speech'
 import Captions from './Captions'
-import PageStrip, { PageChip, slideLabel } from './PageStrip'
+import { slideLabel } from '../slideLabel'
+import PageStrip, { PageChip } from './PageStrip'
 import type { CurrentPage } from './PageStrip'
 
 interface SlideNavProps {
@@ -43,12 +45,9 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
     const element = bar.current
     const shell = element?.closest<HTMLElement>('.presentation-deck')
     if (!element || !shell) return
-    const measure = () => shell.style.setProperty('--player-height', `${element.offsetHeight}px`)
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
+    const stop = observeResize([element], () => shell.style.setProperty('--player-height', `${element.offsetHeight}px`))
     return () => {
-      observer.disconnect()
+      stop()
       shell.style.removeProperty('--player-height')
     }
   }, [])
@@ -60,7 +59,8 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
 
   return (
     // A press on the player must not close the slide's photo: the point it moves to decides that.
-    <div ref={bar} className="slide-nav" {...revealKeep}>
+    <div ref={bar} className="slide-nav paper-tear paper-tear--top" {...revealKeep}>
+      <div className="paper-tear__surface" aria-hidden="true" />
       <DeckProgress slide={slide} point={point} total={total} />
       <div className="slide-nav-controls">
         <nav className="slide-nav-change" aria-label="Change slides">

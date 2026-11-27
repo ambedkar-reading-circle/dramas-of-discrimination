@@ -28,8 +28,12 @@ export function SheetOverlay({ id, content, onClose }: SheetOverlayProps) {
   const spread = useRef<HTMLDivElement>(null)
   const key = content?.key ?? null
 
+  // Focus follows a sticker tapped on the sheet. Laid out from outside (the
+  // deck's notes), the spread leaves focus where it is, on the player.
   useEffect(() => {
-    if (key !== null) spread.current?.focus({ preventScroll: true })
+    const element = spread.current
+    if (key === null || !element) return
+    if (element.closest('dialog')?.contains(document.activeElement)) element.focus({ preventScroll: true })
   }, [key])
 
   return (
