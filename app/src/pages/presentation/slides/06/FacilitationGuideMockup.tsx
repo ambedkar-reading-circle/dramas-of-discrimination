@@ -86,7 +86,7 @@ export function FacilitationGuideMockup() {
       if (target < 0) return warnCue({ set: 'guide', to: stop }, 'no such step in the journey')
       moveToStop(target)
     },
-    { rest: opening, value: journey[position] },
+    { rest: opening, value: journey[position], followRest: true },
   )
 
   // `towards` is the direction of travel: 1 forward, -1 back.

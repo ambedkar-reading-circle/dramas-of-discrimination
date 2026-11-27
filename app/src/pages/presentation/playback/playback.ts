@@ -98,15 +98,16 @@ export function usePlaybackState({ slide, point, slideId, points, atEnd, next, g
   const replay = useCallback(() => setProgress((p) => ({ ...p, captionsApplied: p.captionsApplied + 1, cuesApplied: p.cuesApplied + 1 })), [])
 
   // The film can end just after Pause. Its point is then done: play moves on from it rather than starting the film over.
+  // Kept by the cues' count, which only a new point or a replay changes: turning the voice on while paused leaves it done.
   const endedWhilePaused = useRef<number | null>(null)
 
   const play = useCallback(() => {
     setPlaying(true)
     setNarrating(false)
-    if (endedWhilePaused.current === progress.captionsApplied) moveOn(true)
+    if (endedWhilePaused.current === progress.cuesApplied) moveOn(true)
     else replay()
     endedWhilePaused.current = null
-  }, [replay, moveOn, progress.captionsApplied])
+  }, [replay, moveOn, progress.cuesApplied])
   const pause = useCallback(() => {
     setPlaying(false)
     setNarrating(false)
@@ -131,8 +132,8 @@ export function usePlaybackState({ slide, point, slideId, points, atEnd, next, g
   const resolveWait = useCallback(() => {
     if (!waiting) return
     if (playing) advance()
-    else endedWhilePaused.current = progress.captionsApplied
-  }, [waiting, playing, advance, progress.captionsApplied])
+    else endedWhilePaused.current = progress.cuesApplied
+  }, [waiting, playing, advance, progress.cuesApplied])
 
   const pace = useMemo(() => paceOf(caption, current, voice), [caption, current, voice])
   const running = playing || narrating

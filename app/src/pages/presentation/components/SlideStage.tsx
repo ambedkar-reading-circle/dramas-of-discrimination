@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { observeResize } from '#/lib/observe-resize'
+import { useLatest } from '#/lib/use-latest'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { SlideDirectionContext } from '../hooks/useSlideDirection'
 import { SlideStageHostContext } from '../hooks/useSlideStageHost'
@@ -27,6 +28,8 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
   // flies to the centre of what is in view, not of the slide's first screenful.
   // State, not a ref, so slide bodies re-render once it mounts.
   const [host, setHost] = useState<HTMLDivElement | null>(null)
+  // Read by the focus effect below without re-running it when the host mounts.
+  const latestHost = useLatest(host)
   const fit = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement | null>(null)
   const [scale, setScale] = useState(1)
@@ -87,12 +90,13 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
 
   // Move focus to the new slide's heading so keyboard users are never stranded
   // inside the previous slide's embed; reset the stage scroll for each slide.
-  // Only focus that was in the slide (or nowhere: the page, its <main>) moves.
+  // Only focus that was in the slide, its open photo, or nowhere (the page, its <main>) moves.
   // Focus on the player stays there, so Next can be pressed again, and
   // playback crossing a slide does not take a control from under the room.
   useEffect(() => {
     const active = document.activeElement
-    const stranded = !active || active === document.body || active.matches('main') || stage.current?.contains(active) === true
+    const inSlide = stage.current?.contains(active) === true || latestHost.current?.contains(active) === true
+    const stranded = !active || active === document.body || active.matches('main') || inSlide
     if (!mounted.current) mounted.current = true
     else if (stranded) focusHeading()
     stage.current?.scrollTo({ top: 0, behavior: 'instant' })

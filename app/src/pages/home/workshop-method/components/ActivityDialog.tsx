@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import '../ActivityOverlays.css'
 import { twoDigit } from '#/lib/format'
+import { useLatest } from '#/lib/use-latest'
 import type { WorkshopActivity } from '../content/workshopActivities'
 import { ActivityDrawing } from '../content/activityDrawings'
 import { resolveOverlay } from '../content/sheetOverlay'
@@ -59,6 +60,21 @@ export function ActivityDialog({ activities, active, shown, onShow, onSelect, on
     }
   }, [open, modeless])
 
+  // A popover has no cancel event, and focus can sit outside it (on the deck's
+  // player, when a cue opened the sheet), so Escape is heard on the document:
+  // it puts the overlay away first, then the sheet.
+  const dismiss = useLatest(() => (overlayOpen ? overlay.close() : onClose()))
+  useEffect(() => {
+    if (!open || !modeless) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      event.preventDefault()
+      dismiss.current()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open, modeless, dismiss])
+
   // A new act starts at its top.
   useEffect(() => {
     content.current?.scrollTo({ top: 0 })
@@ -89,12 +105,6 @@ export function ActivityDialog({ activities, active, shown, onShow, onSelect, on
         else onClose()
       }}
       onKeyDown={(event) => {
-        // A popover has no cancel event, so Escape is heard here.
-        if (modeless && event.key === 'Escape') {
-          event.preventDefault()
-          if (overlayOpen) overlay.close()
-          else onClose()
-        }
         // Keep keys here, unless the page around drives the sheet with them.
         if (!modeless) event.stopPropagation()
       }}

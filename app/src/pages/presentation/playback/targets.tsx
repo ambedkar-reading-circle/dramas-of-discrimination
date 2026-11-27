@@ -16,6 +16,12 @@ type Options<TValue> = Readonly<{
    * deck: to the point whose cues set this value, nearest the current one.
    */
   value?: TValue
+  /**
+   * A change by hand back to `rest` moves the deck too, as any other value
+   * does: for a target whose rest is a place of its own (the guide's opening
+   * step), not an absence (a closed photo).
+   */
+  followRest?: boolean
 }>
 
 /** Cue values are plain data, so two with the same JSON are the same value. */
@@ -46,8 +52,8 @@ function pointFor(points: ReadonlyArray<Point>, current: number, id: CueTarget, 
  *
  * With `value`, a change made by hand inside the slide moves the deck to the
  * point that shows it, so the slide number and caption follow the click. A
- * value no point sets, or a return to `rest` (closing a photo), stays a
- * change by hand, until the deck next moves.
+ * value no point sets, or a return to `rest` (closing a photo) unless
+ * `followRest`, stays a change by hand, until the deck next moves.
  */
 export function useCueTarget<TTarget extends CueTarget>(id: TTarget, set: (value: CueTargets[TTarget]) => void, options: Options<CueTargets[TTarget]> = {}) {
   const scope = use(ScopeContext)
@@ -78,7 +84,7 @@ export function useCueTarget<TTarget extends CueTarget>(id: TTarget, set: (value
     lastSeen.current = value
     if (!at || deepEqual(value, lastCued.current)) return
     lastCued.current = value
-    if (hasRest && deepEqual(value, options.rest)) return
+    if (hasRest && options.followRest !== true && deepEqual(value, options.rest)) return
     const point = pointFor(at.points, at.point, id, value)
     if (point !== null && point !== at.point) at.goToPoint(point)
     // Only a change in what the slide shows is a hand change; the rest of the options are read as they stand.
