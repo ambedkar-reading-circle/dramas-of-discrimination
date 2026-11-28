@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import DodLogo from '#/components/DodLogo'
+import { proposedLabel } from './content/proposed'
 import { GuideJourney } from './GuideJourney'
 import type { Mode } from './ModeControls'
 import './guide.css'
@@ -31,7 +32,11 @@ const guideTitle = (
   </>
 )
 
-/** The facilitation guide's shell: navy bars around a cream screen, the workshop journey across the top, and a desk below it. */
+/**
+ * The facilitation guide's shell: navy bars around a cream screen, the
+ * workshop journey across the top, and a desk below it. The guide is a
+ * proposal still being built, and its foot bar says so on every slide.
+ */
 export function GuideFrame({ label, className, mode, title = guideTitle, act, step, onSelectAct, bar, foot, children }: GuideFrameProps) {
   return (
     <div className={['fac activity-surface', className].filter(Boolean).join(' ')} data-mode={mode} role="group" aria-label={label}>
@@ -49,6 +54,7 @@ export function GuideFrame({ label, className, mode, title = guideTitle, act, st
         <span className="fac-wordmark">
           <DodLogo variant="inline" />
         </span>
+        <span className="fac-proposed">{proposedLabel}</span>
         {foot}
         <img className="fac-logo" src="/ARCLogo-blue.png" alt="Ambedkar Reading Circle" />
       </footer>

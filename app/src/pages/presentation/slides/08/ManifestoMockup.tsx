@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
@@ -12,6 +13,7 @@ import { WriterCaret, WriterCursors } from '../shared/WriterCursors'
 import { FernCorner } from './FernCorner'
 import { draft, prompt } from './content/manifesto'
 import type { DraftBlock } from './content/manifesto'
+import { useCharterScroll } from './hooks/useCharterScroll'
 import { useManifestoDraft } from './hooks/useManifestoDraft'
 import type { Segment } from './hooks/useManifestoDraft'
 import { useCueTarget } from '../../playback/targets'
@@ -38,7 +40,7 @@ const tabs: Record<Mode, ReadonlyArray<string>> = {
  * generates the Manifesto of Inclusion and every Member edits it at once.
  */
 export function ManifestoMockup() {
-  const [mode, setMode] = useState<Mode>('local')
+  const [mode, setMode] = useState<Mode>('cloud')
   useCueTarget('mode', setMode, { value: mode })
   // The draft lives here, above the mode switch, so a trip to Local mode and back keeps it.
   const reducedMotion = usePrefersReducedMotion()
@@ -107,7 +109,7 @@ const sparkle = 'M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z
 const pencil = 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4'
 
 const generateLabel = {
-  idle: 'Generate Manifesto of Inclusion',
+  idle: 'Generate Manifesto',
   generate: 'Generating…',
 } as const
 
@@ -134,7 +136,7 @@ function ManifestoDraft({ manifesto }: { manifesto: ReturnType<typeof useManifes
         </button>
       </SheetTabs>
 
-      <Charter ref={charter} blank={stage === 'idle'} overlay={<WriterCursors container={charter} writers={editors} named />}>
+      <Charter ref={charter} blank={stage === 'idle'} follow={stage === 'generate'} overlay={<WriterCursors container={charter} writers={editors} named />}>
         {draft.map((block) => (
           <DraftLine key={block.id} block={block}>
             <Segments segments={segmentsOf(block.id)} />
@@ -145,10 +147,16 @@ function ManifestoDraft({ manifesto }: { manifesto: ReturnType<typeof useManifes
   )
 }
 
-/** The Manifesto as an illuminated charter: fern fronds at the corners, a blackletter title. */
-function Charter({ ref, blank, overlay, children }: { ref: RefObject<HTMLDivElement | null>; blank: boolean; overlay: ReactNode; children: ReactNode }) {
+/**
+ * The Manifesto as an illuminated charter: fern fronds at the corners, a
+ * blackletter title. The page scrolls inside the frame; while the draft
+ * generates, it follows the stream down.
+ */
+function Charter({ ref, blank, follow, overlay, children }: { ref: RefObject<HTMLDivElement | null>; blank: boolean; follow: boolean; overlay: ReactNode; children: ReactNode }) {
+  const { page, overflow, onScroll, scrollOn } = useCharterScroll(follow)
+
   return (
-    <div ref={ref} className="mani-charter" data-blank={blank ? '' : undefined}>
+    <div ref={ref} className="mani-charter" data-blank={blank ? '' : undefined} data-above={overflow.above ? '' : undefined} data-below={overflow.below ? '' : undefined}>
       {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
         <FernCorner key={corner} className={`mani-fern mani-fern--${corner}`} />
       ))}
@@ -158,10 +166,16 @@ function Charter({ ref, blank, overlay, children }: { ref: RefObject<HTMLDivElem
       <span className="mani-fleuron mani-fleuron--bottom" aria-hidden="true">
         ❦
       </span>
-      <div className="mani-page">
+      <div ref={page} className="mani-page" tabIndex={blank ? undefined : 0} onScroll={onScroll}>
         <h3 className="mani-title">Manifesto of Inclusion</h3>
         {blank ? <p className="mani-empty">The Facilitator generates the draft once every Group has submitted its worksheets.</p> : children}
       </div>
+      <span className="mani-more-fade mani-more-fade--top" aria-hidden="true" />
+      <span className="mani-more-fade mani-more-fade--bottom" aria-hidden="true" />
+      <button type="button" className="mani-more" tabIndex={overflow.below ? undefined : -1} aria-hidden={overflow.below ? undefined : true} onClick={scrollOn}>
+        <ChevronDown size={12} strokeWidth={2.2} aria-hidden="true" />
+        More below
+      </button>
       {overlay}
     </div>
   )
@@ -171,8 +185,7 @@ function DraftLine({ block, children }: { block: DraftBlock; children: ReactNode
   switch (block.kind) {
     case 'heading':
       return <h4 className="mani-heading">{children}</h4>
-    case 'value':
-    case 'pledge':
+    case 'policy':
       return <p className={`mani-item mani-item--${block.kind}`}>{children}</p>
     default:
       return <p className={`mani-${block.kind}`}>{children}</p>

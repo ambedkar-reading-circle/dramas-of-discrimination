@@ -1,10 +1,9 @@
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { motion } from 'motion/react'
 import { twoDigit } from '#/lib/format'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
-import { actorRows, categories, members, scenarioCell, scribe } from '../shared/content/actorMap'
+import { actorRows, columns, constitutionalValues, members, scenarioCell, scribe, valuesInstruction } from '../shared/content/actorMap'
 import type { SheetCell, Writer } from '../shared/content/actorMap'
 import { GuideFrame } from '../shared/GuideFrame'
 import { ModeBar } from '../shared/ModeControls'
@@ -50,6 +49,7 @@ function ActorMapSheet({ mode }: { mode: Mode }) {
   const reducedMotion = usePrefersReducedMotion()
   const { typedOf, writers } = useSheetFill(writersFor[mode], reducedMotion)
   const wrap = useRef<HTMLDivElement>(null)
+  const valuesHintId = useId()
   const writerOn = new Map(writers.map((at) => [at.cell, at]))
 
   const cell = (item: SheetCell) => <Cell item={item} typed={typedOf(item.id)} at={writerOn.get(item.id)} />
@@ -61,27 +61,25 @@ function ActorMapSheet({ mode }: { mode: Mode }) {
           {cell(scenarioCell)}
         </span>
 
-        <ul className="modes-categories" aria-label="Categories">
-          {categories.map((item) => {
-            const ticked = typedOf(item.id) >= 1
-            const at = writerOn.get(item.id)
-            return (
-              <li key={item.id} data-ticked={ticked ? '' : undefined} {...writerMarks(at)}>
-                <span className="modes-box" data-caret={at?.writer.id} aria-hidden="true">
-                  {ticked && (
-                    <motion.svg viewBox="0 0 16 16" initial={reducedMotion ? false : { pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}>
-                      <motion.path d="M3 8.5l3.2 3L13 4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" initial={reducedMotion ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.25 }} />
-                    </motion.svg>
-                  )}
-                </span>
-                <span>
-                  {item.text}
-                  <span className="sr-only">{ticked ? ', ticked' : ', not ticked'}</span>
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+        <div className="modes-values">
+          <p className="modes-values-hint" id={valuesHintId}>
+            {valuesInstruction}
+          </p>
+          <ul aria-labelledby={valuesHintId}>
+            {constitutionalValues.map((item) => {
+              const struck = typedOf(item.id) >= 1
+              const at = writerOn.get(item.id)
+              return (
+                <li key={item.id} data-struck={struck ? '' : undefined} {...writerMarks(at)}>
+                  {/* A pen stroke drawn through the value, as the Group strikes it out on paper. */}
+                  <span className="modes-value-name">{item.text}</span>
+                  <span className="sr-only">{struck ? ', struck out: violated' : ', not struck out'}</span>
+                  <span className="modes-value-caret" data-caret={at?.writer.id} aria-hidden="true" />
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </section>
 
       <table className="modes-table">
@@ -96,9 +94,12 @@ function ActorMapSheet({ mode }: { mode: Mode }) {
             <th scope="col">
               <span className="sr-only">Row</span>
             </th>
-            <th scope="col">Actor</th>
-            <th scope="col">Ideal behaviour</th>
-            <th scope="col">Failures</th>
+            {Object.values(columns).map((column) => (
+              <th key={column.name} scope="col">
+                {column.name}
+                <span className="modes-th-hint">{column.hint}</span>
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>

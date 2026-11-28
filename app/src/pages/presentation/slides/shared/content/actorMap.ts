@@ -5,19 +5,19 @@
 
 /** A cell the writers type into. */
 type TextCell = Readonly<{ id: string; kind: 'text'; text: string }>
-/** A category box the writers tick; its text is the printed label. */
-type TickCell = Readonly<{
+/** A printed label the writers strike out, or leave; `struck` is whether it ends up struck. */
+type StrikeCell = Readonly<{
   id: string
-  kind: 'tick'
+  kind: 'strike'
   text: string
-  ticked: boolean
+  struck: boolean
 }>
 
-export type SheetCell = TextCell | TickCell
+export type SheetCell = TextCell | StrikeCell
 
-/** How much a cell holds once filled: its characters, or 1 for a ticked box. */
+/** How much a cell holds once filled: its characters, or 1 for a struck label. */
 export function fullLength(cell: SheetCell) {
-  if (cell.kind === 'tick') return cell.ticked ? 1 : 0
+  if (cell.kind === 'strike') return cell.struck ? 1 : 0
   return cell.text.length
 }
 
@@ -38,21 +38,42 @@ export const scenarioCell = textCell(
   'Aspiration: a girl from a waste-picking family wants to open a beauty parlour near her home.',
 )
 
-export const categories: ReadonlyArray<TickCell> = [
+/** The sheet's three columns, left to right, each with the question it asks (manual, pp. 18–19). */
+export const columns: Readonly<Record<keyof ActorRow, Readonly<{ name: string; hint: string }>>> = {
+  actor: { name: 'Actor', hint: 'Who is involved' },
+  ideal: { name: 'Ideal behaviour', hint: 'What they should do' },
+  failures: { name: 'Failures', hint: 'What stops them' },
+}
+
+/** What the sheet asks of the Group about the values below (manual, pp. 18–19). */
+export const valuesInstruction =
+  'Strike out each constitutional value this Scenario violates.'
+
+/** The constitutional values printed across the top of the sheet. */
+export const constitutionalValues: ReadonlyArray<StrikeCell> = [
   {
-    id: 'cat-education',
-    text: 'Educational hurdles',
-    kind: 'tick',
-    ticked: false,
+    id: 'value-justice',
+    kind: 'strike',
+    text: 'Justice',
+    struck: true,
   },
-  { id: 'cat-health', text: 'Health & addiction', kind: 'tick', ticked: false },
-  { id: 'cat-economic', text: 'Economic', kind: 'tick', ticked: true },
-  { id: 'cat-family', text: 'Family', kind: 'tick', ticked: true },
   {
-    id: 'cat-social',
-    text: 'Social & institutional',
-    kind: 'tick',
-    ticked: true,
+    id: 'value-liberty',
+    kind: 'strike',
+    text: 'Liberty',
+    struck: false,
+  },
+  {
+    id: 'value-equality',
+    kind: 'strike',
+    text: 'Equality',
+    struck: true,
+  },
+  {
+    id: 'value-fraternity',
+    kind: 'strike',
+    text: 'Fraternity',
+    struck: true,
   },
 ]
 
@@ -67,26 +88,46 @@ const rows: ReadonlyArray<[string, string, string]> = [
     'Financial, emotional and moral support',
     'Financial crisis, taboos, patriarchy, stereotypes',
   ],
-  ['Friends', 'Supportive, and demotivating', ''],
+  [
+    'Friends',
+    'Supportive, and not demotivating',
+    'Fear of what others will say',
+  ],
   [
     'Community',
-    '10% support; demotivating, pulling her down',
+    'Supports her, and does not pull her down',
     'No awareness, no habit of supporting each other',
   ],
   [
     'Building owner',
-    'Will not rent the shop, for caste and occupation',
+    'Open to renting her the shop, whatever her caste',
     'Biased, judgemental, greedy',
   ],
   [
     'Other castes',
-    'Not ready to take her service',
+    'Willing to take her service',
     'Biased, no equality, blind to the struggle',
   ],
-  ['Bank', '', ''],
-  ['Customers', '', ''],
-  ['Area leaders', '', ''],
-  ['Police dept.', '', ''],
+  [
+    'Bank',
+    'Gives her a fair loan to set up the parlour',
+    'Asks for collateral, caste bias at the desk',
+  ],
+  [
+    'Customers',
+    'Choose her parlour, and recommend it',
+    'Taboos of purity and pollution',
+  ],
+  [
+    'Area leaders',
+    'Back her shop, and speak up for her',
+    'Caste loyalties, and no will to act',
+  ],
+  [
+    'Police dept.',
+    'Protects her shop from harassment',
+    'Caste bias, pressure from the powerful',
+  ],
 ]
 
 export const actorRows: ReadonlyArray<ActorRow> = rows.map(
@@ -99,7 +140,7 @@ export const actorRows: ReadonlyArray<ActorRow> = rows.map(
 
 export const allCells: ReadonlyArray<SheetCell> = [
   scenarioCell,
-  ...categories,
+  ...constitutionalValues,
   ...actorRows.flatMap((row) => [row.actor, row.ideal, row.failures]),
 ]
 
@@ -125,9 +166,10 @@ export const scribe: Writer = {
   color: 'var(--fac-navy)',
   queue: filled([
     scenarioCell,
-    ...categories,
     ...actorRows.map((row) => row.actor),
     ...actorRows.flatMap((row) => [row.ideal, row.failures]),
+    // Last: the room strikes out values once the whole map is in front of it.
+    ...constitutionalValues,
   ]),
   pace: 1,
 }
@@ -143,28 +185,32 @@ export const memberById = {
     id: 'asha',
     name: 'Asha',
     color: '#b23a48',
-    queue: filled([scenarioCell, ...actorRows.map((row) => row.actor)]),
+    queue: filled([
+      scenarioCell,
+      ...actorRows.map((row) => row.actor),
+      ...failures(8, 9),
+    ]),
     pace: 1.2,
   },
   ravi: {
     id: 'ravi',
     name: 'Ravi',
     color: '#1f7a6d',
-    queue: filled([...ideal(0, 1, 2), ...failures(3, 4)]),
+    queue: filled([...ideal(0, 1, 2), ...failures(3, 4), ...ideal(6, 7)]),
     pace: 0.9,
   },
   meena: {
     id: 'meena',
     name: 'Meena',
     color: '#b0701c',
-    queue: filled(failures(0, 1, 5)),
+    queue: filled(failures(0, 1, 5, 2, 6, 7)),
     pace: 0.8,
   },
   imran: {
     id: 'imran',
     name: 'Imran',
     color: '#6a3fa0',
-    queue: filled([...categories, ...ideal(3, 4, 5)]),
+    queue: filled([...ideal(3, 4, 5, 8, 9), ...constitutionalValues]),
     pace: 1,
   },
 } as const satisfies Record<string, Writer>

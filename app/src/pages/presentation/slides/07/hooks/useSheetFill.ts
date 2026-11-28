@@ -29,6 +29,20 @@ type SheetState = Readonly<{
 
 const lengthOf = new Map(allCells.map((cell) => [cell.id, fullLength(cell)]))
 
+/** The values to strike out, which wait until the rest of the sheet is filled. */
+const valueIds = new Set(
+  allCells.filter((cell) => cell.kind === 'strike').map((cell) => cell.id),
+)
+
+/** The cells that end up with text in them. */
+const textIds = allCells
+  .filter((cell) => cell.kind === 'text' && fullLength(cell) > 0)
+  .map((cell) => cell.id)
+
+/** Whether every cell that will hold text is fully typed. */
+const mapFilled = (typed: Readonly<Record<string, number>>) =>
+  textIds.every((id) => (typed[id] ?? 0) >= (lengthOf.get(id) ?? 0))
+
 /** The empty sheet, every writer setting off for their first cell. */
 function blankSheet(writers: ReadonlyArray<Writer>): SheetState {
   return {
@@ -80,10 +94,14 @@ function advance(
     if (current.index >= queue.length) return current
     const cell = queue[current.index]
     const length = lengthOf.get(cell) ?? 0
-    if (current.phase === 'travel')
+    if (current.phase === 'travel') {
+      // A value is struck out only once the whole map is filled, so its writer waits on it.
+      if (valueIds.has(cell) && !mapFilled(typed))
+        return { ...current, wait: 1 }
       return current.wait > 1
         ? { ...current, wait: current.wait - 1 }
         : { ...current, phase: 'type', wait: 0 }
+    }
     if (current.phase === 'type') {
       const next = Math.min(
         length,
@@ -140,7 +158,7 @@ export function useSheetFill(
   )
 
   return {
-    /** How many characters of a cell are in, or 1 when a category is ticked. */
+    /** How many characters of a cell are in, or 1 when a value is struck out. */
     typedOf: (id: string) => Math.floor(sheet.typed[id] ?? 0),
     writers: writersAt,
   }

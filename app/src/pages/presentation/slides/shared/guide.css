@@ -7,7 +7,6 @@
     --fac-navy: var(--primary-blue);
     --fac-cream: var(--primary-white);
     --fac-red: #9d2f2f;
-    --fac-desk-height: 31rem;
     /* The charter a Manifesto of Inclusion is laid out as, wherever it is read. */
     --charter-paper: #f6ebcf;
     --charter-ink: #2e2114;
@@ -80,6 +79,18 @@
 
   .fac-wordmark {
     flex: none;
+  }
+
+  /* The guide is not built yet: a dashed tag, like a sketch's label. */
+  .fac-proposed {
+    flex: none;
+    padding: 0.25rem 0.5rem;
+    border: 1px dashed rgb(255 255 238 / 0.5);
+    border-radius: 0.25rem;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.85;
   }
 
   .fac-logo {
@@ -205,10 +216,12 @@
     animation: fac-ripple 2.4s ease-out infinite;
   }
 
-  /* The desk: a fixed stage the sheets slide on and off */
+  /* The desk: a fixed stage the sheets slide on and off. One size for every
+     slide that shows the guide, so the deck scales them all alike and the
+     mockups match from slide to slide. A sheet fits itself to the desk. */
   .fac-desk {
     position: relative;
-    height: var(--fac-desk-height);
+    height: 34rem;
     margin-inline: -0.875rem;
     padding: 0.25rem 0.875rem 0.875rem;
     overflow: hidden;
@@ -265,6 +278,7 @@
     }
 
     .fac-wordmark,
+    .fac-proposed,
     .fac-logo {
       display: none;
     }

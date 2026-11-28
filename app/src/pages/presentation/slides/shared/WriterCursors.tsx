@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useReducer, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
 import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
@@ -31,6 +31,15 @@ type WriterCursorsProps<TPhase extends string> = {
 export function WriterCursors<TPhase extends string>({ container, writers, named }: WriterCursorsProps<TPhase>) {
   const reducedMotion = usePrefersReducedMotion()
   const [points, setPoints] = useState<Readonly<Partial<Record<string, Point>>>>({})
+  // A scroll anywhere inside the container moves the carets under the cursors, so they measure again.
+  const [, rescrolled] = useReducer((count: number) => count + 1, 0)
+
+  useEffect(() => {
+    const element = container.current
+    if (!element) return
+    element.addEventListener('scroll', rescrolled, { capture: true, passive: true })
+    return () => element.removeEventListener('scroll', rescrolled, { capture: true })
+  }, [container])
 
   // Follow each writer's caret. The slide may be scaled to fit, so client
   // rectangles are brought back to the container's own pixels.

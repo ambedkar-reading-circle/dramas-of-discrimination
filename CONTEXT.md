@@ -95,7 +95,7 @@ _Avoid_: line, utterance, edge
 ### Public surface
 
 **Manifesto portal**:
-The open, public collection of every Manifesto of Inclusion a Community chooses to share — browsable by kind of Community, searchable, and read together for the pledges the collection holds in common. A Cloud-mode Community publishes to it; a Local-mode Community may bring its finished Manifesto or keep it to itself.
+The open, public collection of every Manifesto of Inclusion a Community chooses to share — browsable by kind of Community, searchable, and read together for the rules the collection holds in common. A Cloud-mode Community publishes to it; a Local-mode Community may bring its finished Manifesto or keep it to itself.
 _Avoid_: repository, library, archive, gallery
 
 ### Running a workshop

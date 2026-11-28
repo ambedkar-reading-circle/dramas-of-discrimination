@@ -6,14 +6,6 @@
    out as an illuminated charter: parchment, a blackletter title, fern fronds
    at the corners. Fixed colours in either theme, like the guide itself. */
 @layer components {
-  .mani {
-    --fac-desk-height: 38rem;
-  }
-
-  .mani .fac-sheet {
-    padding-bottom: 1rem;
-  }
-
   .mani-body {
     position: relative;
     display: grid;
@@ -136,6 +128,8 @@
       var(--charter-paper);
     color: var(--charter-ink);
     box-shadow: var(--activity-lift-raised);
+    /* Cursors over words scrolled out of the page stay out of sight. */
+    overflow: hidden;
   }
 
   .mani-charter::before,
@@ -226,11 +220,154 @@
   .mani-page {
     position: relative;
     height: 100%;
-    padding: 1rem 4.25rem;
+    /* The scrollbar sits well inside the gilt border, clear of the ferns' stems. */
+    margin-inline-end: 1.5rem;
+    padding: 1.25rem 2.75rem 1.25rem 4.25rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    /* The site's inherited scrollbar colour would switch Chrome off the charter's scrollbar below. */
+    scrollbar-color: auto;
     font:
       17px/1.42 'IM Fell English',
       Georgia,
       serif;
+  }
+
+  .mani-page:focus-visible {
+    outline: 1px dashed var(--charter-gold);
+    outline-offset: -0.375rem;
+  }
+
+  /* The scrollbar: a sunken ink channel with a solid red thumb, so it reads
+     as a control and never as one more gilt rule. Firefox takes the colours
+     alone. */
+  @supports not selector(::-webkit-scrollbar) {
+    .mani-page {
+      scrollbar-color: var(--charter-red)
+        color-mix(in srgb, var(--charter-ink) 12%, transparent);
+    }
+  }
+
+  .mani-page::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .mani-page::-webkit-scrollbar-track {
+    margin-block: 4.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--charter-ink) 10%, transparent);
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--charter-ink) 25%, transparent);
+  }
+
+  .mani-page::-webkit-scrollbar-thumb {
+    min-height: 3rem;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--charter-red) padding-box;
+  }
+
+  .mani-page::-webkit-scrollbar-thumb:hover,
+  .mani-page::-webkit-scrollbar-thumb:active {
+    border-width: 1px;
+  }
+
+  /* Paper fades over the page's edge on any side that has more to scroll,
+     with a hairline shadow so the cut reads as a fold, not a margin. */
+  .mani-more-fade {
+    position: absolute;
+    inset-inline: 1.5rem 3.25rem;
+    z-index: 1;
+    height: 3.5rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .mani-more-fade--top {
+    top: 0.75rem;
+    background: linear-gradient(
+      var(--charter-paper) 15%,
+      color-mix(in srgb, var(--charter-paper) 0%, transparent)
+    );
+    box-shadow: inset 0 1px 0
+      color-mix(in srgb, var(--charter-ink) 22%, transparent);
+  }
+
+  .mani-more-fade--bottom {
+    bottom: 0.75rem;
+    background: linear-gradient(
+      color-mix(in srgb, var(--charter-paper) 0%, transparent),
+      var(--charter-paper) 70%
+    );
+    box-shadow: inset 0 -1px 0
+      color-mix(in srgb, var(--charter-ink) 22%, transparent);
+  }
+
+  .mani-charter[data-above] .mani-more-fade--top,
+  .mani-charter[data-below] .mani-more-fade--bottom {
+    opacity: 1;
+  }
+
+  /* A labelled nudge sits on the bottom fade while there is more below. */
+  .mani .mani-more {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.625rem;
+    border: 0;
+    border-radius: 999px;
+    translate: -50% 0;
+    background: var(--charter-red);
+    color: var(--charter-paper);
+    box-shadow: 0 2px 6px rgb(60 30 10 / 0.25);
+    font:
+      12px/1.2 'IM Fell English',
+      Georgia,
+      serif;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition:
+      opacity 0.2s,
+      translate 0.2s;
+  }
+
+  .mani .mani-more:hover,
+  .mani .mani-more:focus-visible {
+    translate: -50% 2px;
+    outline: none;
+  }
+
+  .mani .mani-more:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--charter-paper),
+      0 0 0 3.5px var(--charter-red);
+  }
+
+  .mani .mani-more svg {
+    animation: mani-nudge 1.6s ease-in-out infinite;
+  }
+
+  .mani .mani-charter:not([data-below]) .mani-more {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @keyframes mani-nudge {
+    50% {
+      translate: 0 2px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mani .mani-more svg {
+      animation: none;
+    }
   }
 
   /* The charter keeps its own leading, off the notebook's ruled rows. */
@@ -243,10 +380,10 @@
   }
 
   .mani-title {
-    margin-bottom: 0.625rem;
+    margin-bottom: 0.375rem;
     color: var(--charter-ink);
     font:
-      36px/1.1 'UnifrakturMaguntia',
+      32px/1.1 'UnifrakturMaguntia',
       'Old English Text MT',
       serif;
     text-align: center;
@@ -257,7 +394,7 @@
     display: block;
     width: 9rem;
     height: 1px;
-    margin: 0.5rem auto 0;
+    margin: 0.375rem auto 0;
     background: linear-gradient(
       90deg,
       transparent,
@@ -307,15 +444,7 @@
     color: var(--charter-red);
   }
 
-  .mani-item--value {
-    font-style: italic;
-  }
-
-  .mani-item--value::before {
-    content: '❧';
-  }
-
-  .mani-item--pledge::before {
+  .mani-item--policy::before {
     content: '✦';
     font-size: 0.75em;
     top: 0.25em;
@@ -323,7 +452,7 @@
 
   .mani-heading {
     min-height: 1lh;
-    margin-top: 0.5rem;
+    margin-top: 0.375rem;
     color: var(--charter-red);
     font:
       14px/1.4 'IM Fell English',
@@ -336,7 +465,7 @@
 
   .mani-closing {
     min-height: 1lh;
-    margin-top: 0.5rem;
+    margin-top: 0.375rem;
     font-style: italic;
     text-align: center;
   }
@@ -381,8 +510,8 @@
     }
 
     .mani-page {
-      padding-inline: 2.5rem;
-      overflow-y: auto;
+      margin-inline-end: 0.75rem;
+      padding-inline: 2.5rem 1.75rem;
     }
 
     .mani-fern {
