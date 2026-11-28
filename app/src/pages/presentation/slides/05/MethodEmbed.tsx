@@ -51,18 +51,18 @@ export function MethodEmbed() {
   // What the deck follows: the last thing opened, by a cue or by hand. Opening
   // a sheet or a sticker by hand moves the deck to the point that shows it;
   // putting one away stays a change by hand, so the deck does not jump back.
-  const [opened, setOpened] = useState<MethodCue>(null)
-  const cue = (value: MethodCue) => {
+  const [followed, setFollowed] = useState<MethodCue>(null)
+  const showAndFollow = (value: MethodCue) => {
     setShown(value)
-    setOpened(value)
+    setFollowed(value)
   }
-  useCueTarget('method', cue, { rest: null, value: opened })
+  useCueTarget('method', showAndFollow, { rest: null, value: followed })
 
   const view = viewOf(shown)
   const change = (next: SheetView | null) => {
     const closing = next === null || (next.show === null && view?.act === next.act && view.show !== null)
     if (closing) setShown(next === null ? null : cueOf(next))
-    else cue(cueOf(next))
+    else showAndFollow(cueOf(next))
   }
 
   // The sheet sits in the top layer, over every slide: it goes as soon as this slide starts to leave.

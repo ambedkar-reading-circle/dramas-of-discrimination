@@ -1,6 +1,7 @@
 import { createContext, use, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import type { Reveal } from '#/components/Reveal'
+import type { SlideId } from '../types'
 import { useLatest } from '#/lib/use-latest'
 import type { CueTarget, CueTargets } from './cues'
 import type { Point, SlideCues } from './points'
@@ -105,7 +106,7 @@ export function useRevealCue<TTarget extends RevealTarget>(id: TTarget, reveal: 
 }
 
 /** The cues of one slide: the current point's while the deck is on it, none while it leaves. */
-export function CueScope({ slideId, children }: { slideId: string; children: ReactNode }) {
+export function CueScope({ slideId, children }: { slideId: SlideId; children: ReactNode }) {
   const slideCues = usePlayback()?.slideCues
   const scope = slideCues?.slideId === slideId ? slideCues : null
   return <ScopeContext value={scope}>{children}</ScopeContext>

@@ -1,11 +1,11 @@
 import { ChevronDown } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import type { CSSProperties, ReactNode, RefObject } from 'react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { workshopActivities } from '#/pages/home/workshop-method'
 import { members } from '../shared/content/actorMap'
 import { GuideFrame } from '../shared/GuideFrame'
-import { ModeBar } from '../shared/ModeControls'
+import { ModeBar, useCuedMode } from '../shared/ModeControls'
 import type { Mode } from '../shared/ModeControls'
 import { SheetTabs } from '../shared/SheetTabs'
 import { useCopyText } from '../shared/useCopyText'
@@ -40,8 +40,7 @@ const tabs: Record<Mode, ReadonlyArray<string>> = {
  * generates the Manifesto of Inclusion and every Member edits it at once.
  */
 export function ManifestoMockup() {
-  const [mode, setMode] = useState<Mode>('cloud')
-  useCueTarget('mode', setMode, { value: mode })
+  const [mode, setMode] = useCuedMode('cloud')
   // The draft lives here, above the mode switch, so a trip to Local mode and back keeps it.
   const reducedMotion = usePrefersReducedMotion()
   const manifesto = useManifestoDraft(reducedMotion)

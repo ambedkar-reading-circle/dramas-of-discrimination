@@ -14,9 +14,9 @@ import { useLatest } from '#/lib/use-latest'
 
 export default function PresentationDeck() {
   const position = usePresentationDeck()
-  const { slide, point, total, goTo, onDeckKeyDown, stageSwipeHandlers, opened, rememberPlayback } = position
+  const { slide, point, total, goTo, onDeckKeyDown, stageSwipeHandlers, initialSwitches, rememberPlayback } = position
   const current = slides[slide - 1]
-  const playback = usePlaybackState({ slide, point, slideId: current.id, points: deckPoints[slide - 1], atEnd: position.atEnd, next: position.next, goTo }, opened)
+  const playback = usePlaybackState({ slide, point, slideId: current.id, points: deckPoints[slide - 1], atEnd: position.atEnd, next: position.next, goTo }, initialSwitches)
   useEffect(() => rememberPlayback({ play: playback.playing, voice: playback.voice }), [rememberPlayback, playback.playing, playback.voice])
   const deck = useRef<HTMLElement>(null)
 

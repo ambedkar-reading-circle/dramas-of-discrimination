@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import NotebookSurface from '#/components/NotebookSurface'
 import PresentationDeck from '#/pages/presentation'
+import type { PlaybackSwitches } from '#/pages/presentation/playback/switches'
 
 export const Route = createFileRoute('/approach')({
-  // Keep the presenter's place across refresh and deep links: /approach?slide=7&point=3
+  // Keep the deck's place across refresh and deep links: /approach?slide=7&point=3
   // ?play and ?voice: whether the deck plays itself and reads its captions aloud. Both open on; the deck writes them in on arrival.
-  validateSearch: (search: Record<string, unknown>): { slide: number; point?: number; play?: boolean; voice?: boolean } => {
+  validateSearch: (search: Record<string, unknown>): { slide: number; point?: number } & Partial<PlaybackSwitches> => {
     const play = onOff(search.play)
     const voice = onOff(search.voice)
     return {
