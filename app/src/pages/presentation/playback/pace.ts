@@ -1,4 +1,5 @@
 import type { Caption, Point } from './points'
+import { createTimers } from '#/lib/timers'
 import { speech } from './speech'
 
 export type Pace =
@@ -27,16 +28,14 @@ export function knownMs(pace: Pace): number | null {
 
 export function runPace(pace: Pace, onEnd: () => void): () => void {
   let done = false
-  const timers: Array<ReturnType<typeof setTimeout>> = []
+  const timers = createTimers()
   const later = (ms: number) =>
-    timers.push(
-      setTimeout(() => {
-        if (done) return
-        done = true
-        onEnd()
-      }, ms),
-    )
-  const clearTimers = () => timers.forEach(clearTimeout)
+    timers.after(ms, () => {
+      if (done) return
+      done = true
+      onEnd()
+    })
+  const clearTimers = timers.clear
 
   switch (pace.kind) {
     case 'film':
