@@ -14,7 +14,6 @@ export default function ApproachReveal() {
   const diagram = useRef<HTMLElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
 
-  // The diagram is open at the points that reveal its cells. Focus stays put.
   useCueTarget('approach', (side) => setOpen(side !== null), { rest: null })
 
   const show = () => {

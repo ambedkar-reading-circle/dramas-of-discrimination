@@ -11,17 +11,14 @@ export function stateOf(index: number, current: number): StepState {
   return index < current ? 'done' : index === current ? 'now' : 'next'
 }
 
-/** How full an act's track is: done and upcoming acts are settled, the current one fills by step. */
 const settledFill: Partial<Record<StepState, number>> = { done: 1, next: 0 }
 
 type GuideJourneyProps = {
   act: number
   step: number
-  /** Leave out for a journey that only shows where the room is. */
   onSelect?: (act: number) => void
 }
 
-/** The whole workshop across the top of the guide: five acts, each as wide as its share of the day. */
 export function GuideJourney({ act, step, onSelect }: GuideJourneyProps) {
   const reducedMotion = usePrefersReducedMotion()
   return (

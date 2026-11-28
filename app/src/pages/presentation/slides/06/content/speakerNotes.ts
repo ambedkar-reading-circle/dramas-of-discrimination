@@ -3,7 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const guide = cuesOf('guide')
 
-/** What to say over slide 06, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'What follows is a proposal. It does not exist yet, and we are actively working on it and need support to make it happen.',
   'Today the workshop runs without any software. It needs a trained Facilitator in the room, which usually means an outsider is parachuted into a Community, or someone has to be trained before they can take the room.',

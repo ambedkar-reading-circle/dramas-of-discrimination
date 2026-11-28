@@ -6,10 +6,6 @@ import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { useSlideDirection } from '../../hooks/useSlideDirection'
 import { useFilmCue } from './useFilmCue'
 
-// The tablet slides in from beyond the viewport's edge and out past the other,
-// following the reader: forward it enters from the right and leaves to the
-// left, back the reverse. The names match the slide frame's variants, so the
-// stage's enter and exit drive the tablet.
 const swing: Variants = {
   enter: (dir: number) => ({ x: `${100 * dir}vw`, rotateX: 60, rotateY: -28 * dir, rotate: 2 * dir, scale: 0.9 }),
   center: {

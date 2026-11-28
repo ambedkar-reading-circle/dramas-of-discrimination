@@ -9,23 +9,18 @@ interface PageStripProps {
   slides: ReadonlyArray<Slide>
   slide: number
   onSelect: (slide: number) => void
-  /** How the current slide's square reads; its plain number when left out. */
   current?: CurrentPage
-  /** Focus the current slide's square on mount, for a control that removed itself to show the strip. */
   focusOnMount?: boolean
 }
 
-/** The current slide's square: what it shows, such as its number with the point the deck is on (4.2), and what its accessible name adds, such as ", point 2 of 9". */
 export type CurrentPage = Readonly<{ label: string; note: string }>
 
-/** One slide's numbered square, in the strip or beside the caption. The current one is filled. */
 export function PageChip({ current = false, className, ...button }: ComponentProps<'button'> & { current?: boolean }) {
   return <button type="button" className={className ? `slide-index-chip ${className}` : 'slide-index-chip'} aria-current={current ? 'true' : undefined} {...button} />
 }
 
 type StripEntry = { kind: 'page'; number: number } | { kind: 'gap'; from: number; to: number }
 
-/** Pages that fit in `slots` chips: the full run, or the ends with a window around the current page. */
 function stripEntries(total: number, current: number, slots: number): StripEntry[] {
   const pages = (from: number, to: number): StripEntry[] => Array.from({ length: to - from + 1 }, (_, index) => ({ kind: 'page', number: from + index }))
 
@@ -49,12 +44,6 @@ function stripEntries(total: number, current: number, slots: number): StripEntry
   return [{ kind: 'page', number: 1 }, { kind: 'gap', from: 2, to: start - 1 }, ...pages(start, end), { kind: 'gap', from: end + 1, to: total - 1 }, { kind: 'page', number: total }]
 }
 
-/**
- * Every slide as a numbered square, filling the middle of the player while
- * captions are off. Too narrow for all of them, it keeps the ends and a
- * window around the current slide. Arrow keys move between pages; only the
- * current page is in the Tab order.
- */
 export default function PageStrip({ slides, slide, onSelect, current, focusOnMount = false }: PageStripProps) {
   const total = slides.length
   const chips = useRef<Array<HTMLButtonElement | null>>([])
@@ -63,7 +52,6 @@ export default function PageStrip({ slides, slide, onSelect, current, focusOnMou
   const [slots, setSlots] = useState(total)
   const entries = stripEntries(total, slide, slots)
 
-  // Fit the window to the strip, from the rendered chip's width.
   useLayoutEffect(() => {
     const element = strip.current
     if (!element) return
@@ -79,12 +67,8 @@ export default function PageStrip({ slides, slide, onSelect, current, focusOnMou
     return observeResize([element], measure)
   }, [])
 
-  // The slide a key pressed in the strip left from. Whichever key moves the
-  // deck (the arrows here, or n, p, Home, End heard by the deck), focus goes
-  // with it to the new current page, until focus is taken out of the strip.
   const keyedFrom = useRef<number | null>(null)
 
-  // The destination chip may not be mounted until the window re-renders.
   useEffect(() => {
     const follows = keyedFrom.current !== null && keyedFrom.current !== slide
     if (pendingFocus.current !== slide && !follows) return
@@ -98,8 +82,6 @@ export default function PageStrip({ slides, slide, onSelect, current, focusOnMou
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (!plainKey(event)) return
     keyedFrom.current = slide
-    // Arrows inside the strip move between pages. The deck's own arrow
-    // handling must not also fire for the same keystroke.
     const key = keyName(event)
     if (key !== 'ArrowLeft' && key !== 'ArrowRight') return
     event.stopPropagation()
@@ -108,8 +90,6 @@ export default function PageStrip({ slides, slide, onSelect, current, focusOnMou
     if (target !== slide) onSelect(target)
   }
 
-  // Focus taken somewhere else ends the following. A page leaving the window
-  // drops focus to nowhere (no related target), which does not.
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     if (event.relatedTarget && !strip.current?.contains(event.relatedTarget)) keyedFrom.current = null
   }

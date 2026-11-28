@@ -3,10 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const method = cuesOf('method')
 
-/**
- * What to say over slide 05, line by line, with the cues that change the slide between them.
- * One string per point: the arrows step from point to point, and a long line is cut into captions on its own.
- */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'The workshop runs in five acts, and works best with fifteen to eighteen people. Small enough that everyone takes part fully, and large enough for a diverse room whose groups can cross-pollinate.',
 

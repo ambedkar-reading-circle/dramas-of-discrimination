@@ -1,10 +1,3 @@
-/**
- * Slide 10: the closing ask. It borrows the last words of the Preamble, in
- * which the people "adopt, enact and give to ourselves this Constitution",
- * with adopt turned to adapt, since a Community makes the Workshop its own:
- * three ways to take the Workshop up, then who made it.
- */
-
 import { manualEmail } from '#/pages/home/manual-flipbook'
 
 export const closingLede =
@@ -20,7 +13,6 @@ export type ClosingWay = Readonly<{
   verb: string
   line: string
   action: ClosingAction
-  /** The way we ask for most, set apart from the others. */
   lead?: boolean
 }>
 
@@ -58,7 +50,6 @@ export const aboutLabel = 'Meet the team'
 
 export const arcSiteLabel = 'arc-community.in'
 
-/** A steady tilt per card and per portrait, so they look pinned by hand but the same on every visit. */
 export const cardTilts: ReadonlyArray<number> = [-1.2, 0.6, 1.4]
 export const portraitTilts: ReadonlyArray<number> = [-4, 3, -2, 4, -3]
 

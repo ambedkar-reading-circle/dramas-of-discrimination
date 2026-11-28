@@ -9,18 +9,14 @@ type FilmState = 'playing' | 'stopped'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 02: the film. Set it with `wait: 'film'` so the deck waits for its end. */
     film: FilmState
   }
 }
 
-/** YouTube's player states, as its iframe API reports them. Buffering, unstarted and cued do not mean the film is playing. */
 const ended = 0
 const playingState = 1
 
-/** Plays muted if the browser blocks sound this long after the play request. */
 const unmuteGraceMs = 2500
-/** Gives up on a film that never starts playing, so the deck is not stuck on a blank caption. */
 const silentPlayerMs = 7000
 
 function stateOf(data: unknown): number | null {
@@ -39,27 +35,17 @@ function stateOf(data: unknown): number | null {
   return null
 }
 
-/**
- * Lets playback drive the film on slide 02: its point sets `film` to
- * `playing`, which starts it through the YouTube iframe API while the deck
- * plays, and its end moves the deck on. Pausing the deck pauses the film;
- * any other point stops it.
- */
 export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const playback = usePlayback()
   const wanted = useRef(false)
-  // The film has been seen playing since it was asked to.
   const confirmed = useRef(false)
-  // The deck gave up on a start that never came. A play request may still be pending in the player: if it lands late, pause it.
   const abandoned = useRef(false)
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
   const resolve = useLatest(playback?.resolveWait)
 
-  /** The player inside the iframe, once it has loaded. */
   const player = () => frame.current?.contentWindow ?? null
   const post = (message: object) => player()?.postMessage(JSON.stringify({ ...message, id: 1, channel: 'widget' }), videoOrigin)
   const command = (func: string) => {
-    // Asking to listen each time is harmless, and covers a player that loaded late.
     post({ event: 'listening' })
     post({ event: 'command', func, args: [] })
   }
@@ -95,7 +81,6 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
 
   const setFilm = (state: FilmState) => {
     clearTimers()
-    // Stepping onto the film's point while paused leaves it waiting: play applies the cue again and starts it then.
     if (state === 'playing' && playback?.playing === true) {
       wanted.current = true
       confirmed.current = false
@@ -121,12 +106,10 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   }
   useCueTarget('film', setFilm, { rest: 'stopped' })
 
-  // The deck paused mid-film: hold the film too. Play re-applies the cue and resumes it.
   const paused = playback?.playing === false
   useEffect(() => {
     if (!paused || !wanted.current) return
     clearTimers()
     command('pauseVideo')
-    // `command` only reads refs, so `paused` is the only thing to watch.
   }, [paused])
 }

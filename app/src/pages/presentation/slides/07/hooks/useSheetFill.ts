@@ -4,24 +4,17 @@ import type { Writer } from '../../shared/content/actorMap'
 import { beatMs, jitter } from '../../shared/motion'
 import type { CursorAt } from '../../shared/WriterCursors'
 
-/** Beats a cursor takes to travel to its next cell before it starts typing. */
 const travelBeats = 9
-/** Beats a writer lingers on a finished cell. */
 const restBeats = 5
-/** Beats the finished sheet stays on screen before it clears and starts over. */
 const holdBeats = 90
-/** Keystrokes per beat at a pace of 1. */
 const baseSpeed = 1.6
 
 type Phase = 'travel' | 'type' | 'rest'
 
-/** Where one writer is in their queue, and what they are doing there. */
 type WriterProgress = Readonly<{ index: number; phase: Phase; wait: number }>
 
 type SheetState = Readonly<{
-  /** Beats played so far this run. */
   beat: number
-  /** Keystrokes into each cell so far; fractional, so slow typists still get there. */
   typed: Readonly<Record<string, number>>
   writers: ReadonlyArray<WriterProgress>
   hold: number
@@ -29,21 +22,17 @@ type SheetState = Readonly<{
 
 const lengthOf = new Map(allCells.map((cell) => [cell.id, fullLength(cell)]))
 
-/** The values to strike out, which wait until the rest of the sheet is filled. */
 const valueIds = new Set(
   allCells.filter((cell) => cell.kind === 'strike').map((cell) => cell.id),
 )
 
-/** The cells that end up with text in them. */
 const textIds = allCells
   .filter((cell) => cell.kind === 'text' && fullLength(cell) > 0)
   .map((cell) => cell.id)
 
-/** Whether every cell that will hold text is fully typed. */
 const mapFilled = (typed: Readonly<Record<string, number>>) =>
   textIds.every((id) => (typed[id] ?? 0) >= (lengthOf.get(id) ?? 0))
 
-/** The empty sheet, every writer setting off for their first cell. */
 function blankSheet(writers: ReadonlyArray<Writer>): SheetState {
   return {
     beat: 0,
@@ -57,7 +46,6 @@ function blankSheet(writers: ReadonlyArray<Writer>): SheetState {
   }
 }
 
-/** The sheet as it stands once everyone is done: every cell full, every writer resting on their last. */
 function finishedSheet(writers: ReadonlyArray<Writer>): SheetState {
   const typed = Object.fromEntries(
     writers.flatMap((writer) =>
@@ -95,7 +83,6 @@ function advance(
     const cell = queue[current.index]
     const length = lengthOf.get(cell) ?? 0
     if (current.phase === 'travel') {
-      // A value is struck out only once the whole map is filled, so its writer waits on it.
       if (valueIds.has(cell) && !mapFilled(typed))
         return { ...current, wait: 1 }
       return current.wait > 1
@@ -113,7 +100,6 @@ function advance(
         : current
     }
     if (current.wait > 1) return { ...current, wait: current.wait - 1 }
-    // The last cell keeps its writer, so the cursor parks there instead of vanishing.
     return current.index + 1 >= queue.length
       ? { ...current, index: queue.length }
       : { index: current.index + 1, phase: 'travel', wait: travelBeats }
@@ -121,14 +107,8 @@ function advance(
   return { beat: sheet.beat + 1, typed, writers: progress, hold: 0 }
 }
 
-/** A writer's cursor, and the cell it is in. */
 export type WriterAt = CursorAt<Phase> & Readonly<{ cell: string }>
 
-/**
- * Plays the writers filling in the sheet, each down their own queue of cells,
- * all at once, and loops when the sheet is full. With `reducedMotion`, it holds
- * the finished sheet. Mount it afresh (a new key) to play a different set of writers.
- */
 export function useSheetFill(
   writers: ReadonlyArray<Writer>,
   reducedMotion: boolean,
@@ -158,7 +138,6 @@ export function useSheetFill(
   )
 
   return {
-    /** How many characters of a cell are in, or 1 when a value is struck out. */
     typedOf: (id: string) => Math.floor(sheet.typed[id] ?? 0),
     writers: writersAt,
   }

@@ -2,11 +2,6 @@ import { AnimatePresence, motion } from 'motion/react'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { usePlayback } from '../playback/playback'
 
-/**
- * The middle of the player while captions are on: the current caption,
- * framed like the buttons. While the slide carries a point alone, such as the
- * film on slide 02, it says so, and how to start it when the deck is not playing.
- */
 export default function Captions() {
   const playback = usePlayback()
   const reduced = usePrefersReducedMotion()

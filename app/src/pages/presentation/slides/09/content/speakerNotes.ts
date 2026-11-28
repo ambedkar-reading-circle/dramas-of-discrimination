@@ -3,7 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const portal = cuesOf('portal')
 
-/** What to say over slide 09, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   portal('explore'),
   'Every Manifesto of Inclusion a Community chooses to share comes here, to one open portal.',

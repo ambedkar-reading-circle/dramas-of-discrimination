@@ -4,7 +4,6 @@ import type { SpeakerNote } from '../../../types'
 const mode = cuesOf('mode')
 const manifesto = cuesOf('manifesto')
 
-/** What to say over slide 08, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   mode('cloud'),
   'The last part of the proposal is how the workshop ends: where it began, with the Community. In the guide we are building, what its Groups worked through becomes a Manifesto of Inclusion, the rules the whole Community holds itself to.',

@@ -11,7 +11,6 @@ import './CircleBoard.css'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 03: the value or circle whose photo or phone is open. */
     circles: BoardKey | null
   }
 }
