@@ -23,6 +23,24 @@
       0 24px 48px -16px rgb(19 24 87 / 0.4);
   }
 
+  .fac-tablet {
+    width: 100%;
+    max-width: calc(66rem + 2 * var(--tablet-frame-padding));
+    margin-inline: auto;
+  }
+
+  .fac-tablet.tablet-frame--landscape .tablet-frame-screen {
+    min-height: 0;
+    aspect-ratio: auto;
+    background: var(--primary-blue);
+  }
+
+  .fac-tablet .fac {
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .fac :where(p, h3, h4, figure, figcaption) {
     top: 0;
     margin: 0;
