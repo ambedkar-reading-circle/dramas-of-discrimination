@@ -6,8 +6,6 @@ export const slide = {
   id: '02',
   kicker: 'The Workshop',
   heading: 'Dramas of Discrimination',
-  // The tablet is the whole slide. The heading stays for screen readers and
-  // for the stage's focus-on-arrival, but is not drawn.
   ownsHeading: true,
   body: (
     <>

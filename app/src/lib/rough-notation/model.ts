@@ -1,7 +1,3 @@
-// Adapted from rough-notation — © Preet Shihn / rough-stuff (MIT)
-// https://github.com/rough-stuff/rough-notation
-// Clean-room re-implementation of its annotation model for this repo.
-
 export const SVG_NS = 'http://www.w3.org/2000/svg'
 
 export const DEFAULT_ANIMATION_DURATION = 800
@@ -29,14 +25,14 @@ export type RoughPadding = number | [number, number] | FullPadding
 export type BracketType = 'left' | 'right' | 'top' | 'bottom'
 
 export interface RoughAnnotationConfigBase {
-  animate?: boolean // defaults to true
-  animationDuration?: number // defaults to 800ms
-  hideDuration?: number // retract duration, defaults to ~40% of animationDuration
-  color?: string // defaults to currentColor
-  strokeWidth?: number // defaults to 2 (type-dependent)
-  padding?: RoughPadding // defaults to 5px
-  iterations?: number // defaults to 2
-  brackets?: BracketType | BracketType[] // defaults to 'right'
+  animate?: boolean
+  animationDuration?: number
+  hideDuration?: number
+  color?: string
+  strokeWidth?: number
+  padding?: RoughPadding
+  iterations?: number
+  brackets?: BracketType | BracketType[]
 }
 
 export interface RoughAnnotationConfig extends RoughAnnotationConfigBase {

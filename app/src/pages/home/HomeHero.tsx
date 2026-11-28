@@ -5,9 +5,6 @@ import DodLogo from '#/components/DodLogo'
 import WorkshopIllustration from '#/components/WorkshopIllustration'
 import { viewportSection } from './FitSectionButton'
 
-// Fill the viewport below the header exactly, so the next section never peeks
-// in. Content keeps whole rows; the sub-row remainder pads the bottom edge so
-// the caption still sits on a paper rule.
 export default function HomeHero() {
   return (
     <section {...viewportSection} className="hero-section page-wrap rise-in flex flex-col relative isolate overflow-y-clip pt-[calc(2*var(--notebook-row))] min-h-[calc(100svh_-_var(--site-header-height))] pb-[calc(100svh_-_var(--site-header-height)_-_round(down,calc(100svh_-_var(--site-header-height)),var(--notebook-row)))] [@media(max-height:760px)]:pt-row">

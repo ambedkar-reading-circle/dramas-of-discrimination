@@ -10,9 +10,6 @@ const ofClasses = 'font-of text-[2.15em] font-normal leading-0 tracking-[0]'
 
 const lineClasses = 'block'
 
-// Shifts the whole wordmark onto the notebook baseline. Applied to the outer
-// span (not each line) so the element's own bounding rect matches the painted
-// text — annotations measure that rect.
 const heroShift = 'relative top-[calc(0.5lh_-_var(--notebook-row)_+_var(--notebook-baseline)_-_var(--notebook-font-mono))]'
 
 const titleWords = ['Discrimination', 'Diversity', 'Inclusivity', 'Fraternity', 'Belonging'] as const
@@ -84,16 +81,11 @@ function TitleWord({ word, printed = false }: { word: string; printed?: boolean 
   )
 }
 
-/**
- * Cycles the title word while the logo is pointed at. When `held` is given,
- * the logo's owner decides instead, and the logo's own pointer is ignored.
- */
 function useTitleCycle(held: boolean | undefined) {
   const [hovered, setHovered] = useState(false)
   const cycling = held ?? hovered
   const [wordIndex, setWordIndex] = useState(0)
 
-  // Starting jumps straight to the first alternate; stopping returns to the printed word.
   const [wasCycling, setWasCycling] = useState(cycling)
   if (cycling !== wasCycling) {
     setWasCycling(cycling)
@@ -119,7 +111,6 @@ function useTitleCycle(held: boolean | undefined) {
 type DodLogoProps = {
   variant?: 'hero' | 'inline'
   ref?: Ref<HTMLSpanElement>
-  /** Hands the hover to the logo's owner: the words cycle for as long as it is true. */
   held?: boolean
 }
 

@@ -7,7 +7,6 @@ import { ManualAsciiCanvas } from './ManualAsciiCanvas'
 import '../ManualFlipbook.css'
 import { twoDigit } from '#/lib/format'
 
-// The letter is re-typeset as short reading pages between the two covers.
 export function ManualPage({ index }: { index: number }) {
   const active = useManualPageActive(index)
   const { canvasRoots } = useContext(ManualPageState)

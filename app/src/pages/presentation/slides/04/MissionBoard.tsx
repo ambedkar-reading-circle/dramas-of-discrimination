@@ -70,7 +70,6 @@ function MissionSourceView({ source, reveal }: { source: MissionSource; reveal: 
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 04: the mission card whose photo is open, or the source clipping. */
     mission: MissionPhotoKey | null
   }
 }

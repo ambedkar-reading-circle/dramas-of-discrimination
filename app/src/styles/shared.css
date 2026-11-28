@@ -12,7 +12,6 @@
     width: min(1200px, calc(100% - clamp(2rem, 8vw, 8rem)));
     margin-inline: auto;
   }
-  /* Button-style action links; ActionButton.tsx applies these class names. */
   .action-link {
     max-width: 100%;
     display: inline-flex;
@@ -53,8 +52,6 @@
     color: var(--stage-red);
     margin-right: 0.75rem;
   }
-  /* Add one edge modifier and an aria-hidden .paper-tear__surface child.
-     Keep overflow visible so the tear and its shadow can extend outside. */
   .paper-tear {
     position: relative;
     isolation: isolate;
@@ -78,7 +75,6 @@
     content: '';
     position: absolute;
     inset: 0;
-    /* Overlap the solid sheet and torn strip by 1px to avoid a hairline seam. */
     mask-image: linear-gradient(#000, #000), url('/paper-tear.svg');
     mask-size:
       100% calc(100% - 5px),
@@ -93,7 +89,6 @@
     inset: -6px 0 0;
   }
   .paper-tear--top > .paper-tear__surface::before {
-    /* Flip the paper shape; the wrapper casts its shadow upward explicitly. */
     transform: scaleY(-1);
   }
   .skip-link {

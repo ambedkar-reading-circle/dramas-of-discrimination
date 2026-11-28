@@ -79,8 +79,6 @@ export function createAsciiRenderer(
         throw new Error('Shader link failed')
       gl.useProgram(program)
       gl.viewport(0, 0, canvas.width, canvas.height)
-      // Canvas texture upload and filtering follow the WebGL texture API:
-      // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
       gl.bindTexture(gl.TEXTURE_2D, texture)
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas)
@@ -118,7 +116,7 @@ export function createAsciiRenderer(
       }
     } catch {
       dispose()
-      return null // The static ASCII layer remains available on shader failure.
+      return null
     }
   }
 

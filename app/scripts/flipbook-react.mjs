@@ -17,8 +17,6 @@ try {
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text())
   })
-  // This fixture has no other animation or resize subscribers. Count resources
-  // around a real StrictMode wrapper mount rather than only detached DOM nodes.
   await page.addInitScript(() => {
     const frames = new Set()
     const listeners = new Set()

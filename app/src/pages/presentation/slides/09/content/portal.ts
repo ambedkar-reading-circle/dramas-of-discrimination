@@ -1,11 +1,3 @@
-/**
- * Slide 09: the Manifesto portal, where every Manifesto of Inclusion a
- * Community chooses to share is gathered. The Communities and their
- * Manifestos are illustrative, written for the mockup. Like slide 08's, each
- * opens with the Scenario its Groups acted out, and each rule answers a
- * Failure they found in it.
- */
-
 export type CommunityKind =
   'workplace' | 'college' | 'neighbourhood' | 'housing' | 'readingCircle'
 
@@ -17,7 +9,6 @@ export const kindLabels: Record<CommunityKind, string> = {
   readingCircle: 'Reading circles',
 }
 
-/** A rule many Manifestos make in their own words, counted across the portal. */
 export type RuleId =
   'ask' | 'speak' | 'access' | 'work' | 'redress' | 'voice' | 'share'
 
@@ -38,10 +29,8 @@ export type PortalManifesto = Readonly<{
   kind: CommunityKind
   people: number
   adopted: string
-  /** The Scenario the rules were drawn from. */
   opening: string
   rules: ReadonlyArray<string>
-  /** Which of the shared rules this Manifesto makes, in its own words. */
   ruleIds: ReadonlyArray<RuleId>
 }>
 
@@ -184,12 +173,10 @@ export const manifestos: ReadonlyArray<PortalManifesto> = [
   },
 ]
 
-/** The whole portal: every Manifesto shared so far, the eight above among them. */
 export const collection = {
   manifestos: 2_400,
   people: 52_800,
   cities: 312,
-  /** The share of Manifestos making each rule, from 0 to 1. */
   shares: {
     ask: 0.86,
     speak: 0.81,

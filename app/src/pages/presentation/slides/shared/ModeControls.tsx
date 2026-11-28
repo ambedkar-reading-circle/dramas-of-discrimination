@@ -9,22 +9,16 @@ export type Mode = 'local' | 'cloud'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slides 07 and 08: Local or Cloud mode, set by each tab of notes. */
     mode: Mode
   }
 }
 
-/**
- * The mode a slide shows, opening on `initial`: the notes' `mode` cues set it,
- * and a switch by hand moves the deck to the point that shows that mode.
- */
 export function useCuedMode(initial: Mode) {
   const [mode, setMode] = useState<Mode>(initial)
   useCueTarget('mode', setMode, { value: mode })
   return [mode, setMode] as const
 }
 
-/** The mode switch's thumb snaps across quickly. */
 const thumbSpring: Transition = { type: 'spring', stiffness: 380, damping: 32 }
 
 const status: Record<Mode, string> = {
@@ -32,7 +26,6 @@ const status: Record<Mode, string> = {
   cloud: 'Shared with the platform · live',
 }
 
-/** Local or Cloud, in the guide's top bar. */
 function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
   const options: ReadonlyArray<{ value: Mode; label: string; icon: string }> = [
     { value: 'local', label: 'Local', icon: 'M3 5h18v11H3zM8 20h8M12 16v4' },
@@ -53,7 +46,6 @@ function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => 
   )
 }
 
-/** Where the data lives, at the end of the top bar. */
 function ModeChip({ mode }: { mode: Mode }) {
   return (
     <span className="modes-chip" data-mode={mode}>
@@ -63,7 +55,6 @@ function ModeChip({ mode }: { mode: Mode }) {
   )
 }
 
-/** Every Member in the document, by face. */
 function Presence() {
   return (
     <span className="modes-presence" aria-label={`${members.length} Members editing: ${members.map((member) => member.name).join(', ')}`}>
@@ -78,7 +69,6 @@ function Presence() {
   )
 }
 
-/** The guide's top bar past its title: the mode switch, who is present in Cloud mode, and where the data lives. */
 export function ModeBar({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
   return (
     <>

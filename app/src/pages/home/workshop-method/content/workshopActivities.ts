@@ -1,4 +1,3 @@
-/** The five acts of the workshop, in order. */
 export type ActivityName =
   'IntroTime' | 'PartTime' | 'StoryTime' | 'PlayTime' | 'OverTime'
 
@@ -11,24 +10,20 @@ export interface WorkshopActivity {
   steps: ActivityStep[]
   prompt: string
   manual: ManualExcerpt[]
-  /** Stickers for the activity's worksheet, under the drawing. */
   worksheets?: WorksheetSticker[]
 }
 
-/** One instruction; a step with photographs opens them from its own text. */
 export interface ActivityStep {
   text: string
   photos?: Photo[]
 }
 
-/** A photograph from a past workshop; the caption carries what it adds. */
 export interface Photo {
   src: string
   alt: string
   caption: string
 }
 
-/** The worksheet as the manual prints it, or as a group filled it in. */
 export type WorksheetSticker =
   | { kind: 'manual'; label: string; pages: number[] }
   | { kind: 'photo'; label: string; photo: Photo }

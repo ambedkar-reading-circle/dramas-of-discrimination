@@ -31,7 +31,6 @@
     border-radius: 50%;
     background: var(--bg-base);
   }
-  /* Keep the recessed edge above the moving circles so the opening stays still. */
   .theme-toggle-window::after {
     content: '';
     position: absolute;

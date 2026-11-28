@@ -20,8 +20,6 @@ export const manual = {
 
 export const manualEmail = manual.email
 
-// Page breaks follow complete sentences; the original letter also supplies
-// the linear transcript for assistive technology, reduced motion, and print.
 const sentences = manual.letter.map((paragraph) =>
   paragraph.split(/(?<=[.!?])\s+/),
 )

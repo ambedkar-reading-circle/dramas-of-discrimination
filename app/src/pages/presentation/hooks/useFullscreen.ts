@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 
-/**
- * Whether the element `target` finds is fullscreen, and a toggle for it.
- * `target` is read on each use, so it can find an element rendered after this
- * hook first runs.
- */
 export function useFullscreen(target: () => HTMLElement | null) {
   const [fullscreen, setFullscreen] = useState(false)
 

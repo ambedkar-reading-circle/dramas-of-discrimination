@@ -125,8 +125,6 @@ export function createPencilRenderer(config: RendererConfig): TrailRenderer {
     return Math.max(window.devicePixelRatio || 1, 1)
   }
 
-  // The sheet can be as tall as the document. Keep the bitmap to the part
-  // currently on screen and store strokes in sheet coordinates.
   function placeWindow() {
     const surface = config.surface.getBoundingClientRect()
     const viewLeft = Math.max(surface.left, 0)

@@ -48,8 +48,6 @@
     inset: 0;
     z-index: -1;
     border-radius: inherit;
-    /* Like inset(0), but follows the inherited corner radii as well. Only
-       decoration is clipped; the host's content and shadows may overflow. */
     clip-path: border-box;
     pointer-events: none;
     display: none;

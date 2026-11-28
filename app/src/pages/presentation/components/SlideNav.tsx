@@ -16,31 +16,17 @@ import type { CurrentPage } from './PageStrip'
 
 interface SlideNavProps {
   slides: ReadonlyArray<Slide>
-  /** Where the deck is, and the arrows that step it one point. */
   deck: Pick<DeckPosition, 'slide' | 'point' | 'total' | 'atStart' | 'atEnd' | 'next' | 'prev'>
   onSelect: (slide: number) => void
-  /** Deck tools that always sit at the bar's right end, such as fullscreen. */
   tools?: ReactNode
 }
 
-/**
- * The deck's player, docked across the bottom of the window like a music
- * player's: the transport (previous, play/pause, next) on the left; across
- * the middle, the current slide's number and its caption while captions
- * are on (from arrival, played or not), or else every slide's number to jump to; and on the right the caption and voice
- * switches, then the deck's tools (fullscreen). The current slide's number
- * carries the point of its speaker notes the deck is on (4.3), and the
- * arrows step from point to point. The progress line runs along its top edge.
- */
 export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProps) {
   const { slide, point, total } = deck
   const playback = usePlayback()
   const bar = useRef<HTMLDivElement>(null)
-  // Hiding captions from the current slide's square removes that square, so focus moves to its place in the strip.
   const [focusStrip, setFocusStrip] = useState(false)
 
-  // The bar floats over the bottom of the window, so the deck keeps room for
-  // it: its height, as a custom property, whatever the caption wraps to.
   useLayoutEffect(() => {
     const element = bar.current
     const shell = element?.closest<HTMLElement>('.presentation-deck')
@@ -53,12 +39,10 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
   }, [])
 
   const captioning = playback?.captions === true
-  // The current slide's number carries its point (4.3: slide 4, third point), so no separate readout is needed.
   const points = playback?.points.length ?? 1
   const currentPage: CurrentPage = { label: `${slide}.${point}`, note: `, point ${point} of ${points}` }
 
   return (
-    // A press on the player must not close the slide's photo: the point it moves to decides that.
     <div ref={bar} className="slide-nav paper-tear paper-tear--top" {...revealKeep}>
       <div className="paper-tear__surface" aria-hidden="true" />
       <DeckProgress slide={slide} point={point} total={total} />
@@ -71,8 +55,6 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
         </div>
         </nav>
         {captioning ? (
-          // The current slide stays in view beside the caption; pressing it puts
-          // the caption away and brings back every slide's number.
           <div className="slide-nav-captioned">
             <PageChip current aria-label={`${slideLabel(slide, slides[slide - 1].heading, ` of ${total}${currentPage.note}`)}. Hide captions to show all slides`} title="Slide . point: each point is one entry of the slide's speaker notes" onClick={() => {
                 setFocusStrip(true)
@@ -103,16 +85,9 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
   )
 }
 
-/** The play button's two faces: what it says, its tooltip and its mark. */
 const playButton = { label: 'Play the deck with captions', title: 'Play (Space)', mark: <PlayMark /> }
 const pauseButton = { label: 'Pause', title: 'Pause (Space)', mark: <PauseMark /> }
 
-/**
- * The current caption's own time, along the bar's bottom edge: it fills
- * across the caption's length and starts over with the next. A pace whose
- * length is not known ahead (the browser's voice, the film) leaves it empty,
- * as does a point whose captions have run.
- */
 function CaptionTime() {
   const playback = usePlayback()
   if (!playback) return null
@@ -124,11 +99,6 @@ function CaptionTime() {
   )
 }
 
-/**
- * How far through the deck we are: through the slides, and within a slide
- * through its points. While playing it fills across each caption's hold, the
- * way a music player's line runs through a track.
- */
 function DeckProgress({ slide, point, total }: { slide: number; point: number; total: number }) {
   const playback = usePlayback()
   const percent = (part: number) => `${(part / total) * 100}%`
@@ -140,11 +110,9 @@ function DeckProgress({ slide, point, total }: { slide: number; point: number; t
     )
   }
   const { points, current, captionIndex, runningMs, captionsApplied } = playback
-  // A point's captions share its stretch of the line.
   const at = (done: number) => percent(slide - 1 + (point - 1 + done / current.captions.length) / points.length)
   const from = at(captionIndex)
   const to = at(captionIndex + 1)
-  // A pace of unknown length (the browser's voice, the film) leaves the line at the caption's start.
   return (
     <div className="slide-progress" aria-hidden="true">
       <motion.div key={captionsApplied} className="slide-progress-fill slide-progress-fill--points" initial={{ width: from }} animate={{ width: runningMs !== null ? to : from }} transition={runTransition(runningMs)} />
@@ -152,7 +120,6 @@ function DeckProgress({ slide, point, total }: { slide: number; point: number; t
   )
 }
 
-/** A line that runs across a caption's length while it plays, and settles quickly otherwise. */
 function runTransition(runningMs: number | null): Transition {
   return runningMs !== null ? { duration: runningMs / 1000, ease: 'linear' } : { duration: 0.2 }
 }
@@ -173,7 +140,6 @@ function PauseMark() {
   )
 }
 
-/** "CC" in a frame: closed captions. */
 function CaptionsMark() {
   return (
     <Mark>

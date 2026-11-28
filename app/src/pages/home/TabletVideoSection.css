@@ -10,7 +10,6 @@
     );
     margin-block-start: 0;
     padding-block: 0;
-    /* The stage centres the tablet in the full viewport, under the navbar. */
     scroll-margin-top: calc(0px - var(--site-header-height));
   }
 

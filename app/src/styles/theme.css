@@ -5,29 +5,19 @@
   --font-of: 'Italianno', cursive;
   --font-logo: 'Cascadia Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* Breakpoints mirror the notebook media-query boundaries exactly:
-     max-sm: is width < 481px, max-md: is width < 701px, max-lg: is width < 1001px.
-     xs is the narrowest phone: under it, a bar of seven controls no longer fits
-     on one row. */
   --breakpoint-xs: 352px;
   --breakpoint-sm: 481px;
   --breakpoint-md: 701px;
   --breakpoint-lg: 1001px;
 
-  /* Whole-row spacing vocabulary; values follow --notebook-* across widths. */
   --spacing-row: var(--notebook-row);
   --spacing-section: var(--notebook-section-space);
   --spacing-gutter: var(--notebook-gutter);
 
-  /* The one square every small control shares: the 44px touch target,
-     Tailwind's step 11. size-control in JSX, var(--spacing-control) in CSS. */
   --spacing-control: calc(var(--spacing) * 11);
 
-  /* The corner of every boxed control and frame. */
   --radius-control: var(--radius-xs);
 
-  /* Color aliases over theme custom properties so dark mode keeps flipping
-     without dark: variants. */
   --color-ink: var(--sea-ink);
   --color-ink-soft: var(--sea-ink-soft);
   --color-ink-faint: var(--ink-faint);
@@ -40,17 +30,8 @@
   --color-link-bg-hover: var(--link-bg-hover);
 }
 
-/*
- * Dramas of Discrimination — navy/cream theme.
- * Two brand colors drive everything:
- *   --primary-blue   #131857  (ink, borders, accent fills)
- *   --primary-white  #ffffee  (sheet edges, inverted ink)
- * Dark mode is the brand inversion: deep navy surfaces, cream ink.
- */
-
 :root {
   --layer-site-foreground: 50;
-  /* Overlays inside the slide stage (instant photos), above slide content. */
   --layer-slide-overlay: 10;
   --primary-blue: #131857;
   --primary-white: #ffffee;
@@ -66,7 +47,6 @@
   --paper-inverse-blend: screen;
   --paper-backing-strength: 60%;
   --paper-backing: #e7e1d3;
-  /* Alpha stays mostly opaque: only sparse pockets of ink reveal the stock. */
   --print-ink-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='ink' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='3' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='.82 .88 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cpath fill='white' filter='url(%23ink)' d='M0 0h256v256H0z'/%3E%3C/svg%3E");
   --print-ink-mask-small: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='ink' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='3' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='.94 .97 1 1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cpath fill='white' filter='url(%23ink)' d='M0 0h256v256H0z'/%3E%3C/svg%3E");
   --print-ink-size: 256px 256px;
@@ -77,8 +57,6 @@
   --ink-scrim: rgba(19, 24, 87, 0.06);
   --stage-red: #9d2f2f;
   --paper-warm: #ebe4d2;
-  /* Instant photos are physical prints: the same in both themes, so the dark
-     blocks leave these alone. */
   --photo-stock: #ede3c8;
   --photo-ink: var(--primary-blue);
   --photo-sheen: rgb(255 255 255 / 0.45);

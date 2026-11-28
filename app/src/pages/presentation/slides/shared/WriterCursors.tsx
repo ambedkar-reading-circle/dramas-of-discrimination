@@ -7,31 +7,24 @@ import type { Writer } from './content/actorMap'
 import { motionUnlessReduced } from './motion'
 import './modes.css'
 
-/** A cursor glides loosely from place to place, the way a hand moves a mouse. */
 const cursorSpring: Transition = { type: 'spring', stiffness: 150, damping: 20, mass: 0.6, opacity: { duration: 0.3 } }
 
-/** A writer, and what they are doing: one of its simulation's own phases, or `idle` once they are done. */
 export type CursorAt<TPhase extends string> = Readonly<{
   writer: Writer
-  /** `idle` once the writer is done: the cursor drifts off and fades. */
   phase: TPhase | 'idle'
 }>
 
 type Point = Readonly<{ x: number; y: number }>
 
 type WriterCursorsProps<TPhase extends string> = {
-  /** The positioned box the cursors ride over; it holds each writer's caret, marked `data-caret="<writer id>"`. */
   container: RefObject<HTMLElement | null>
   writers: ReadonlyArray<CursorAt<TPhase>>
-  /** Show a name flag beside each working cursor (Cloud mode). */
   named: boolean
 }
 
-/** Each writer's mouse cursor, following their caret around the container. */
 export function WriterCursors<TPhase extends string>({ container, writers, named }: WriterCursorsProps<TPhase>) {
   const reducedMotion = usePrefersReducedMotion()
   const [points, setPoints] = useState<Readonly<Partial<Record<string, Point>>>>({})
-  // A scroll anywhere inside the container moves the carets under the cursors, so they measure again.
   const [, rescrolled] = useReducer((count: number) => count + 1, 0)
 
   useEffect(() => {
@@ -41,8 +34,6 @@ export function WriterCursors<TPhase extends string>({ container, writers, named
     return () => element.removeEventListener('scroll', rescrolled, { capture: true })
   }, [container])
 
-  // Follow each writer's caret. The slide may be scaled to fit, so client
-  // rectangles are brought back to the container's own pixels.
   useLayoutEffect(() => {
     const element = container.current
     if (!element) return
@@ -71,7 +62,6 @@ export function WriterCursors<TPhase extends string>({ container, writers, named
       {writers.map(({ writer, phase }) => {
         const caret = points[writer.id]
         if (!caret) return null
-        // A writer who is done drifts off their last word, fades back and lowers their flag.
         const point = phase === 'idle' ? { x: caret.x + 14, y: caret.y + 6 } : caret
         return (
           <motion.span key={writer.id} className="modes-cursor" style={{ '--who': writer.color } as CSSProperties} initial={{ ...point, opacity: 0 }} animate={{ ...point, opacity: phase === 'idle' ? 0.5 : 1 }} transition={motionUnlessReduced(reducedMotion, cursorSpring)}>
@@ -86,7 +76,6 @@ export function WriterCursors<TPhase extends string>({ container, writers, named
   )
 }
 
-/** A writer's caret in the text, which their cursor follows: solid while typing, blinking while they pause. */
 export function WriterCaret<TPhase extends string>({ at }: { at: CursorAt<TPhase> }) {
   return <span className="modes-caret" data-caret={at.writer.id} data-phase={at.phase} style={{ '--who': at.writer.color } as CSSProperties} />
 }

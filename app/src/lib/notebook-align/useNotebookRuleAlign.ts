@@ -1,11 +1,5 @@
 import { useLayoutEffect } from 'react'
 
-/**
- * Re-runs `align` once on mount, whenever any collected element resizes, and
- * when web fonts finish loading (`loadingdone` changes text metrics). Elements
- * are collected once per effect run; pass stable callbacks so the observation
- * set is not rebuilt on every render.
- */
 export function useNotebookRuleAlign(
   getElements: () => Array<Element | null | undefined>,
   align: () => void,

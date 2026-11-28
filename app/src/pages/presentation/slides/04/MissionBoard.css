@@ -22,7 +22,6 @@
     width: 100%;
   }
 
-  /* Taped like the title slide's cards, but read, not pressed. */
   .mission-card {
     display: grid;
     grid-template-rows: auto auto 1fr;
@@ -74,7 +73,6 @@
     color: var(--sea-ink-soft);
   }
 
-  /* A pencilled spectrum with illustrative marks on it. */
   .mission-merge {
     display: grid;
     color: var(--sea-ink-soft);
@@ -135,7 +133,6 @@
     color: var(--sea-ink);
   }
 
-  /* One numbered tag per passage the speaker notes quote, in line with its source, each opening its clipping. */
   .mission-source-excerpt {
     display: inline-block;
     margin-right: 0.3em;

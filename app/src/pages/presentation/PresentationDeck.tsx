@@ -21,11 +21,8 @@ export default function PresentationDeck() {
   const deck = useRef<HTMLElement>(null)
 
   const notebook = useCallback(() => deck.current?.closest<HTMLElement>('.notebook-surface') ?? null, [])
-  // The notebook surface already carries the ruling, margin guides, and pencil.
-  // Fullscreening the deck alone would leave those layers behind.
   const { fullscreen, toggle: toggleFullscreen } = useFullscreen(notebook)
 
-  // Space plays and pauses, as on any player; held down, it does so once. Space on a control still works that control.
   const onKeyDown = useLatest((event: KeyboardEvent) => {
     if (event.key === ' ' && plainKey(event) && !pressedOn(event, controlSelector)) {
       event.preventDefault()
@@ -35,11 +32,6 @@ export default function PresentationDeck() {
     onDeckKeyDown(event)
   })
 
-  // The keys are heard on the document, not the deck: a click on a slide's
-  // empty space focuses the <main> around it, and on load focus is on the
-  // page itself, and the keys must work from both. A key press anywhere else
-  // (the site header) is left alone. Handlers inside the deck run first, so a
-  // key they stop or prevent never gets here.
   useEffect(() => {
     const listen = (event: KeyboardEvent) => {
       const surface = notebook()

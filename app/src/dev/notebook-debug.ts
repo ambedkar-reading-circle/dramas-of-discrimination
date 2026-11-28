@@ -1,6 +1,5 @@
 import './notebook-debug.css'
 
-// Loaded only in development, and only when ?notebook-grid is present.
 const selector =
   'section, .notebook-stack, .notebook-frame, .action-link, .hero-copy, .workshop-illustration'
 const panel = document.createElement('output')

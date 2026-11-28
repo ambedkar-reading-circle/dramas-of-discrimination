@@ -4,7 +4,6 @@ import { usePrefersReducedMotion } from '#/lib/use-media-query'
 import { fadeTransition, faded, flightTransition, offscreen, settled } from './flight'
 import type { InstantPhotoProps } from './types'
 
-// A tap closes the photo, except on its caption's link, which opens and leaves the photo up.
 const onLink = (event: Event) => event.target instanceof Element && event.target.closest('a') !== null
 
 export default function InstantPhoto({ src, alt, caption, href, direction, tilt = 0, controls }: InstantPhotoProps) {

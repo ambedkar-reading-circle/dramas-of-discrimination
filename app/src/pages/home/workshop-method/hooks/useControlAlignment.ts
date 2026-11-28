@@ -2,11 +2,6 @@ import { useCallback } from 'react'
 import type { RefObject } from 'react'
 import { snapBaselineToRule, useNotebookRuleAlign } from '#/lib/notebook-align'
 
-/**
- * Aligns the section controls as complete boxes so their labels retain even
- * padding. Relative offsets preserve document flow and the existing paper
- * rules; the offsets land in `--method-baseline-offset` per control.
- */
 export function useControlAlignment(
   surface: RefObject<HTMLElement | null> | undefined,
   deck: RefObject<HTMLDivElement | null>,
@@ -40,7 +35,6 @@ export function useControlAlignment(
   const observeAlignment = useCallback(() => {
     const element = surface?.current
     if (!element) return []
-    // The section can keep its viewport minimum while the deck changes size.
     return [
       element,
       deck.current,

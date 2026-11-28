@@ -3,7 +3,6 @@ import type { RefCallback } from 'react'
 import { targetKey } from '../content/sheetOverlay'
 import type { OverlayKind, OverlayTarget } from '../content/sheetOverlay'
 
-/** What every sticker needs to open the overlay and say that it controls it. */
 export interface OverlayTriggerProps {
   ref: RefCallback<HTMLButtonElement>
   open: boolean
@@ -11,26 +10,17 @@ export interface OverlayTriggerProps {
   onToggle: () => void
 }
 
-/** Hands a sticker its trigger props, by kind and position. */
 export type TriggerFor = (
   kind: OverlayKind,
   index: number,
 ) => OverlayTriggerProps
 
-/**
- * The stickers of the open sheet, and the one that has laid something over
- * it. The caller holds that choice (`shown`) for one act, so moving to another
- * act shows nothing until a sticker there is tapped, or a cue lays one out.
- * Closing returns focus to the sticker that opened it.
- */
 export function useSheetOverlay(
   shown: OverlayTarget | null,
   setShown: (target: OverlayTarget | null) => void,
   overlayId: string,
 ) {
   const triggers = useRef(new Map<string, HTMLButtonElement>())
-  // One ref callback per sticker, kept across renders, so React does not
-  // detach and reattach every sticker's ref on each render.
   const refCallbacks = useRef(new Map<string, RefCallback<HTMLButtonElement>>())
 
   const refFor = (key: string) => {

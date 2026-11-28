@@ -14,7 +14,6 @@ import { useSheetFill } from './hooks/useSheetFill'
 import type { WriterAt } from './hooks/useSheetFill'
 import './ModesMockup.css'
 
-/** PartTime, on its last step: the Group fills in the Actor map. */
 const act = 1
 const step = workshopActivities[act].steps.length - 1
 
@@ -22,19 +21,12 @@ const writersFor: Record<Mode, ReadonlyArray<Writer>> = { local: [scribe], cloud
 
 const sheetTabs = ['Steps', 'Example', 'Actor map']
 
-/**
- * Mockup: the facilitation guide open on PartTime's Actor map, in either mode.
- * In Local mode one cursor fills the sheet on the room's shared screen; in
- * Cloud mode every Member's cursor writes into it at once, each under their
- * own name.
- */
 export function ModesMockup() {
   const [mode, setMode] = useCuedMode('local')
 
   return (
     <GuideFrame label="Mockup: in Local mode the Actor map is filled on one device and its data stays there; in Cloud mode the data is shared with the platform and several Members fill it at once" className="modes actor-fill" mode={mode} act={act} step={step} bar={<ModeBar mode={mode} onChange={setMode} />}>
       <article className="fac-sheet modes-sheet" aria-label="Actor map">
-        {/* The journey above already names the act, so the sheet carries only its tabs. */}
         <SheetTabs tabs={sheetTabs} active={2} />
         <ActorMapSheet key={mode} mode={mode} />
       </article>
@@ -42,7 +34,6 @@ export function ModesMockup() {
   )
 }
 
-/** The Actor map with its writers' cursors laid over it, typing it in. */
 function ActorMapSheet({ mode }: { mode: Mode }) {
   const reducedMotion = usePrefersReducedMotion()
   const { typedOf, writers } = useSheetFill(writersFor[mode], reducedMotion)
@@ -69,7 +60,6 @@ function ActorMapSheet({ mode }: { mode: Mode }) {
               const at = writerOn.get(item.id)
               return (
                 <li key={item.id} data-struck={struck ? '' : undefined} {...writerMarks(at)}>
-                  {/* A pen stroke drawn through the value, as the Group strikes it out on paper. */}
                   <span className="modes-value-name">{item.text}</span>
                   <span className="sr-only">{struck ? ', struck out: violated' : ', not struck out'}</span>
                   <span className="modes-value-caret" data-caret={at?.writer.id} aria-hidden="true" />
@@ -119,10 +109,6 @@ function ActorMapSheet({ mode }: { mode: Mode }) {
   )
 }
 
-/**
- * Marks a cell with the writer in it: what they are doing there (unless they
- * have finished and only parked there), and their colour.
- */
 function writerMarks(at: WriterAt | undefined) {
   if (!at) return {}
   return {
@@ -131,7 +117,6 @@ function writerMarks(at: WriterAt | undefined) {
   }
 }
 
-/** A cell as far as it has been typed, with a caret where its writer is. */
 function Cell({ item, typed, at }: { item: SheetCell; typed: number; at: WriterAt | undefined }) {
   return (
     <>

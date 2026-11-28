@@ -1,6 +1,5 @@
 import type { SpeakerNote } from '../../../types'
 
-/** What to say over slide 10, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'Thank you for staying with us.',
   'The Preamble ends with a promise its people make to themselves: we adopt, enact and give to ourselves this Constitution. The Workshop asks for nearly the same promise, with one word changed. Not adopt, but adapt: it means something only once a Community makes it its own.',

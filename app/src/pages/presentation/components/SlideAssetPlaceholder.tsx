@@ -6,11 +6,6 @@ const roleLabels: Record<AssetSlot['role'], string> = {
   document: 'Document',
 }
 
-/**
- * The stand-in for an asset the project has not procured yet. The framed box is
- * deliberate decoration (aria-hidden); the caption is the text label. Swapping
- * in a real asset replaces this slot without any layout change.
- */
 export default function SlideAssetPlaceholder({ role, note }: AssetSlot) {
   return (
     <figure className={`slide-asset slide-asset--${role}`}>

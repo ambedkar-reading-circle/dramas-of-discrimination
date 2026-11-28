@@ -1,13 +1,3 @@
-// Adapted from rough-notation — © Preet Shihn / rough-stuff (MIT)
-// https://github.com/rough-stuff/rough-notation
-// Clean-room re-implementation of its renderer. Deviations from the original:
-//  - The stroke-draw animation uses WAAPI instead of an injected CSS
-//    @keyframes rule, so playback is not disabled by global reduced-motion
-//    `animation: none` rules and can be reversed for retractable hide().
-//  - An explicit prefers-reduced-motion gate makes drawing instant.
-//  - The stroke color is set as a CSS style, not an SVG presentation
-//    attribute, so configs may pass var()/color-mix() theme colors.
-
 import { SVG_NS } from './model'
 import type {
   BracketType,
@@ -265,7 +255,6 @@ export function renderAnnotation(
         : 0
       const delay = animationGroupDelay + durationOffset
       const style = path.style
-      // Hide the stroke during the delay phase; the animation replaces this.
       style.strokeDasharray = `${length}`
       style.strokeDashoffset = `${length}`
       const animation = path.animate(

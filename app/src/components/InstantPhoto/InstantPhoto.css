@@ -35,7 +35,6 @@
     display: grid;
     place-items: center;
     min-height: var(--lip);
-    /* Take no width of its own, so the photo sets the width and a long caption wraps under it. */
     width: 0;
     min-width: 100%;
     text-wrap: balance;

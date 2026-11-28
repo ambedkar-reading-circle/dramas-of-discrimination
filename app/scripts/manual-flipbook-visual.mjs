@@ -22,8 +22,6 @@ try {
   })
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message))
-  // Use one timeline for installation and pausing. Host wall time can lag the
-  // browser's advancing clock during startup, making pauseAt target the past.
   const clockStart = new Date('2026-01-01T00:00:00Z')
   await page.clock.install({ time: clockStart })
   await page.goto(server.resolvedUrls.local[0])

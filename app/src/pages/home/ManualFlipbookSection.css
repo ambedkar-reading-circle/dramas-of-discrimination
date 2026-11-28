@@ -1,10 +1,3 @@
-/*
- * Styles for the elements ManualFlipbookSection.tsx renders itself: the
- * runway section, sticky stage, grid, transcript wrapper, motion host,
- * scroll nudge, and the lazy-book loading fallback. The book, pages, and
- * reading surfaces live in pages/home/manual-flipbook/ManualFlipbook.css.
- * The --manual-* custom properties defined here cascade into the module.
- */
 .manual-section {
   --manual-blue: #2b448e;
   --manual-paper: #f8f3e7;
@@ -18,7 +11,6 @@
   gap: var(--notebook-row);
   perspective: 1600px;
 }
-/* Only the sticky stage owns paper while animated; the runway is transparent. */
 .manual-animated {
   height: round(up, 900svh, var(--notebook-row));
   padding-block: 0;
@@ -29,13 +21,7 @@
 .manual-animated .manual-stage {
   position: sticky;
   top: 0;
-  /* Sheet covers exactly the viewport: the band pins for the whole
-     runway and hands off to the method section at 100% progress, so
-     no empty ruled tail ever scrolls through view. */
   height: round(up, 100svh, var(--notebook-row));
-  /* Own block formatting context, else the grid's top margin collapses
-     out of the sticky sheet and the heading rides under the navbar
-     while pinned; contained, the grid centres below it instead. */
   display: flow-root;
 }
 .manual-animated .manual-stage-grid {
@@ -47,8 +33,6 @@
   min-width: 0;
   transform-origin: 50% 50%;
 }
-/* The engine paints the moving curl. A second gradient on each printed face
-   would travel with the page and create a detached/doubled spine mid-turn. */
 .manual-scroll-nudge {
   display: grid;
   justify-items: center;
@@ -68,7 +52,6 @@
   place-items: center;
 }
 .manual-transcript {
-  /* A linear copy for assistive technology and print, without reader chrome. */
   position: absolute;
   width: 1px;
   height: 1px;
