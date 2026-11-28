@@ -65,9 +65,9 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
       <div className="slide-nav-controls">
         <nav className="slide-nav-change" aria-label="Change slides">
         <div className="slide-transport">
-          <MarkButton label="Previous point" disabled={deck.atStart} onClick={deck.prev} mark={<MarkGlyph>←</MarkGlyph>} />
-          {playback && <MarkButton label={playback.playing ? 'Pause' : 'Play the deck with captions'} className="slide-play" onClick={playback.toggle} mark={playback.playing ? <PauseMark /> : <PlayMark />} />}
-          <MarkButton label="Next point" disabled={deck.atEnd} onClick={deck.next} mark={<MarkGlyph>→</MarkGlyph>} />
+          <MarkButton label="Previous point" title="Previous point (←)" disabled={deck.atStart} onClick={deck.prev} mark={<MarkGlyph>←</MarkGlyph>} />
+          {playback && <MarkButton {...(playback.playing ? pauseButton : playButton)} className="slide-play" onClick={playback.toggle} />}
+          <MarkButton label="Next point" title="Next point (→)" disabled={deck.atEnd} onClick={deck.next} mark={<MarkGlyph>→</MarkGlyph>} />
         </div>
         </nav>
         {captioning ? (
@@ -88,11 +88,11 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
         <div className="slide-nav-extras">
           {playback && (
             <>
-              <MarkButton label="Captions" pressed={playback.captions} onClick={() => {
+              <MarkButton label="Captions" title={playback.captions ? 'Hide captions' : 'Show captions'} pressed={playback.captions} onClick={() => {
                   setFocusStrip(false)
                   playback.setCaptions(!playback.captions)
                 }} mark={<CaptionsMark />} />
-              {canSpeak && <MarkButton label="Read captions aloud" pressed={playback.voice} onClick={() => playback.setVoice(!playback.voice)} mark={<VoiceMark on={playback.voice} />} />}
+              {canSpeak && <MarkButton label="Read captions aloud" title={playback.voice ? 'Stop reading captions aloud' : 'Read captions aloud'} pressed={playback.voice} onClick={() => playback.setVoice(!playback.voice)} mark={<VoiceMark on={playback.voice} />} />}
             </>
           )}
           {tools}
@@ -102,6 +102,10 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
     </div>
   )
 }
+
+/** The play button's two faces: what it says, its tooltip and its mark. */
+const playButton = { label: 'Play the deck with captions', title: 'Play (Space)', mark: <PlayMark /> }
+const pauseButton = { label: 'Pause', title: 'Pause (Space)', mark: <PauseMark /> }
 
 /**
  * The current caption's own time, along the bar's bottom edge: it fills

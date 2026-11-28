@@ -1,5 +1,5 @@
-import type { Slide } from '../types'
-import type { Cue, CueState, CueWait } from './cues'
+import type { Slide, SlideId } from '../types'
+import type { Cue, CueState } from './cues'
 
 /** One caption on screen: what it says, what is read aloud, and how long it holds when read. */
 export type Caption = Readonly<{
@@ -20,7 +20,7 @@ export type Point = Readonly<{
   /** Every cue in effect at this point: the slide shows this state. */
   cues: CueState
   /** The film this point waits on before the deck moves on. */
-  wait?: CueWait
+  wait?: Cue['wait']
 }>
 
 /** Where the deck stands among a slide's points, and a way to move it to another. */
@@ -36,7 +36,7 @@ export type SlidePoints = Readonly<{
 export type SlideCues = SlidePoints &
   Readonly<{
     /** The id of the slide the points belong to. */
-    slideId: string
+    slideId: SlideId
     cues: CueState
     /**
      * Counts each time the cues are applied: when the deck moves to a point, or play is pressed. The
@@ -49,7 +49,7 @@ export type SlideCues = SlidePoints &
 /** A cue's point holds the caption before it this long while the slide acts. */
 const cueMs = 1200
 
-/** A caption longer than this is split, as film subtitles are, so two lines hold it in the player. */
+/** A caption longer than this is split, so two lines hold it in the player. */
 const chunkChars = 140
 
 /** Pieces merged back up to the limit; short pieces (and stray initials like "R.") join a neighbour so each chunk reads whole. */
@@ -94,7 +94,8 @@ const withCue = (state: CueState, cue: Cue): CueState => ({ ...state, [cue.set]:
 export function pointsOf(slide: Slide): ReadonlyArray<Point> {
   const points: Array<Point> = []
   let state: CueState = {}
-  const lastSay = () => points.at(-1)?.captions.at(-1)?.say ?? ''
+  // What the last line ends on: a cue's point keeps it on screen.
+  let lastSay = ''
   for (const note of slide.speakerNotes ?? []) {
     if (typeof note !== 'string') {
       const cues = withCue(state, note)
@@ -102,14 +103,16 @@ export function pointsOf(slide: Slide): ReadonlyArray<Point> {
         state = cues
         continue
       }
-      points.push({ captions: [{ say: lastSay(), speak: '', holdMs: cueMs }], cues, wait: note.wait })
+      points.push({ captions: [{ say: lastSay, speak: '', holdMs: cueMs }], cues, wait: note.wait })
       if (!note.wait) state = cues
       continue
     }
     // One space between words, so a caption packed back from its pieces reads as written.
     const text = note.replace(/\s+/g, ' ').trim()
     if (text === '') continue
-    points.push({ captions: chunksOf(text).map(spoken), cues: state })
+    const captions = chunksOf(text).map(spoken)
+    points.push({ captions, cues: state })
+    lastSay = captions[captions.length - 1].say
   }
   // Notes that read as nothing (blank lines) still leave the slide one point: its heading.
   return points.length > 0 ? points : [{ captions: [spoken(slide.heading)], cues: state }]

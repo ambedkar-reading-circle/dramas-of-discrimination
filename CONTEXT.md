@@ -110,7 +110,7 @@ _Avoid_: autoplay, unfacilitated mode, kiosk mode
 
 **Point**:
 One entry of a slide's speaker notes, a line or a cue, numbered after its slide (4.3); the unit the deck's arrows step through. The slide shows every cue in effect at its point, however the deck got there.
-_Avoid_: step, beat, pointer
+_Avoid_: step (that is a step of a workshop activity), beat, pointer
 
 **Caption**:
 A line of a slide's speaker notes as playback shows it, cut into pieces short enough for the player; a cue's point keeps the caption before it.

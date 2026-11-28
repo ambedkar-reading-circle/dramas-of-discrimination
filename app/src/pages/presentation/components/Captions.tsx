@@ -11,7 +11,7 @@ export default function Captions() {
   const playback = usePlayback()
   const reduced = usePrefersReducedMotion()
   if (!playback) return null
-  const film = playback.current.wait === 'video'
+  const film = playback.current.wait === 'film'
   const filmNote = playback.playing ? 'The film is playing. The captions pick up when it ends.' : 'Press play to watch the film, or step on past it.'
   const text = film ? filmNote : playback.caption.say
 

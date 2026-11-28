@@ -16,15 +16,12 @@ export interface CueTargets {}
 
 export type CueTarget = keyof CueTargets
 
-/** What a cue's point can wait on before the deck moves on. */
-export type CueWait = 'video'
-
 /**
  * Sets one target to a value, from its point on until another cue sets it.
- * `wait: 'video'` holds its point until the film ends, and sets the target
+ * `wait: 'film'` holds its point until the slide's film ends, and sets the target
  * for that point only.
  */
-export type Cue = { [K in CueTarget]: Readonly<{ set: K; to: CueTargets[K]; wait?: CueWait }> }[CueTarget]
+export type Cue = { [K in CueTarget]: Readonly<{ set: K; to: CueTargets[K]; wait?: 'film' }> }[CueTarget]
 
 /** Every target a cue has set by some point of a slide, and the value it holds there. */
 export type CueState = Readonly<Partial<CueTargets>>
