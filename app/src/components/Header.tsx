@@ -3,6 +3,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import DodLogo from './DodLogo'
 import PencilToggle from './PencilToggle'
 import ThemeToggle from './ThemeToggle'
+import { bindHeightVariable } from '#/lib/observe-resize'
 import { useRoughAnnotation } from '#/lib/rough-notation'
 import type { RoughAnnotationConfig } from '#/lib/rough-notation'
 
@@ -30,7 +31,6 @@ function NavLink({ link }: { link: NavEntry }) {
   const labelRef = useRef<HTMLSpanElement>(null)
   const { show, hide } = useRoughAnnotation(labelRef, annotationConfig)
 
-  // The active route keeps its brackets drawn; routes losing active retract.
   useEffect(() => {
     if (active) {
       show()
@@ -70,15 +70,7 @@ export default function Header() {
   useLayoutEffect(() => {
     const element = header.current
     if (!element) return
-    const root = document.documentElement
-    const measure = () => root.style.setProperty('--site-header-height', `${element.getBoundingClientRect().height}px`)
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
-    return () => {
-      observer.disconnect()
-      root.style.removeProperty('--site-header-height')
-    }
+    return bindHeightVariable(element, document.documentElement, '--site-header-height')
   }, [])
 
   return (

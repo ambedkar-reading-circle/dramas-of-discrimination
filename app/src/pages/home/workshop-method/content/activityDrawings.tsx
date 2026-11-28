@@ -74,7 +74,6 @@ const drawings: Partial<Record<string, () => ReactElement>> = {
   OverTime,
 }
 
-/** Printed diagrams share the ink and paper of the activity sheet. */
 export function ActivityDrawing({ name }: { name: string }) {
   const Drawing = drawings[name]
   return (

@@ -6,8 +6,6 @@ import { viewportSection } from './FitSectionButton'
 export default function CommunityInvitation() {
   const sectionRef = useRef<HTMLElement>(null)
 
-  // The preceding card deck can end between rows. Adjust the content padding
-  // to the existing paper rules, including after opening cards or resizing.
   const alignPadding = useCallback(() => {
     const section = sectionRef.current
     const paper = section?.closest<HTMLElement>('.notebook-surface')

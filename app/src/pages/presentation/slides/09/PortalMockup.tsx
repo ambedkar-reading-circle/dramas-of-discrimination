@@ -1,12 +1,19 @@
 import { useId, useState } from 'react'
 import { motion } from 'motion/react'
 import { GuideFrame } from '../shared/GuideFrame'
-import { collection, kindLabels, manifestos, sharedPledges } from './content/portal'
-import type { CommunityKind, PledgeId, PortalManifesto } from './content/portal'
+import { collection, kindLabels, manifestos, sharedRules } from './content/portal'
+import type { CommunityKind, PortalManifesto, RuleId } from './content/portal'
 import '../shared/modes.css'
+import { useCueTarget } from '../../playback/targets'
 import './PortalMockup.css'
 
 type View = 'explore' | 'common'
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    portal: View
+  }
+}
 
 const views: ReadonlyArray<{ value: View; label: string }> = [
   { value: 'explore', label: 'Explore' },
@@ -15,18 +22,14 @@ const views: ReadonlyArray<{ value: View; label: string }> = [
 
 const count = new Intl.NumberFormat('en-IN')
 
-/**
- * Mockup: the Manifesto portal. Communities explore and share the Manifestos
- * of Inclusion they adopted; read together, the collection shows the pledges
- * they hold in common.
- */
 export function PortalMockup() {
   const [view, setView] = useState<View>('explore')
+  useCueTarget('portal', setView, { value: view })
   const tabsId = useId()
 
   return (
     <GuideFrame
-      label="Mockup: the Manifesto portal, where Communities read and share their Manifestos of Inclusion and see the pledges they hold in common"
+      label="Mockup: the Manifesto portal, where Communities read and share their Manifestos of Inclusion and see the rules they hold in common"
       className="modes portal"
       title={
         <>
@@ -58,14 +61,12 @@ export function PortalMockup() {
 
 const kinds = Object.keys(kindLabels) as Array<CommunityKind>
 
-/** Whether a Manifesto is of the chosen kind and holds the search word anywhere in its text. */
 function matches(item: PortalManifesto, kind: CommunityKind | 'all', needle: string) {
   if (kind !== 'all' && item.kind !== kind) return false
   if (!needle) return true
-  return [item.community, item.place, item.opening, ...item.values, ...item.pledges].join(' ').toLowerCase().includes(needle)
+  return [item.community, item.place, item.opening, ...item.rules].join(' ').toLowerCase().includes(needle)
 }
 
-/** Every shared Manifesto, by the Community that adopted it; one open to read whole. */
 function Explore() {
   const [kind, setKind] = useState<CommunityKind | 'all'>('all')
   const [query, setQuery] = useState('')
@@ -120,7 +121,6 @@ function Explore() {
   )
 }
 
-/** One Manifesto, whole, as its Community adopted it. */
 function Reader({ manifesto }: { manifesto: PortalManifesto }) {
   return (
     <section className="portal-reader" aria-label={`Manifesto of Inclusion: ${manifesto.community}, ${manifesto.place}`}>
@@ -130,17 +130,12 @@ function Reader({ manifesto }: { manifesto: PortalManifesto }) {
           {manifesto.community}, {manifesto.place}
         </p>
         <p className="portal-reader-opening">{manifesto.opening}</p>
-        <ul className="portal-reader-values">
-          {manifesto.values.map((value) => (
-            <li key={value}>{value}</li>
+        <p className="portal-reader-heading">Our rules</p>
+        <ol className="portal-reader-rules">
+          {manifesto.rules.map((rule) => (
+            <li key={rule}>{rule}</li>
           ))}
-        </ul>
-        <p className="portal-reader-heading">And to these ends we pledge</p>
-        <ul className="portal-reader-pledges">
-          {manifesto.pledges.map((pledge) => (
-            <li key={pledge}>{pledge}</li>
-          ))}
-        </ul>
+        </ol>
         <p className="portal-reader-adopted">
           Adopted {manifesto.adopted} by {manifesto.people} people
         </p>
@@ -149,9 +144,8 @@ function Reader({ manifesto }: { manifesto: PortalManifesto }) {
   )
 }
 
-/** The pledges the whole collection holds in common. */
 function CommonGround() {
-  const ranked = [...(Object.keys(sharedPledges) as Array<PledgeId>)].sort((a, b) => collection.shares[b] - collection.shares[a])
+  const ranked = [...(Object.keys(sharedRules) as Array<RuleId>)].sort((a, b) => collection.shares[b] - collection.shares[a])
 
   const tiles = [
     { label: 'Manifestos', value: count.format(collection.manifestos) },
@@ -171,15 +165,15 @@ function CommonGround() {
         ))}
       </dl>
 
-      <section className="portal-pledges" aria-label="What Communities pledge">
+      <section className="portal-rules" aria-label="Rules Communities share">
         <div>
-          <h3 className="portal-h">What Communities pledge</h3>
-          <p className="portal-sub">Share of Manifestos making each pledge, in their own words</p>
+          <h3 className="portal-h">Rules Communities share</h3>
+          <p className="portal-sub">Share of Manifestos with each rule, in their own words</p>
         </div>
         <ol className="portal-bars">
           {ranked.map((id, index) => (
-            <li key={id} title={`${sharedPledges[id]}: ${count.format(Math.round(collection.shares[id] * collection.manifestos))} of ${count.format(collection.manifestos)} Manifestos`}>
-              <span className="portal-bar-label">{sharedPledges[id]}</span>
+            <li key={id} title={`${sharedRules[id]}: ${count.format(Math.round(collection.shares[id] * collection.manifestos))} of ${count.format(collection.manifestos)} Manifestos`}>
+              <span className="portal-bar-label">{sharedRules[id]}</span>
               <span className="portal-bar-value">{Math.round(collection.shares[id] * 100)}%</span>
               <span className="portal-bar-track">
                 <motion.span className="portal-bar-fill" initial={{ width: 0 }} animate={{ width: `${collection.shares[id] * 100}%` }} transition={{ delay: index * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} />

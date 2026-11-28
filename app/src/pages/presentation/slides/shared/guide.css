@@ -1,14 +1,8 @@
-/* The facilitation guide's shell, shared by every slide that shows it: navy
-   chrome around a cream screen, as the real app has it, with the workshop's
-   journey across the top and a fixed desk the sheets lie on. Fixed colours in
-   either theme: it stands for a screen the room will see. */
 @layer components {
   .fac {
     --fac-navy: var(--primary-blue);
     --fac-cream: var(--primary-white);
     --fac-red: #9d2f2f;
-    --fac-desk-height: 31rem;
-    /* The charter a Manifesto of Inclusion is laid out as, wherever it is read. */
     --charter-paper: #f6ebcf;
     --charter-ink: #2e2114;
     --charter-gold: #a8823a;
@@ -29,7 +23,54 @@
       0 24px 48px -16px rgb(19 24 87 / 0.4);
   }
 
-  /* The app sets its own type, off the notebook's ruled rows. */
+  .fac-swing,
+  .fac-swing > .tablet-swing-motion {
+    width: 100%;
+  }
+
+  .fac-tablet {
+    --tablet-frame-padding: 0.3rem;
+    --tablet-frame-radius: clamp(0.75rem, 1.6vw, 1.25rem);
+    width: 100%;
+    max-width: calc(66rem + 2 * var(--tablet-frame-padding));
+    margin-inline: auto;
+  }
+
+  .fac-tablet .tablet-frame-camera {
+    position: absolute;
+    top: calc(var(--tablet-frame-padding) / 2);
+    left: 50%;
+    width: 0.2rem;
+    height: 0.2rem;
+    margin: 0;
+    translate: -50% -50%;
+  }
+
+  .fac-tablet .tablet-frame-button {
+    width: 3px;
+  }
+
+  .fac-tablet .tablet-frame-button--volume-one,
+  .fac-tablet .tablet-frame-button--volume-two {
+    left: -3px;
+  }
+
+  .fac-tablet .tablet-frame-button--power {
+    right: -3px;
+  }
+
+  .fac-tablet.tablet-frame--landscape .tablet-frame-screen {
+    min-height: 0;
+    aspect-ratio: auto;
+    background: var(--primary-blue);
+  }
+
+  .fac-tablet .fac {
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .fac :where(p, h3, h4, figure, figcaption) {
     top: 0;
     margin: 0;
@@ -58,7 +99,6 @@
     opacity: 0.75;
   }
 
-  /* Navy bars, top and foot */
   .fac-bar {
     display: flex;
     align-items: center;
@@ -82,6 +122,17 @@
     flex: none;
   }
 
+  .fac-proposed {
+    flex: none;
+    padding: 0.25rem 0.5rem;
+    border: 1px dashed rgb(255 255 238 / 0.5);
+    border-radius: 0.25rem;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
   .fac-logo {
     height: 2.125rem;
     padding: 0.1875rem 0.5rem;
@@ -89,7 +140,6 @@
     background: var(--fac-cream);
   }
 
-  /* The cream screen between the bars */
   .fac-screen {
     display: grid;
     gap: 0.75rem;
@@ -99,7 +149,6 @@
     color: var(--fac-navy);
   }
 
-  /* Journey: five acts, each as wide as its share of the day */
   .fac-journey ol {
     display: flex;
     gap: 0.625rem;
@@ -205,10 +254,9 @@
     animation: fac-ripple 2.4s ease-out infinite;
   }
 
-  /* The desk: a fixed stage the sheets slide on and off */
   .fac-desk {
     position: relative;
-    height: var(--fac-desk-height);
+    height: 34rem;
     margin-inline: -0.875rem;
     padding: 0.25rem 0.875rem 0.875rem;
     overflow: hidden;
@@ -258,13 +306,13 @@
     }
   }
 
-  /* Narrow screens: the sheet stacks and grows to its content. */
   @media (max-width: 760px) {
     .fac-desk {
       height: auto;
     }
 
     .fac-wordmark,
+    .fac-proposed,
     .fac-logo {
       display: none;
     }
@@ -273,7 +321,6 @@
       gap: 0.25rem;
     }
 
-    /* Too narrow to size acts by length: each takes an equal share. */
     .fac-journey li {
       flex-grow: 1 !important;
       min-width: 0;

@@ -10,9 +10,6 @@ const ofClasses = 'font-of text-[2.15em] font-normal leading-0 tracking-[0]'
 
 const lineClasses = 'block'
 
-// Shifts the whole wordmark onto the notebook baseline. Applied to the outer
-// span (not each line) so the element's own bounding rect matches the painted
-// text — annotations measure that rect.
 const heroShift = 'relative top-[calc(0.5lh_-_var(--notebook-row)_+_var(--notebook-baseline)_-_var(--notebook-font-mono))]'
 
 const titleWords = ['Discrimination', 'Diversity', 'Inclusivity', 'Fraternity', 'Belonging'] as const
@@ -84,9 +81,16 @@ function TitleWord({ word, printed = false }: { word: string; printed?: boolean 
   )
 }
 
-function useTitleCycle() {
-  const [cycling, setCycling] = useState(false)
+function useTitleCycle(held: boolean | undefined) {
+  const [hovered, setHovered] = useState(false)
+  const cycling = held ?? hovered
   const [wordIndex, setWordIndex] = useState(0)
+
+  const [wasCycling, setWasCycling] = useState(cycling)
+  if (cycling !== wasCycling) {
+    setWasCycling(cycling)
+    setWordIndex(cycling ? 1 : 0)
+  }
 
   useEffect(() => {
     if (!cycling) return
@@ -97,20 +101,21 @@ function useTitleCycle() {
   }, [cycling])
 
   const startCycling = (event: PointerEvent) => {
-    if (event.pointerType === 'touch') return
-    setCycling(true)
-    setWordIndex(1)
+    if (held === undefined && event.pointerType !== 'touch') setHovered(true)
   }
-  const stopCycling = () => {
-    setCycling(false)
-    setWordIndex(0)
-  }
+  const stopCycling = () => setHovered(false)
 
   return { word: titleWords[wordIndex], showsAlternate: wordIndex !== 0, cycling, startCycling, stopCycling }
 }
 
-export default function DodLogo({ variant = 'hero', ref }: { variant?: 'hero' | 'inline'; ref?: Ref<HTMLSpanElement> }) {
-  const { word, showsAlternate, cycling, startCycling, stopCycling } = useTitleCycle()
+type DodLogoProps = {
+  variant?: 'hero' | 'inline'
+  ref?: Ref<HTMLSpanElement>
+  held?: boolean
+}
+
+export default function DodLogo({ variant = 'hero', ref, held }: DodLogoProps) {
+  const { word, showsAlternate, cycling, startCycling, stopCycling } = useTitleCycle(held)
 
   const inkClasses = `transition-[filter] duration-200 ease-out ${cycling ? '[filter:drop-shadow(0_0_max(0.02em,0.5px)_currentColor)_drop-shadow(0_0_max(0.12em,4px)_color-mix(in_srgb,currentColor_40%,transparent))]' : ''}`
 

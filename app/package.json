@@ -19,6 +19,7 @@
     "test:manual": "node scripts/manual-flipbook.mjs",
     "test:manual-canvas": "node scripts/manual-canvas.mjs",
     "test:grid": "node scripts/notebook-grid.mjs",
+    "test:deck-keys": "node scripts/deck-keyboard.mjs",
     "test:notebook-layers": "node scripts/notebook-layers.mjs",
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",

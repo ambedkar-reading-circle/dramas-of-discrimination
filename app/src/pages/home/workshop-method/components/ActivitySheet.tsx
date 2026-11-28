@@ -11,17 +11,15 @@ interface ActivitySheetProps {
   activity: WorkshopActivity
   index: number
   total: number
-  /** This sheet is the one open in the dialog. */
   selected: boolean
-  /** The fan's layout: card size, spacing and fit-to-screen scale. */
+  expanded: boolean
   geometry: DeckGeometry
   reduceMotion: boolean
   transition: Transition
   onTrigger: (index: number) => void
 }
 
-/** One card in the fanned deck. Opening it shows the full sheet in ActivityDialog. */
-export function ActivitySheet({ activity, index, total, selected, geometry, reduceMotion, transition, onTrigger }: ActivitySheetProps) {
+export function ActivitySheet({ activity, index, total, selected, expanded, geometry, reduceMotion, transition, onTrigger }: ActivitySheetProps) {
   const { small, fit, spread, cardWidth } = geometry
   const lifted = { y: (offsets[index] - 25) * fit, rotate: 0 }
   return (
@@ -62,7 +60,7 @@ export function ActivitySheet({ activity, index, total, selected, geometry, redu
         className="method-sheet-trigger"
         aria-label={`Open ${activity.name}: ${activity.title}`}
         aria-haspopup="dialog"
-        aria-expanded={selected}
+        aria-expanded={expanded}
         aria-controls={activityDialogId}
         onClick={() => onTrigger(index)}
       >

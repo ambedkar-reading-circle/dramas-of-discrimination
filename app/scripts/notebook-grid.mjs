@@ -2,7 +2,6 @@ import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { createServer } from 'vite'
 
-// Fail before starting a server if the requested browser is not installed.
 const browser = await chromium.launch({
   channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
 })
@@ -97,8 +96,6 @@ try {
       await page.evaluate(() => document.fonts.ready)
       await checkGrid(`${path} at ${width}px`)
     }
-    // Exercise the failure mode: longer content and larger media must move later
-    // sections by whole rows, without clipping or compensating sibling offsets.
     for (const width of [320, 768, 1440]) {
       await page.setViewportSize({ width, height: 733 })
       await page.goto(new URL(path, server.resolvedUrls.local[0]).href)

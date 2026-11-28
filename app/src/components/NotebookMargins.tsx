@@ -17,7 +17,6 @@ function createMarginController() {
     element.style.setProperty('--margin-x', String(x))
     element.style.setProperty('--margin-y', String(y))
     element.toggleAttribute('data-margin-guides', active)
-    // This empty span belongs to the controller, not React's render state.
     if (label && label.textContent !== `...${word}`) label.textContent = `...${word}`
   }
 

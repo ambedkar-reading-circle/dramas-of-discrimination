@@ -1,22 +1,15 @@
 import { manualPageSrc } from '#/pages/home/workshop-method'
 import type { ActivityName } from '#/pages/home/workshop-method'
 
-/**
- * The still that stands in for each step's recorded example: a photograph
- * from a past workshop, or a spread of the manual where no photograph fits.
- */
 export type RecordedExample = Readonly<{
-  /** One photograph, or two manual pages laid side by side. */
   srcs: ReadonlyArray<string>
   alt: string
   caption: string
-  /** Where a tall photograph keeps its subject when cropped to the frame. */
   focus?: string
 }>
 
 const photo = (name: string) => `/facilitation/${name}.jpg`
 
-/** Keyed by act, one entry per step, in step order. */
 export const recordedExamples: Readonly<
   Record<ActivityName, ReadonlyArray<RecordedExample>>
 > = {

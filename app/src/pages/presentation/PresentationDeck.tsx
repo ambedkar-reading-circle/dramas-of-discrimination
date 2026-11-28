@@ -1,57 +1,50 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { slides } from './slides'
 import MarkButton, { Mark } from '#/components/MarkButton'
-import { usePresentationDeck } from './hooks/usePresentationDeck'
-import SlideIndex, { SlideOverviewControl } from './components/SlideIndex'
+import { useFullscreen } from './hooks/useFullscreen'
+import { deckPoints, usePresentationDeck } from './hooks/usePresentationDeck'
 import SlideNav from './components/SlideNav'
-import SpeakerNotes, { SpeakerNotesControl } from './components/SpeakerNotes'
 import SlideStage from './components/SlideStage'
-import type { SlideStageHandle } from './components/SlideStage'
+import { controlSelector, plainKey, pressedOn } from './keyTargets'
+import { PlaybackContext, usePlaybackState } from './playback/playback'
+import { slideLabel } from './slideLabel'
 import './PresentationDeck.css'
 import { twoDigit } from '#/lib/format'
+import { useLatest } from '#/lib/use-latest'
 
 export default function PresentationDeck() {
-  const { slide, total, goTo, next, prev, onDeckKeyDown, stageSwipeHandlers } = usePresentationDeck()
+  const position = usePresentationDeck()
+  const { slide, point, total, goTo, onDeckKeyDown, stageSwipeHandlers, initialSwitches, rememberPlayback } = position
   const current = slides[slide - 1]
-  const [overviewOpen, setOverviewOpen] = useState(false)
-  const [notesOpen, setNotesOpen] = useState(false)
-  const [fullscreen, setFullscreen] = useState(false)
+  const playback = usePlaybackState({ slide, point, slideId: current.id, points: deckPoints[slide - 1], atEnd: position.atEnd, next: position.next, goTo }, initialSwitches)
+  useEffect(() => rememberPlayback({ play: playback.playing, voice: playback.voice }), [rememberPlayback, playback.playing, playback.voice])
   const deck = useRef<HTMLElement>(null)
-  const stage = useRef<SlideStageHandle>(null)
-  const focusStage = useCallback(() => {
-    stage.current?.focusHeading()
-  }, [])
 
-  const notebook = () => deck.current?.closest<HTMLElement>('.notebook-surface') ?? null
+  const notebook = useCallback(() => deck.current?.closest<HTMLElement>('.notebook-surface') ?? null, [])
+  const { fullscreen, toggle: toggleFullscreen } = useFullscreen(notebook)
 
-  const selectSlide = useCallback(
-    (target: number) => {
-      setOverviewOpen(false)
-      goTo(target)
-    },
-    [goTo],
-  )
+  const onKeyDown = useLatest((event: KeyboardEvent) => {
+    if (event.key === ' ' && plainKey(event) && !pressedOn(event, controlSelector)) {
+      event.preventDefault()
+      if (!event.repeat) playback.toggle()
+      return
+    }
+    onDeckKeyDown(event)
+  })
 
   useEffect(() => {
-    const sync = () => setFullscreen(document.fullscreenElement === notebook())
-    document.addEventListener('fullscreenchange', sync)
-    return () => document.removeEventListener('fullscreenchange', sync)
-  }, [])
-
-  // The notebook surface already carries the ruling, margin guides, and pencil.
-  // Fullscreening the deck alone would leave those layers behind.
-  const toggleFullscreen = useCallback(() => {
-    const surface = notebook()
-    if (!surface) return
-    if (document.fullscreenElement === surface) {
-      void document.exitFullscreen()
-    } else {
-      void surface.requestFullscreen().catch(() => {})
+    const listen = (event: KeyboardEvent) => {
+      const surface = notebook()
+      const here = event.target === document.body || (event.target instanceof Node && surface?.contains(event.target) === true)
+      if (here) onKeyDown.current(event)
     }
-  }, [])
+    document.addEventListener('keydown', listen)
+    return () => document.removeEventListener('keydown', listen)
+  }, [onKeyDown, notebook])
 
   return (
-    <section ref={deck} className="presentation-deck page-wrap" onKeyDown={onDeckKeyDown} {...stageSwipeHandlers}>
+    <PlaybackContext value={playback}>
+    <section ref={deck} className="presentation-deck page-wrap" {...stageSwipeHandlers}>
       <header className="presentation-meta">
         <p className="eyebrow" title={current.ownsHeading ? undefined : current.kicker}>
           <span>
@@ -59,25 +52,17 @@ export default function PresentationDeck() {
           </span>
           {current.ownsHeading ? null : <> {current.kicker}</>}
         </p>
-        <div className="presentation-tools">
-          <SpeakerNotesControl open={notesOpen} onOpen={() => setNotesOpen(true)} />
-          <SlideOverviewControl open={overviewOpen} onOpen={() => setOverviewOpen(true)} />
-          <MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />
-        </div>
       </header>
 
-      <SlideStage ref={stage} slide={current} index={slide} total={total} />
+      <SlideStage slide={current} index={slide} total={total} />
 
-      <SlideNav slides={slides} slide={slide} total={total} next={next} prev={prev} onSelect={goTo} onOpenOverview={() => setOverviewOpen(true)} />
-
-      <SlideIndex slides={slides} current={slide} open={overviewOpen} onOpenChange={setOverviewOpen} onSelect={selectSlide} onFocusStage={focusStage} />
-
-      <SpeakerNotes slide={current} open={notesOpen} onOpenChange={setNotesOpen} />
+      <SlideNav slides={slides} deck={position} onSelect={goTo} tools={<MarkButton label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'} pressed={fullscreen} onClick={toggleFullscreen} mark={fullscreen ? <ExitFullscreenMark /> : <FullscreenMark />} />} />
 
       <p className="slide-sr" aria-live="polite">
-        Slide {slide} of {total}: {current.heading}
+        {slideLabel(slide, current.heading, ` of ${total}`)}
       </p>
     </section>
+    </PlaybackContext>
   )
 }
 

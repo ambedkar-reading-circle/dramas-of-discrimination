@@ -1,139 +1,155 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import type { Slide } from '../types'
-import MarkButton, { MarkGlyph } from '#/components/MarkButton'
-import { twoDigit } from '#/lib/format'
+import type { DeckPosition } from '../hooks/usePresentationDeck'
+import { motion } from 'motion/react'
+import type { Transition } from 'motion/react'
+import MarkButton, { Mark, MarkGlyph } from '#/components/MarkButton'
+import { revealKeep } from '#/components/Reveal'
+import { bindHeightVariable } from '#/lib/observe-resize'
+import { usePlayback } from '../playback/playback'
+import { canSpeak } from '../playback/speech'
+import Captions from './Captions'
+import { slideLabel } from '../slideLabel'
+import PageStrip, { PageChip } from './PageStrip'
+import type { CurrentPage } from './PageStrip'
 
 interface SlideNavProps {
   slides: ReadonlyArray<Slide>
-  slide: number
-  total: number
-  next: () => void
-  prev: () => void
+  deck: Pick<DeckPosition, 'slide' | 'point' | 'total' | 'atStart' | 'atEnd' | 'next' | 'prev'>
   onSelect: (slide: number) => void
-  onOpenOverview: () => void
+  tools?: ReactNode
 }
 
-type StripEntry = { kind: 'page'; number: number } | { kind: 'gap'; from: number; to: number }
+export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProps) {
+  const { slide, point, total } = deck
+  const playback = usePlayback()
+  const bar = useRef<HTMLDivElement>(null)
+  const [focusStrip, setFocusStrip] = useState(false)
 
-/** Pages that fit in `slots` chips: the full run, or the ends with a window around the current page. */
-function stripEntries(total: number, current: number, slots: number): StripEntry[] {
-  const pages = (from: number, to: number): StripEntry[] => Array.from({ length: to - from + 1 }, (_, index) => ({ kind: 'page', number: from + index }))
-
-  if (total <= slots) return pages(1, total)
-  if (slots < 5) {
-    const from = Math.max(1, Math.min(current - Math.floor((slots - 1) / 2), total - slots + 1))
-    return pages(from, from + slots - 1)
-  }
-
-  const lead = slots - 2
-  const windowSize = slots - 4
-  const start = current - Math.floor((windowSize - 1) / 2)
-  const end = start + windowSize - 1
-
-  if (start <= 3) return [...pages(1, lead), { kind: 'gap', from: lead + 1, to: total - 1 }, { kind: 'page', number: total }]
-  if (end >= total - 2) {
-    const first = total - lead + 1
-    return [{ kind: 'page', number: 1 }, { kind: 'gap', from: 2, to: first - 1 }, ...pages(first, total)]
-  }
-
-  return [
-    { kind: 'page', number: 1 },
-    { kind: 'gap', from: 2, to: start - 1 },
-    ...pages(start, end),
-    { kind: 'gap', from: end + 1, to: total - 1 },
-    { kind: 'page', number: total },
-  ]
-}
-
-function gapLabel(from: number, to: number): string {
-  const slides = from === to ? `Slide ${from}` : `Slides ${from} to ${to}`
-  return `${slides}, show all slides`
-}
-
-/** Previous / next, with a page window between the arrows. */
-export default function SlideNav({ slides, slide, total, next, prev, onSelect, onOpenOverview }: SlideNavProps) {
-  const chips = useRef<Array<HTMLButtonElement | null>>([])
-  const stripRef = useRef<HTMLDivElement>(null)
-  const pendingFocus = useRef<number | null>(null)
-  const [slots, setSlots] = useState(total)
-  const entries = stripEntries(total, slide, slots)
-
-  // Fit the window to the strip. The chip width comes from the rendered control,
-  // so a media-query change in min-width is picked up with the next resize.
   useLayoutEffect(() => {
-    const strip = stripRef.current
-    if (!strip) return
-
-    const measure = () => {
-      const chip = strip.querySelector<HTMLElement>('.slide-index-chip:not(.slide-index-gap)')
-      if (!chip) return
-      const gap = Number.parseFloat(getComputedStyle(strip).columnGap) || 0
-      const chipWidth = chip.getBoundingClientRect().width
-      if (chipWidth <= 0 || strip.clientWidth <= 0) return
-      const next = Math.max(1, Math.floor((strip.clientWidth + gap) / (chipWidth + gap)))
-      setSlots((current) => (current === next ? current : next))
-    }
-
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(strip)
-    return () => observer.disconnect()
+    const element = bar.current
+    const shell = element?.closest<HTMLElement>('.presentation-deck')
+    if (!element || !shell) return
+    return bindHeightVariable(element, shell, '--player-height')
   }, [])
 
-  // The destination chip may not be mounted until the window re-renders.
-  useEffect(() => {
-    if (pendingFocus.current !== slide) return
-    pendingFocus.current = null
-    chips.current[slide - 1]?.focus()
-  }, [slide, slots])
-
-  const onStripKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    // Arrows inside the strip move between pages. The deck's own arrow
-    // handling must not also fire for the same keystroke.
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-    event.stopPropagation()
-    event.preventDefault()
-    const delta = event.key === 'ArrowLeft' ? -1 : 1
-    const index = Math.min(Math.max(slide - 1 + delta, 0), slides.length - 1)
-    if (index === slide - 1) return
-    pendingFocus.current = index + 1
-    onSelect(index + 1)
-  }
+  const captioning = playback?.captions === true
+  const points = playback?.points.length ?? 1
+  const currentPage: CurrentPage = { label: `${slide}.${point}`, note: `, point ${point} of ${points}` }
 
   return (
-    <div className="slide-nav">
-      <nav className="slide-nav-controls" aria-label="Change slides">
-        <MarkButton label="Previous slide" disabled={slide <= 1} onClick={prev} mark={<MarkGlyph>←</MarkGlyph>} />
-        <div ref={stripRef} className="slide-index-strip" role="group" aria-label="Jump to a slide" data-lenis-prevent="" onKeyDown={onStripKeyDown}>
-          {entries.map((entry) =>
-            entry.kind === 'gap' ? (
-              <button key={`gap-${entry.from}`} className="slide-index-chip slide-index-gap" type="button" tabIndex={-1} aria-label={gapLabel(entry.from, entry.to)} onClick={onOpenOverview}>
-                …
-              </button>
-            ) : (
-              <button
-                key={slides[entry.number - 1].id}
-                className="slide-index-chip"
-                type="button"
-                ref={(element) => {
-                  chips.current[entry.number - 1] = element
-                }}
-                tabIndex={entry.number === slide ? 0 : -1}
-                aria-current={entry.number === slide ? 'true' : undefined}
-                aria-label={`Slide ${entry.number}: ${slides[entry.number - 1].heading}`}
-                onClick={() => onSelect(entry.number)}
-              >
-                {twoDigit(entry.number)}
-              </button>
-            ),
-          )}
+    <div ref={bar} className="slide-nav paper-tear paper-tear--top" {...revealKeep}>
+      <div className="paper-tear__surface" aria-hidden="true" />
+      <DeckProgress slide={slide} point={point} total={total} />
+      <div className="slide-nav-controls">
+        <nav className="slide-nav-change" aria-label="Change slides">
+        <div className="slide-transport">
+          <MarkButton label="Previous point" title="Previous point (←)" disabled={deck.atStart} onClick={deck.prev} mark={<MarkGlyph>←</MarkGlyph>} />
+          {playback && <MarkButton {...(playback.playing ? pauseButton : playButton)} className="slide-play" onClick={playback.toggle} />}
+          <MarkButton label="Next point" title="Next point (→)" disabled={deck.atEnd} onClick={deck.next} mark={<MarkGlyph>→</MarkGlyph>} />
         </div>
-        <MarkButton label="Next slide" disabled={slide >= total} onClick={next} mark={<MarkGlyph>→</MarkGlyph>} />
-      </nav>
-      <div className="slide-progress" aria-hidden="true">
-        <div className="slide-progress-fill" style={{ inlineSize: `${(slide / total) * 100}%` }} />
+        </nav>
+        {captioning ? (
+          <div className="slide-nav-captioned">
+            <PageChip current aria-label={`${slideLabel(slide, slides[slide - 1].heading, ` of ${total}${currentPage.note}`)}. Hide captions to show all slides`} title="Slide . point: each point is one entry of the slide's speaker notes" onClick={() => {
+                setFocusStrip(true)
+                playback.setCaptions(false)
+              }}>
+              {currentPage.label}
+            </PageChip>
+            <Captions />
+          </div>
+        ) : (
+          <PageStrip slides={slides} slide={slide} onSelect={onSelect} current={currentPage} focusOnMount={focusStrip} />
+        )}
+        <div className="slide-nav-extras">
+          {playback && (
+            <>
+              <MarkButton label="Captions" title={playback.captions ? 'Hide captions' : 'Show captions'} pressed={playback.captions} onClick={() => {
+                  setFocusStrip(false)
+                  playback.setCaptions(!playback.captions)
+                }} mark={<CaptionsMark />} />
+              {canSpeak && <MarkButton label="Read captions aloud" title={playback.voice ? 'Stop reading captions aloud' : 'Read captions aloud'} pressed={playback.voice} onClick={() => playback.setVoice(!playback.voice)} mark={<VoiceMark on={playback.voice} />} />}
+            </>
+          )}
+          {tools}
+        </div>
       </div>
+      <CaptionTime />
     </div>
+  )
+}
+
+const playButton = { label: 'Play the deck with captions', title: 'Play (Space)', mark: <PlayMark /> }
+const pauseButton = { label: 'Pause', title: 'Pause (Space)', mark: <PauseMark /> }
+
+function CaptionTime() {
+  const playback = usePlayback()
+  if (!playback) return null
+  const { runningMs, captionsApplied } = playback
+  return (
+    <div className="caption-time" aria-hidden="true">
+      <motion.div key={captionsApplied} className="caption-time-fill" initial={{ scaleX: 0 }} animate={{ scaleX: runningMs !== null ? 1 : 0 }} transition={runTransition(runningMs)} />
+    </div>
+  )
+}
+
+function DeckProgress({ slide, point, total }: { slide: number; point: number; total: number }) {
+  const playback = usePlayback()
+  const percent = (part: number) => `${(part / total) * 100}%`
+  if (!playback) {
+    return (
+      <div className="slide-progress" aria-hidden="true">
+        <div className="slide-progress-fill" style={{ inlineSize: percent(slide) }} />
+      </div>
+    )
+  }
+  const { points, current, captionIndex, runningMs, captionsApplied } = playback
+  const at = (done: number) => percent(slide - 1 + (point - 1 + done / current.captions.length) / points.length)
+  const from = at(captionIndex)
+  const to = at(captionIndex + 1)
+  return (
+    <div className="slide-progress" aria-hidden="true">
+      <motion.div key={captionsApplied} className="slide-progress-fill slide-progress-fill--points" initial={{ width: from }} animate={{ width: runningMs !== null ? to : from }} transition={runTransition(runningMs)} />
+    </div>
+  )
+}
+
+function runTransition(runningMs: number | null): Transition {
+  return runningMs !== null ? { duration: runningMs / 1000, ease: 'linear' } : { duration: 0.2 }
+}
+
+function PlayMark() {
+  return (
+    <Mark>
+      <path d="M5 3.25v9.5L12.5 8z" />
+    </Mark>
+  )
+}
+
+function PauseMark() {
+  return (
+    <Mark>
+      <path d="M5.5 3.5v9M10.5 3.5v9" />
+    </Mark>
+  )
+}
+
+function CaptionsMark() {
+  return (
+    <Mark>
+      <rect x="1.75" y="3.5" width="12.5" height="9" rx="1" />
+      <path d="M7 6.75a1.75 1.75 0 1 0 0 2.5M11.5 6.75a1.75 1.75 0 1 0 0 2.5" />
+    </Mark>
+  )
+}
+
+function VoiceMark({ on }: { on: boolean }) {
+  return (
+    <Mark>
+      <path d="M2.5 6v4h2.5l3.5 3V3L5 6z" />
+      {on ? <path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.75 3.75a6 6 0 0 1 0 8.5" /> : <path d="m11 6 3 4M14 6l-3 4" />}
+    </Mark>
   )
 }

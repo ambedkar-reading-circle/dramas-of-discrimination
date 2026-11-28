@@ -13,23 +13,20 @@ interface SheetOverlayProps {
   onClose: () => void
 }
 
-/** The region's class for each kind of overlay. */
 const regionClass: Record<OverlayContent['type'], string> = {
   pages: 'method-manual',
   prints: 'method-manual method-step-photo',
 }
 
-/**
- * Lays manual pages or photographic prints over the open sheet. Tapping
- * anywhere puts them away; each item drops in on its own, slightly askew.
- */
 export function SheetOverlay({ id, content, onClose }: SheetOverlayProps) {
   const reduceMotion = usePrefersReducedMotion()
   const spread = useRef<HTMLDivElement>(null)
   const key = content?.key ?? null
 
   useEffect(() => {
-    if (key !== null) spread.current?.focus({ preventScroll: true })
+    const element = spread.current
+    if (key === null || !element) return
+    if (element.closest('dialog')?.contains(document.activeElement)) element.focus({ preventScroll: true })
   }, [key])
 
   return (
@@ -66,14 +63,12 @@ export function SheetOverlay({ id, content, onClose }: SheetOverlayProps) {
 
 interface LaidFigureProps {
   className: string
-  /** Position in the spread; later items land a beat after earlier ones. */
   order: number
   tilt: TiltRange
   reduceMotion: boolean
   children: ReactNode
 }
 
-/** One page or print, sliding in from the side and settling at its own tilt. */
 function LaidFigure({ className, order, tilt, reduceMotion, children }: LaidFigureProps) {
   const [lean] = useState(() => randomTilt(tilt))
   return (

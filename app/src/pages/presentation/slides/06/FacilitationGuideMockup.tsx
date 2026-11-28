@@ -9,18 +9,28 @@ import { recordedExamples } from './content/recordedExamples'
 import { GuideFrame } from '../shared/GuideFrame'
 import { stateOf } from '../shared/GuideJourney'
 import { motionUnlessReduced } from '../shared/motion'
+import { warnCue } from '../../playback/cues'
+import { useCueTarget } from '../../playback/targets'
 import './FacilitationGuideMockup.css'
 
-/** Every step of the workshop in order, so Back and Next walk the whole journey. */
-const journey = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
+export type GuideStop = Readonly<{ act: number; step: number }>
 
-/** Stand-in clip lengths for the recorded examples, one per step slot. */
+const journey: ReadonlyArray<GuideStop> = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
+
+declare module '../../playback/cues' {
+  interface CueTargets {
+    guide: GuideStop
+  }
+}
+
+const opening = journey[journey.findIndex((stop) => stop.act === 1)]
+
+const positionOf = ({ act, step }: GuideStop) => journey.findIndex((stop) => stop.act === act && stop.step === step)
+
 const clipLengths = ['2:10', '1:45', '2:30']
 
-/** Fixed leans, so stickers sit the same way on every render. */
 const stickerTilts = [-1.8, 1.4, -0.9, 2.1]
 
-/** The workshop has been running this long when the mockup opens. */
 const startElapsed = 47 * 60 + 12
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -31,7 +41,6 @@ function clock(seconds: number) {
   return `${twoDigit(h)}:${twoDigit(m)}:${twoDigit(seconds % 60)}`
 }
 
-/** A clock that ticks on from where the workshop already is. */
 function useElapsed() {
   const [seconds, setSeconds] = useState(startElapsed)
   useEffect(() => {
@@ -41,25 +50,31 @@ function useElapsed() {
   return seconds
 }
 
-/**
- * Mockup: the facilitation guide a room follows by itself. The whole workshop
- * runs across the top, the current act lies open as a facilitation sheet,
- * a recorded example plays beside its steps, and the room moves on when it
- * says it is ready.
- */
 export function FacilitationGuideMockup() {
   const reducedMotion = usePrefersReducedMotion()
   const elapsed = useElapsed()
-  const [{ position, direction }, setMove] = useState({ position: journey.findIndex((stop) => stop.act === 1), direction: 1 })
+  const [{ position, direction }, setMove] = useState({ position: journey.indexOf(opening), direction: 1 })
   const { act, step } = journey[position]
   const activity = workshopActivities[act]
   const example = recordedExamples[activity.name][step]
   const isLast = position === journey.length - 1
 
   const moveTo = (target: number) => setMove({ position: target, direction: target >= position ? 1 : -1 })
-  const goTo = (targetAct: number, targetStep: number) => moveTo(journey.findIndex((stop) => stop.act === targetAct && stop.step === targetStep))
+  const moveToStop = (target: number) => {
+    if (target >= 0 && target !== position) moveTo(target)
+  }
+  const goTo = (target: GuideStop) => moveToStop(positionOf(target))
 
-  // `towards` is the direction of travel: 1 forward, -1 back.
+  useCueTarget(
+    'guide',
+    (stop) => {
+      const target = positionOf(stop)
+      if (target < 0) return warnCue({ set: 'guide', to: stop }, 'no such step in the journey')
+      moveToStop(target)
+    },
+    { rest: opening, value: journey[position], followRest: true },
+  )
+
   const fadeVariants: Variants = { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } }
   const sheetVariants: Variants = reducedMotion
     ? fadeVariants
@@ -75,7 +90,6 @@ export function FacilitationGuideMockup() {
         center: { opacity: 1, y: 0, rotate: step % 2 ? 0.8 : -0.9, scale: 1 },
         exit: (towards: number) => ({ opacity: 0, y: -10, rotate: -2 * towards, scale: 0.98 }),
       }
-  /** Shared by the sheet and the print: enter from the side we travel towards, leave by the other. */
   const swapMotion = { custom: direction, initial: 'enter', animate: 'center', exit: 'exit', transition: { duration: reducedMotion ? 0.2 : 0.55, ease } }
 
   const stickers = [...activity.manual.map((excerpt) => ({ label: excerpt.part ? `Manual · ${excerpt.part}` : 'Manual', detail: `p. ${excerpt.pages.join('–')}` })), ...(activity.worksheets ?? []).map((sheet) => ({ label: sheet.label, detail: sheet.kind === 'photo' ? 'example' : 'to print' }))]
@@ -85,7 +99,7 @@ export function FacilitationGuideMockup() {
       label="Mockup: the facilitation guide, walking the room through the workshop"
       act={act}
       step={step}
-      onSelectAct={(index) => goTo(index, 0)}
+      onSelectAct={(index) => goTo({ act: index, step: 0 })}
       bar={
         <>
           <span className="fac-bar-room">
@@ -99,10 +113,6 @@ export function FacilitationGuideMockup() {
       }
       foot={
         <>
-          <span className="fac-pace">
-            <span className="method-clock" aria-hidden="true" />
-            about {activity.duration} min · take the time you need
-          </span>
           <span className="fac-nav">
             <button type="button" className="fac-btn" onClick={() => moveTo(position - 1)} disabled={position === 0}>
               <span aria-hidden="true">←</span> Back
@@ -152,7 +162,7 @@ export function FacilitationGuideMockup() {
                           <span className="fac-step-tape" />
                         </motion.span>
                       )}
-                      <button type="button" onClick={() => goTo(act, index)} aria-current={state === 'now' ? 'step' : undefined}>
+                      <button type="button" onClick={() => goTo({ act, step: index })} aria-current={state === 'now' ? 'step' : undefined}>
                         <span className="fac-step-num">{state === 'done' ? '✓' : twoDigit(index + 1)}</span>
                         <span className="fac-step-text">{item.text}</span>
                       </button>

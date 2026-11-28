@@ -1,24 +1,17 @@
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
+import { observeResize } from '#/lib/observe-resize'
 
-/** The section the deck must fit in one viewport, and its padded content. */
 export interface DeckFitTarget {
   surface: RefObject<HTMLElement | null>
   content: RefObject<HTMLElement | null>
 }
 
-/**
- * Measures how tall the deck may be for the whole section to fit one viewport:
- * the window height minus the section padding and every non-deck row (lede,
- * index, hint). Returned for the fan's scale. Without a section to fit, the
- * deck keeps its natural size.
- */
 export function useDeckFit(
   fitTo: DeckFitTarget | undefined,
   deck: RefObject<HTMLDivElement | null>,
 ) {
   const [available, setAvailable] = useState<number | null>(null)
-  // The refs are stable even when the object carrying them is not.
   const surface = fitTo?.surface
   const content = fitTo?.content
 
@@ -41,15 +34,11 @@ export function useDeckFit(
         setAvailable((current) => (current === next ? current : next))
       })
     }
-    measure()
-    // The deck's own height follows from this value, so watch only the rows
-    // around it; the deck changing size leaves the chrome unchanged.
-    const observer = new ResizeObserver(measure)
-    for (const element of section.querySelectorAll('.section-lede, .method-index, .method-deck-hint')) observer.observe(element)
+    const stop = observeResize([...section.querySelectorAll('.section-lede, .method-index, .method-deck-hint')], measure)
     window.addEventListener('resize', measure)
     return () => {
       cancelAnimationFrame(frame)
-      observer.disconnect()
+      stop()
       window.removeEventListener('resize', measure)
     }
   }, [surface, content, deck])

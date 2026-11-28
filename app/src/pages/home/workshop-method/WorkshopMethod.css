@@ -1,7 +1,5 @@
 .workshop-method-surface {
   --notebook-section-space: calc(2 * var(--notebook-row));
-  /* Land the surface at the viewport top; clear the navbar inside it.
-     Cancel the shared anchor offset for this full-screen section only. */
   scroll-margin-top: calc(0px - var(--site-header-height));
   min-height: 100svh;
   padding-block: calc(var(--site-header-height) + var(--notebook-section-space))
@@ -298,18 +296,14 @@
     padding-inline: 8px;
   }
 }
-/* The open sheet: a modal in the top layer, inset from every viewport edge
-   so it reads as a sheet laid over the page rather than a takeover. */
 .method-dialog {
   --method-dialog-inset: clamp(12px, 4vmin, 48px);
   --method-dialog-pad: clamp(18px, 3.5vmin, 36px);
 }
-.method-dialog[open] {
+.method-dialog:is([open], :popover-open) {
   position: fixed;
   inset: 0;
   display: grid;
-  /* Fixed tracks, so the sheet's percentage height resolves against the
-     viewport minus the inset and can never grow past the screen. */
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   width: 100%;
@@ -325,7 +319,6 @@
   background: transparent;
   overflow: hidden;
 }
-/* The page stays as it is behind the sheet: no tint, no blur. */
 .method-dialog::backdrop {
   background: transparent;
 }
@@ -432,7 +425,6 @@
   letter-spacing: 0.03em;
   text-align: center;
 }
-/* Short viewports: a tighter header leaves the room to the reading area. */
 @media (max-height: 640px) {
   .method-dialog-sheet h3 {
     margin-top: 6px;
@@ -455,18 +447,15 @@
     animation: none;
   }
 }
-/* Keep the page still behind the modal. */
-html:has(.method-dialog[open]) {
+html:has(.method-dialog:is([open], :popover-open)) {
   overflow: hidden;
   scrollbar-gutter: stable;
 }
-/* Short screens: spend less on padding so the deck keeps its size. */
 @media (max-height: 960px) {
   .workshop-method-surface {
     --notebook-section-space: var(--notebook-row);
   }
 }
-/* Wide but short: the index moves beside the deck instead of under it. */
 @media (min-width: 1001px) and (max-height: 960px) {
   .method-collection {
     display: grid;

@@ -95,5 +95,23 @@ _Avoid_: line, utterance, edge
 ### Public surface
 
 **Manifesto portal**:
-The open, public collection of every Manifesto of Inclusion a Community chooses to share — browsable by kind of Community, searchable, and read together for the pledges the collection holds in common. A Cloud-mode Community publishes to it; a Local-mode Community may bring its finished Manifesto or keep it to itself.
+The open, public collection of every Manifesto of Inclusion a Community chooses to share — browsable by kind of Community, searchable, and read together for the rules the collection holds in common. A Cloud-mode Community publishes to it; a Local-mode Community may bring its finished Manifesto or keep it to itself.
 _Avoid_: repository, library, archive, gallery
+
+### Running a workshop
+
+**Room**:
+Everyone physically present at one Workshop, gathered around one shared screen; in Local mode the Room is the only place the work exists.
+_Avoid_: audience, class
+
+**Self-facilitation**:
+A Room running the workshop, or the Approach deck, by itself with no Facilitator: the facilitation guide or the deck's playback leads, with captions and an optional voice.
+_Avoid_: autoplay, unfacilitated mode, kiosk mode
+
+**Point**:
+One entry of a slide's speaker notes, a line or a cue, numbered after its slide (4.3); the unit the deck's arrows step through. The slide shows every cue in effect at its point, however the deck got there.
+_Avoid_: step (that is a step of a workshop activity), beat, pointer
+
+**Caption**:
+A line of a slide's speaker notes as playback shows it, cut into pieces short enough for the player; a cue's point keeps the caption before it.
+_Avoid_: prompt (that is Prompt export), subtitle, cue (that is what a point carries)

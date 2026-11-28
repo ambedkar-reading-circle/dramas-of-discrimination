@@ -1,133 +1,138 @@
-import type { CSSProperties } from 'react'
 import { Link } from '@tanstack/react-router'
-import { AtSign, Check, Copy, CornerUpLeft, Globe, Mail } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, AtSign, Check, Copy, Globe, Mail, Users } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { motion } from 'motion/react'
 import ArcLink from '#/components/ArcLink'
 import { hoverLift } from '#/lib/card-motion'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
-import { manualEmail } from '#/pages/home/manual-flipbook'
 import { contributors } from '#/pages/about-us/content/contributors'
 import { firstName, teamMembers } from '#/pages/about-us/content/teamMembers'
 import { riseVariants } from '../shared/motion'
 import { useCopyText } from '../shared/useCopyText'
-import { closingLede, invitation, plans, plansLabel, portraitTilts, teamLabel } from './content/closing'
+import { aboutLabel, arcSiteLabel, cardTilts, closingLede, floorLine, instagram, portraitTilts, teamLabel, ways } from './content/closing'
+import type { ClosingAction, ClosingWay } from './content/closing'
 
 const icon = { size: 16, strokeWidth: 1.5, 'aria-hidden': true } as const
+const smallIcon = { ...icon, size: 11 } as const
 
-type CardProps = { order: number; reduce: boolean }
+const linkText = 'min-w-0 text-inherit wrap-anywhere underline underline-offset-4 decoration-1'
+const actionRow = 'flex min-w-0 flex-wrap items-center gap-x-2 text-[0.9375rem] leading-(--notebook-row)'
 
-const cardName = 'm-0 font-title text-[0.875rem] font-normal tracking-[0.13em] uppercase'
-
-// Taped cards here are read and used, not pressed as a whole.
-const usedCard = 'grid cursor-default px-5 py-row'
-
-function CopyEmail() {
-  const { copied, copy } = useCopyText(manualEmail)
+function CopyEmail({ address }: { address: string }) {
+  const { copied, copy } = useCopyText(address)
   return (
-    <button type="button" className="inline-flex cursor-pointer items-center gap-1 rounded-[2px] bg-transparent px-[0.45rem] py-0 text-[0.75rem] text-inherit shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--hl-text)_35%,transparent)] [font:inherit] hover:bg-[color-mix(in_srgb,var(--hl-text)_12%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--hl-text)_12%,transparent)]" onClick={copy} aria-label={copied ? 'Email copied' : 'Copy the email address'}>
-      {copied ? <Check {...icon} /> : <Copy {...icon} />}
-      <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
+    <button type="button" className="inline-grid size-[1.125rem] flex-none cursor-pointer place-items-center rounded-[2px] bg-transparent p-0 text-inherit hover:bg-[color-mix(in_srgb,currentColor_14%,transparent)] focus-visible:bg-[color-mix(in_srgb,currentColor_14%,transparent)]" onClick={copy} aria-label="Copy the email address" title={copied ? 'Copied' : 'Copy'}>
+      {copied ? <Check {...smallIcon} /> : <Copy {...smallIcon} />}
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Email copied' : ''}
+      </span>
     </button>
   )
 }
 
-const contact = 'flex min-w-0 flex-wrap items-center gap-x-2'
-const contactLink = 'min-w-0 text-inherit wrap-anywhere underline-offset-4'
+function Action({ action }: { action: ClosingAction }) {
+  switch (action.kind) {
+    case 'method':
+      return (
+        <Link to="/" hash={action.hash} className={`${actionRow} ${linkText}`}>
+          {action.label}
+          <ArrowRight {...icon} />
+        </Link>
+      )
+    case 'email':
+      return (
+        <span className="grid">
+          <a href={`mailto:${action.address}`} className={`${actionRow} ${linkText}`}>
+            <Mail {...icon} />
+            {action.label}
+          </a>
+          <span className="flex min-w-0 items-center gap-1 text-[0.75rem] leading-(--notebook-row)">
+            <span className="min-w-0 wrap-anywhere opacity-75">{action.address}</span>
+            <CopyEmail address={action.address} />
+          </span>
+        </span>
+      )
+    case 'external':
+      return (
+        <a href={action.href} target="_blank" rel="noopener noreferrer" className={`${actionRow} ${linkText}`}>
+          {action.label}
+          <ArrowUpRight {...icon} />
+        </a>
+      )
+  }
+}
 
-// The invitation: inverse ink, like slide 04's result card.
-function Invitation({ order, reduce }: CardProps) {
+function Way({ way, order, reduce, tilt }: { way: ClosingWay; order: number; reduce: boolean; tilt: number }) {
+  const lead = way.lead === true
+  const tone = lead ? 'bg-hl-bg text-hl-text' : 'bg-surface-warm text-ink shadow-[inset_0_0_0_1px_var(--sheet-edge)]'
   return (
-    <motion.section className={`slide-title-taped slide-title-taped--inverse ${usedCard} bg-hl-bg text-hl-text`} custom={order} variants={riseVariants(reduce, -1)} aria-label={invitation.name}>
-      <h3 className={cardName}>{invitation.name}</h3>
-      <p className="m-0 text-[1.0625rem]">{invitation.note}</p>
-      <ul className="m-0 mt-row grid list-none p-0 pt-row text-[0.9375rem] shadow-[inset_0_1px_0_color-mix(in_srgb,var(--hl-text)_25%,transparent)]">
-        <li className={contact}>
-          <Mail {...icon} />
-          <a href={`mailto:${manualEmail}`} className={contactLink}>
-            {manualEmail}
-          </a>
-          <CopyEmail />
-        </li>
-        <li className={contact}>
-          <Globe {...icon} />
-          <ArcLink className={contactLink}>Ambedkar Reading Circle</ArcLink>
-        </li>
-        <li className={contact}>
-          <AtSign {...icon} />
-          <a href={invitation.instagram.href} target="_blank" rel="noopener noreferrer" className={contactLink}>
-            {invitation.instagram.handle}
-          </a>
-        </li>
-      </ul>
-    </motion.section>
+    <motion.li className={`grid grid-rows-[auto_auto_1fr_auto] rounded-[3px] px-5 py-row text-start shadow-(--sheet-shadow) ${tone}`} custom={order} variants={riseVariants(reduce, tilt)}>
+      <span className={`font-title text-[1.75rem] leading-(--notebook-row) ${lead ? '' : 'text-stage-red'}`} aria-hidden="true">
+        {way.numeral}
+      </span>
+      <h3 className="m-0 font-title text-[1rem] leading-(--notebook-row) font-normal tracking-[0.12em] uppercase">{way.verb}</h3>
+      <p className="m-0 text-[1rem] leading-(--notebook-row)">{way.line}</p>
+      <div className="mt-[calc(var(--notebook-row)/2)] pt-[calc(var(--notebook-row)/2)] shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_25%,transparent)]">
+        <Action action={way.action} />
+      </div>
+    </motion.li>
   )
 }
 
-const planHighlight = 'hover:bg-[color-mix(in_srgb,var(--sea-ink)_6%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--sea-ink)_6%,transparent)] focus-visible:outline-none'
-
-// The plans, each a way back to its slide for the questions.
-function Plans({ order, reduce }: CardProps) {
-  return (
-    <motion.nav className={`slide-title-taped ${usedCard} bg-surface-warm text-ink`} custom={order} variants={riseVariants(reduce, 1)} aria-label={plansLabel}>
-      <h3 className={`${cardName} text-stage-red`}>{plansLabel}</h3>
-      <ol className="m-0 grid list-none p-0">
-        {plans.map((plan) => (
-          <li key={plan.letter} className="[&+&]:shadow-[inset_0_1px_0_var(--line)]">
-            <Link to="/approach" search={{ slide: plan.slide }} replace className={`group grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-3 px-1 text-inherit no-underline transition-colors duration-160 motion-reduce:transition-none ${planHighlight}`} aria-label={`${plan.name}: back to slide ${plan.slide}`}>
-              <span className="grid size-7 place-items-center rounded-full font-title text-[0.875rem] text-stage-red shadow-[inset_0_0_0_1px_var(--stage-red)]" aria-hidden="true">
-                {plan.letter}
-              </span>
-              <span className="grid">
-                <span className="text-base">{plan.name}</span>
-                <span className="text-[0.8125rem] text-ink-soft italic">{plan.line}</span>
-              </span>
-              <CornerUpLeft {...icon} className="text-ink-soft opacity-0 transition-opacity duration-160 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none" />
-            </Link>
-          </li>
-        ))}
-      </ol>
-    </motion.nav>
-  )
-}
-
-const teamNote = 'm-0 text-[0.8125rem] text-ink-soft'
-
-// The team, pinned as a strip of instant portraits. The top padding and photo
-// together fill two rows, and the name tag a third.
 const portrait = 'block size-[calc(2*var(--notebook-row)-0.3rem)] object-cover bg-line'
+const footLink = 'inline-flex items-center gap-1.5 text-ink no-underline hover:underline focus-visible:underline underline-offset-4'
 
-function Team({ order, reduce }: CardProps) {
+function Makers({ order, reduce }: { order: number; reduce: boolean }) {
   return (
-    <motion.figure className="m-0 grid justify-items-center gap-row" custom={order} variants={riseVariants(reduce)}>
-      <figcaption className={teamNote}>{teamLabel}</figcaption>
+    <motion.footer className="grid w-full justify-items-center gap-row pt-row text-center shadow-[inset_0_1px_0_var(--ink-faint)]" custom={order} variants={riseVariants(reduce)}>
       <ul className="m-0 flex list-none flex-wrap justify-center gap-x-4 gap-y-row p-0">
         {teamMembers.map((member, index) => (
           <motion.li key={member.id} className="grid justify-items-center bg-surface-warm px-[0.3rem] pt-[0.3rem] shadow-[inset_0_0_0_1px_var(--sheet-edge),var(--sheet-shadow)] rotate-(--tilt)" style={{ '--tilt': `${portraitTilts[index % portraitTilts.length]}deg` } as CSSProperties} {...hoverLift(reduce)}>
-            {member.photo ? <img src={member.photo} alt="" width={72} height={72} loading="lazy" decoding="async" className={portrait} /> : <span className={portrait} aria-hidden="true" />}
-            <span className="text-[0.75rem] text-ink-soft" aria-hidden="true">
+            {member.photo ? <img src={member.photo} alt="" width={56} height={56} loading="lazy" decoding="async" className={portrait} /> : <span className={portrait} aria-hidden="true" />}
+            <span className="text-[0.75rem] leading-(--notebook-row) text-ink-soft" aria-hidden="true">
               {firstName(member)}
             </span>
             <span className="sr-only">{member.name}</span>
           </motion.li>
         ))}
       </ul>
-      <p className={teamNote}>with {contributors.length} contributors in design and facilitation</p>
-    </motion.figure>
+      <div className="grid justify-items-center">
+        <p className="m-0 text-[0.9375rem] leading-(--notebook-row)">
+          {teamLabel}, with {contributors.length} contributors in design and facilitation.
+        </p>
+        <p className="m-0 flex flex-wrap justify-center gap-x-4 text-[0.875rem] leading-(--notebook-row)">
+          <Link to="/about-us" className={footLink}>
+            <Users {...icon} />
+            {aboutLabel}
+          </Link>
+          <ArcLink className={footLink}>
+            <Globe {...icon} />
+            {arcSiteLabel}
+          </ArcLink>
+          <a href={instagram.href} target="_blank" rel="noopener noreferrer" className={footLink}>
+            <AtSign {...icon} />
+            {instagram.handle}
+          </a>
+          <span className="text-ink-soft italic">{floorLine}</span>
+        </p>
+      </div>
+    </motion.footer>
   )
 }
 
 export function ClosingSlideBody() {
   const reduce = usePrefersReducedMotion()
   return (
-    <div className="mx-auto grid w-full max-w-[60rem] justify-items-center gap-row">
-      <motion.p className="m-0 max-w-[40ch] text-[1.375rem]" custom={0} variants={riseVariants(reduce)}>
+    <div className="mx-auto grid w-full max-w-[62rem] justify-items-center gap-row">
+      <motion.p className="m-0 max-w-[52ch] text-[1.125rem] text-ink-soft" custom={0} variants={riseVariants(reduce)}>
         {closingLede}
       </motion.p>
-      <div className="grid w-full grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-start gap-gutter text-start max-md:grid-cols-1">
-        <Invitation order={1} reduce={reduce} />
-        <Plans order={2} reduce={reduce} />
-      </div>
-      <Team order={3} reduce={reduce} />
+      <ol className="m-0 grid w-full list-none grid-cols-3 gap-gutter p-0 max-md:grid-cols-1">
+        {ways.map((way, index) => (
+          <Way key={way.verb} way={way} order={index + 1} reduce={reduce} tilt={cardTilts[index % cardTilts.length]} />
+        ))}
+      </ol>
+      <Makers order={ways.length + 1} reduce={reduce} />
     </div>
   )
 }

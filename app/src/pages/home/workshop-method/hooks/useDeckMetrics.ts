@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
 
-/** Tracks the deck width for the fan layout. */
 export function useDeckMetrics(deck: RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(900)
 

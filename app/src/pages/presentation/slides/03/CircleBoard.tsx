@@ -1,6 +1,7 @@
 import { InstantPhotoLayer } from '#/components/InstantPhoto'
 import { useReveal } from '#/components/Reveal'
 import { useSlideStageHost } from '../../hooks/useSlideStageHost'
+import { useRevealCue } from '../../playback/targets'
 import { CircleCard } from './CircleCard'
 import { CircleGroup } from './CircleGroup'
 import { PhoneLayer } from './PhoneLayer'
@@ -8,9 +9,16 @@ import { circles, circlesLabel, findByKey, values, valuesLabel } from './content
 import type { BoardKey } from './content/circles'
 import './CircleBoard.css'
 
+declare module '../../playback/cues' {
+  interface CueTargets {
+    circles: BoardKey | null
+  }
+}
+
 export function CircleBoard() {
   const host = useSlideStageHost()
   const reveal = useReveal<BoardKey>()
+  useRevealCue('circles', reveal)
 
   return (
     <div className="circle-board">

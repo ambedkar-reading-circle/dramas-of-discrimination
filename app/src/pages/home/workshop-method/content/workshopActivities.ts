@@ -1,4 +1,3 @@
-/** The five acts of the workshop, in order. */
 export type ActivityName =
   'IntroTime' | 'PartTime' | 'StoryTime' | 'PlayTime' | 'OverTime'
 
@@ -11,24 +10,20 @@ export interface WorkshopActivity {
   steps: ActivityStep[]
   prompt: string
   manual: ManualExcerpt[]
-  /** Stickers for the activity's worksheet, under the drawing. */
   worksheets?: WorksheetSticker[]
 }
 
-/** One instruction; a step with photographs opens them from its own text. */
 export interface ActivityStep {
   text: string
   photos?: Photo[]
 }
 
-/** A photograph from a past workshop; the caption carries what it adds. */
 export interface Photo {
   src: string
   alt: string
   caption: string
 }
 
-/** The worksheet as the manual prints it, or as a group filled it in. */
 export type WorksheetSticker =
   | { kind: 'manual'; label: string; pages: number[] }
   | { kind: 'photo'; label: string; photo: Photo }
@@ -100,8 +95,8 @@ export const workshopActivities: WorkshopActivity[] = [
         text: 'Pool the examples, form mixed groups, and have each group choose one issue.',
         photos: [
           {
-            src: '/slides/05-part-c.jpg',
-            alt: 'A group sits on a mat on the grass around a large sheet, one person writing on it, markers scattered around.',
+            src: '/slides/05-part-d.jpg',
+            alt: 'Small groups sit on the grass under tall trees in a park, one person cross-legged over a large sheet spread on the lawn.',
             caption:
               "Each pair brings its examples to the room. Then a count of 'Liberty, Equality, Fraternity' scatters the pairs into new groups, and each group settles on one issue.",
           },
@@ -111,8 +106,8 @@ export const workshopActivities: WorkshopActivity[] = [
         text: 'Map the actors involved, their ideal behaviour, the failures that stop them, and the constitutional values at stake.',
         photos: [
           {
-            src: '/slides/05-part-d.jpg',
-            alt: 'Small groups sit on the grass under tall trees in a park, one person cross-legged over a large sheet spread on the lawn.',
+            src: '/slides/05-part-c.jpg',
+            alt: 'A group sits on a mat on the grass around a large sheet, one person writing on it, markers scattered around.',
             caption:
               "On the 'Actors, Activities, Challenges' sheet, a group lists who is involved, what each should ideally do and what stops them, then marks Justice, Liberty, Equality or Fraternity wherever the scenario violates one.",
           },

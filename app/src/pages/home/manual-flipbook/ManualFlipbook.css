@@ -1,9 +1,3 @@
-/*
- * Styles for the surfaces this module renders: the reader host, book frame,
- * flip engine, printed pages, letter pages, and ASCII canvases. The section
- * wrapper's own elements (runway, stage, transcript, nudge, loading) are
- * styled by pages/home/ManualFlipbookSection.css.
- */
 .manual-reader {
   width: min(100%, 420px, calc((100svh - 7 * var(--notebook-row)) * 0.7));
   margin-inline: auto;
@@ -15,7 +9,6 @@
 .manual-book-frame {
   container-type: inline-size;
   height: round(up, calc(100cqi * 10 / 7), var(--notebook-row));
-  /* cqi in height must measure this frame's parent, not the viewport. */
 }
 .manual-desktop .manual-book-frame {
   height: round(up, calc(100cqi * 5 / 7), var(--notebook-row));
@@ -29,8 +22,6 @@
   height: 100%;
 }
 .manual-flip-engine .stf__item {
-  /* The engine clips the leaf root. Opaque paper here also covers the page
-     underneath when the printed child is transformed around the fold. */
   background: var(--manual-paper);
 }
 .manual-book-shadow {
@@ -39,7 +30,6 @@
   bottom: 0;
   pointer-events: none;
   z-index: -1;
-  /* This footprint follows the visible cover/spread as the engine turns. */
   box-shadow:
     0 1px 2px rgb(0 0 0 / 0.24),
     0 5px 10px rgb(0 0 0 / 0.2),
@@ -59,8 +49,6 @@
   );
   pointer-events: none;
   z-index: 10;
-  /* The engine paints the moving curl. A second gradient on each printed face
-     would travel with the page and create a detached/doubled spine mid-turn. */
 }
 .manual-reading {
   max-width: 70ch;
@@ -68,7 +56,6 @@
   padding-block: var(--notebook-row);
 }
 
-/* Each printed face is its own typesetting surface, independent of notebook ruling. */
 .manual-page {
   user-select: text;
   -webkit-user-select: text;
@@ -87,7 +74,6 @@
   box-shadow: inset 0 -2px 3px rgb(94 76 43 / 0.12);
 }
 .manual-page::before {
-  /* Attached to the printed face so the texture travels through the curl. */
   content: '';
   position: absolute;
   inset: 0;
@@ -105,7 +91,6 @@
   background-position: 73px 119px;
 }
 .manual-page::after {
-  /* Paint the edge above the artwork without narrowing the printed content. */
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
@@ -200,7 +185,6 @@
   color: var(--manual-paper);
 }
 .manual-letter-inverse::before {
-  /* Uneven ink coverage exposes the fibres without distressing the type. */
   mix-blend-mode: screen;
   opacity: 0.42;
   background-position: 191px 47px;
@@ -214,7 +198,6 @@
 }
 .manual-letter-copy,
 .manual-salutation {
-  /* 14px floor, unless the page is too small for the letter to fit at it. */
   font-size: max(4.2cqi, min(14px, 4.5cqi));
   line-height: 1.45;
   letter-spacing: 0.012em;
@@ -337,7 +320,6 @@
   outline-offset: -4px;
 }
 @media (max-width: 700px) {
-  /* Keep a page-height frame for the transcript and scroll nudge. */
   .manual-animated .manual-reader {
     width: min(100%, 420px, calc((100svh - 8 * var(--notebook-row)) * 0.7));
   }

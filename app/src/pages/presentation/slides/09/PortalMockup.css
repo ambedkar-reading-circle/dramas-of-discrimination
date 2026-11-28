@@ -1,13 +1,4 @@
-/* The Manifesto portal. Built on the facilitation guide's shell
-   (shared/guide.css) and its tabs and switch (shared/modes.css), with no
-   workshop journey: the portal sits above every Workshop. Explore lists
-   every shared Manifesto beside one open to read; Common ground counts the
-   pledges they share. Fixed colours in either theme, like the guide itself. */
 @layer components {
-  .portal {
-    --fac-desk-height: 34rem;
-  }
-
   .portal .fac-screen {
     padding-top: 0.875rem;
   }
@@ -26,7 +17,6 @@
     min-height: 0;
   }
 
-  /* Explore: search and filters, then cards beside the open Manifesto */
   .portal-explore {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -174,7 +164,6 @@
     opacity: 0.85;
   }
 
-  /* The open Manifesto, as a small charter inside a gold rule */
   .portal-reader {
     position: relative;
     min-height: 0;
@@ -245,37 +234,23 @@
       serif;
   }
 
-  .portal-reader-values,
-  .portal-reader-pledges {
+  .portal-reader-rules {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .portal-reader-values li,
-  .portal-reader-pledges li {
+  .portal-reader-rules li {
     position: relative;
     padding-inline-start: 1.375rem;
   }
 
-  .portal-reader-values li {
-    font-style: italic;
-  }
-
-  .portal-reader-values li::before,
-  .portal-reader-pledges li::before {
+  .portal-reader-rules li::before {
+    content: '✦';
     position: absolute;
+    top: 0.2em;
     left: 0.25rem;
     color: var(--charter-red);
-  }
-
-  .portal-reader-values li::before {
-    content: '❧';
-  }
-
-  .portal-reader-pledges li::before {
-    content: '✦';
-    top: 0.2em;
     font-size: 0.7em;
   }
 
@@ -294,7 +269,6 @@
     opacity: 0.75;
   }
 
-  /* Common ground: the collection's size beside the pledges it shares */
   .portal-common {
     display: grid;
     grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.6fr);
@@ -322,7 +296,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .portal-pledges {
+  .portal-rules {
     display: grid;
     align-content: start;
     gap: 0.875rem;
@@ -340,7 +314,6 @@
     opacity: 0.75;
   }
 
-  /* One series, so one hue and no legend: each bar is labelled directly. */
   .portal-bars {
     display: grid;
     gap: 0.75rem;

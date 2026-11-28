@@ -25,7 +25,6 @@ function getInitialEnabled() {
   }
 }
 
-/** Storage and toggle state. `PencilTraceProvider` publishes the result. */
 export function usePencilPreferenceState(): PencilPreference {
   const [enabled, setEnabled] = useState(getInitialEnabled)
 
@@ -33,7 +32,6 @@ export function usePencilPreferenceState(): PencilPreference {
     try {
       window.localStorage.setItem(PENCIL_STORAGE_KEY, enabled ? 'on' : 'off')
     } catch {
-      // Keep the choice for this visit when storage is unavailable.
     }
   }, [enabled])
 

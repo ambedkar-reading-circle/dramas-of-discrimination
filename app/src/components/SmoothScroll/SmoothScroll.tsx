@@ -5,15 +5,12 @@ import 'lenis/dist/lenis.css'
 import { registerPageScroller } from './pageScroller'
 import { useMediaQuery } from '#/lib/use-media-query'
 
-/** Enhance the window scroll so sticky layout and Motion keep using native positions. */
 export default function SmoothScroll() {
   const router = useRouter()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
   useEffect(() => {
     if (reducedMotion) return
-    // Marks this run's instance as destroyed so an anchor navigation that is
-    // still in flight when the preference flips falls back to native scroll.
     let disposed = false
     const lenis = new Lenis({
       autoRaf: true,
@@ -23,7 +20,6 @@ export default function SmoothScroll() {
     })
     registerPageScroller(lenis)
 
-    // Stop the old page's inertia before the router resets or restores scroll.
     const unsubscribe = router.subscribe('onBeforeLoad', () => {
       lenis.scrollTo(window.scrollY, { immediate: true })
     })
@@ -46,8 +42,6 @@ export default function SmoothScroll() {
       const target = document.getElementById(id)
       if (!target) return
 
-      // Prevent the native jump and the router's own hash scroll. Start Lenis
-      // after navigation so onBeforeLoad cannot cancel the new animation.
       event.preventDefault()
       void router
         .navigate({

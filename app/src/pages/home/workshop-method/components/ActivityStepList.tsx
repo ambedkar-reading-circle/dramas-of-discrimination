@@ -5,7 +5,6 @@ import { tilts } from '../content/overlayChoreography'
 import type { TriggerFor } from '../hooks/useSheetOverlay'
 import { TapedButton } from './ActivityStickers'
 
-/** The act's numbered steps. A step with photographs is a sticker that opens them. */
 export function ActivityStepList({ steps, triggerFor }: { steps: ActivityStep[]; triggerFor: TriggerFor }) {
   return (
     <ol className="method-instructions">

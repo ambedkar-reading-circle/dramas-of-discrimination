@@ -7,12 +7,10 @@ type WorksheetCardProps = {
   label: string
   title: string
   description: string
-  /** Accessible name for the full-size preview link. */
   linkLabel: string
   heading?: 'h3' | 'h4'
 }
 
-/** The worksheet sheet preview card shared by the home gallery and the deck. */
 export default function WorksheetCard({ imageUrl, width, height, label, title, description, linkLabel, heading: Heading = 'h4' }: WorksheetCardProps) {
   return (
     <figure

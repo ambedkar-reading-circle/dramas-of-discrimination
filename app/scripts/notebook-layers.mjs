@@ -3,7 +3,6 @@ import { mkdir } from 'node:fs/promises'
 import { chromium } from 'playwright'
 import { createServer } from 'vite'
 
-// Real components rendered in a test-only Vite route; no copied surface CSS.
 const fixture = `
 import '/src/styles.css'
 import React from 'react'
@@ -86,7 +85,6 @@ async function navigate(path) {
   await settle()
 }
 async function point(x, y, type = 'pointermove') {
-  // Synthetic pointer coordinates avoid unrelated hover colors in pixel comparisons.
   await page.evaluate(
     ({ x, y, type }) =>
       window.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y })),
@@ -125,7 +123,6 @@ async function unchanged(clip, x, y, message) {
   const before = await pixels(clip)
   await point(x, y)
   const after = await pixels(clip)
-  // Paper blend compositing can round color channels by one when a layer appears.
   const differences = after.filter(
     (value, index) => Math.abs(value - before[index]) > 2,
   ).length
@@ -179,7 +176,6 @@ try {
     .first()
     .boundingBox()
   assert.ok(button, 'Hero action is visible')
-  // The old implementation paints later sheets' margins over this opaque ink.
   await unchanged(
     { ...inside(button), height: 12 },
     button.x + button.width / 2,
@@ -403,7 +399,6 @@ try {
   )
   await page.setViewportSize({ width: 1100, height: 800 })
   await aligned(420, 181)
-  // Hide all other copies: the visible sticky sheet must still paint on its own.
   await page.locator('.notebook-decoration').evaluateAll((layers) =>
     layers.forEach((layer) => {
       if (layer.parentElement.id !== 'sticky') layer.style.display = 'none'

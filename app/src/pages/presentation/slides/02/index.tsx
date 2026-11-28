@@ -1,12 +1,11 @@
 import type { Slide } from '../../types'
+import { speakerNotes } from './content/speakerNotes'
 import { VideoEmbed } from './VideoEmbed'
 
 export const slide = {
   id: '02',
   kicker: 'The Workshop',
   heading: 'Dramas of Discrimination',
-  // The tablet is the whole slide. The heading stays for screen readers and
-  // for the stage's focus-on-arrival, but is not drawn.
   ownsHeading: true,
   body: (
     <>
@@ -17,10 +16,5 @@ export const slide = {
     </>
   ),
   layout: 'fill',
-  speakerNotes: [
-    'To make this less abstract, let me show you a short film of the workshop.',
-    'It also shows who we are. The Ambedkar Reading Circle is an informal collective.',
-    'Our work is rooted in the values of the Constitution. Liberty, equality, fraternity, and justice.',
-    "Above all, it is rooted in Babasaheb's vision of fraternity.",
-  ],
+  speakerNotes,
 } satisfies Slide

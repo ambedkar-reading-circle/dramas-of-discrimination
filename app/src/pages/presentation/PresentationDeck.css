@@ -1,3 +1,5 @@
+@reference '../../styles.css';
+
 @property --stage-fade-top {
   syntax: '<length>';
   inherits: false;
@@ -27,16 +29,7 @@
   }
 }
 
-/*
- * Presentation deck layout: stage sizing between the site header and the deck
- * controls, chip strip, overview grid, asset placeholders, presenter tools,
- * fullscreen state, and contextual overrides for the embedded home-page
- * components (WorkshopMethod, ManualBook). Colors and spacing come from the
- * theme custom properties; nothing is hardcoded.
- */
 @layer components {
-  /* The deck is the page: it fills the viewport under the site header, and
-     the fullscreen surface, so the window itself never scrolls. */
   .site-shell:has(.presentation-deck) {
     height: 100dvh;
     max-height: 100dvh;
@@ -56,7 +49,6 @@
   }
 
   .presentation-deck {
-    /* The resting outline of the deck's small boxed controls. */
     --control-line: color-mix(in srgb, var(--sea-ink) 30%, transparent);
     display: flex;
     flex: 1 1 auto;
@@ -81,8 +73,6 @@
     min-height: 0;
   }
 
-  /* One line at every width: the running head gives way to the tools and
-     truncates, rather than wrapping them onto a row of their own. */
   .presentation-meta {
     display: flex;
     align-items: center;
@@ -90,7 +80,6 @@
     gap: var(--notebook-gutter);
   }
 
-  /* Centred on the tools rather than offset onto the ruled baseline. */
   .presentation-meta .eyebrow {
     flex: 1 1 auto;
     min-width: 0;
@@ -100,25 +89,25 @@
     text-overflow: ellipsis;
   }
 
-  .presentation-tools {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: calc(var(--notebook-row) / 4);
+  .slide-stage-shell {
+    position: relative;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
-  /* The stage fills the space between the meta bar and the deck controls.
-     It is also the inline-size container the title slide's DodLogo wordmark
-     resolves its 10cqi against — it must be an element of definite width,
-     never the shrink-wrapped title slide body itself (containment would collapse
-     it to nothing). Slides that outgrow the stage are scaled down to fit, so
-     the stage does not grow a vertical scrollbar. */
+  .slide-stage-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
   .slide-stage {
     position: relative;
     container-type: inline-size;
     display: grid;
     grid-template-rows: minmax(0, 1fr);
-    flex: 1 1 auto;
     min-height: 0;
     padding-inline: 0.25rem;
     overflow-x: hidden;
@@ -127,8 +116,6 @@
     border-radius: 0.125rem;
   }
 
-  /* A scaled slide's layout box is taller than what is painted. Clipping it
-     avoids a scrollbar for space the reader cannot see. */
   .slide-stage:has(.slide-frame--scaled) {
     overflow: clip;
     overflow-clip-margin: 0.5rem;
@@ -207,9 +194,6 @@
     gap: var(--notebook-gutter);
   }
 
-  /* Fixed-position children place before auto-placed ones, so the header
-     spans explicitly and the body and interactive claim row 2. Direct children
-     only: .slide-asset also appears inside embeds. */
   .slide--split > .slide-heading {
     grid-column: 1 / -1;
   }
@@ -226,8 +210,6 @@
     align-self: start;
   }
 
-  /* Title slide: the approach trigger and diagram cells are cards taped to
-     the page. Layout and type live as utilities in the JSX. */
   .slide-title-taped {
     position: relative;
     cursor: pointer;
@@ -262,7 +244,6 @@
     outline: none;
   }
 
-  /* The highlighted result card: inverse ink, no visible edge. */
   .slide-title-taped--inverse,
   .slide-title-taped--inverse:hover,
   .slide-title-taped--inverse:focus-visible {
@@ -271,32 +252,6 @@
 
   .slide-title-taped--inverse::before {
     background: color-mix(in srgb, var(--hl-text) 22%, transparent);
-  }
-
-  /* Slide nav stays on one row at the bottom of the viewport. */
-  .slide-nav {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    flex: none;
-    gap: calc(var(--notebook-row) / 4);
-    width: 100%;
-    min-width: 0;
-    margin-top: auto;
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
-  }
-
-  .slide-nav-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: calc(var(--notebook-row) / 2);
-    min-width: 0;
-  }
-
-  .slide-nav-controls > .mark-button {
-    flex: none;
   }
 
   .slide-progress {
@@ -312,330 +267,6 @@
     transition: inline-size 250ms ease;
   }
 
-  /* The overview control lives in the meta tools. This node only hosts the dialog. */
-  .slide-index {
-    display: contents;
-  }
-
-  .slide-index-strip {
-    display: flex;
-    flex: 1 1 auto;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25rem;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  /* A boxed control: a hairline frame, filled only on hover. */
-  .slide-index-chip,
-  .speaker-notes-tab {
-    padding: 0 0.4375rem;
-    border: 0;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--control-line);
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .slide-index-chip:hover,
-  .speaker-notes-tab:hover {
-    background: var(--link-bg-hover);
-  }
-
-  .slide-index-chip {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    color: var(--sea-ink);
-    font-family: var(--font-logo);
-    font-size: 0.75rem;
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
-
-  .slide-index-chip[aria-current='true'] {
-    background: var(--hl-bg);
-    color: var(--hl-text);
-    box-shadow: inset 0 0 0 1px var(--hl-bg);
-  }
-
-  .slide-index-gap {
-    box-shadow: none;
-  }
-
-  /* All slides: the same paper panel as the speaker notes, showing every
-     slide as a numbered tile. */
-  .slide-overview-dialog[open] {
-    z-index: calc(var(--layer-site-foreground) + 1);
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    margin: 0;
-    /* A definite row, so the panel's max-height resolves and a long deck
-       scrolls inside it instead of overflowing the viewport. */
-    grid-template-rows: minmax(0, 1fr);
-    padding: var(--notebook-gutter);
-    border: 0;
-    background: transparent;
-    color: var(--sea-ink);
-    overflow: hidden;
-  }
-
-  .slide-overview-dialog::backdrop {
-    background: transparent;
-  }
-
-  /* The list scrolls, not the panel, so the close button stays put. */
-  .slide-overview-panel {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: min(56rem, 100%);
-    max-height: 100%;
-    /* The extra inline-end row clears the close button. */
-    padding: var(--notebook-row)
-      calc(var(--notebook-gutter) + var(--notebook-row)) var(--notebook-row)
-      var(--notebook-gutter);
-    overflow: hidden;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--sea-ink);
-    background: color-mix(in srgb, var(--bg-base) 95%, transparent);
-  }
-
-  .slide-overview-close {
-    position: absolute;
-    top: calc(var(--notebook-row) / 4);
-    right: calc(var(--notebook-row) / 4);
-  }
-
-  .slide-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
-    gap: calc(var(--notebook-row) / 2);
-    min-height: 0;
-    margin: 0;
-    /* Room for the focus outline, which overflow would clip. */
-    padding: calc(var(--notebook-row) / 8);
-    overflow: auto;
-    overscroll-behavior: contain;
-    list-style: none;
-    font-family: var(--font-logo);
-    font-size: 0.9375rem;
-    line-height: var(--notebook-row);
-  }
-
-  .slide-overview > li {
-    display: grid;
-  }
-
-  /* A tile per slide: number beside heading, in a faint ink frame. */
-  .slide-overview-item {
-    display: grid;
-    grid-template-columns: 2ch 1fr;
-    gap: 0.75rem;
-    align-items: baseline;
-    align-content: start;
-    padding: calc(var(--notebook-row) / 4) 0.75rem;
-    border: 0;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--ink-faint);
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: start;
-    cursor: pointer;
-  }
-
-  .slide-overview-item:hover {
-    background: var(--link-bg-hover);
-  }
-
-  .slide-overview-item:focus-visible {
-    outline: 1px solid var(--sea-ink);
-    outline-offset: 2px;
-  }
-
-  .slide-overview-item[aria-current='true'] {
-    box-shadow: inset 0 0 0 1px var(--sea-ink);
-    background: var(--ink-scrim);
-  }
-
-  .slide-overview-number {
-    color: var(--stage-red);
-  }
-
-  /* Speaker notes: what to say over the slide on stage. */
-  /* showModal() already lifts the dialog into the top layer; the z-index
-     keeps it above the header and pencil if it is ever shown non-modally. */
-  .speaker-notes-dialog[open] {
-    z-index: calc(var(--layer-site-foreground) + 1);
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    margin: 0;
-    /* A definite row, so the panel's max-height resolves and long notes
-       scroll inside it instead of overflowing the viewport. */
-    grid-template-rows: minmax(0, 1fr);
-    padding: var(--notebook-gutter);
-    border: 0;
-    /* The slide stays fully in view around the notes. */
-    background: transparent;
-    color: var(--sea-ink);
-    overflow: hidden;
-  }
-
-  .speaker-notes-dialog::backdrop {
-    background: transparent;
-  }
-
-  /* The list scrolls, not the panel, so the close button stays put. */
-  .speaker-notes-panel {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: min(40rem, 100%);
-    max-height: 100%;
-    /* The extra inline-end row clears the close button. */
-    padding: var(--notebook-row)
-      calc(var(--notebook-gutter) + var(--notebook-row)) var(--notebook-row)
-      var(--notebook-gutter);
-    overflow: hidden;
-    border-radius: 0.125rem;
-    box-shadow: inset 0 0 0 1px var(--sea-ink);
-    /* Paper at 95%, so the slide shows only faintly through the notes. */
-    background: color-mix(in srgb, var(--bg-base) 95%, transparent);
-  }
-
-  .speaker-notes-close {
-    position: absolute;
-    top: calc(var(--notebook-row) / 4);
-    right: calc(var(--notebook-row) / 4);
-  }
-
-  /* One tab per part of the slide, set like the margin labels. */
-  .speaker-notes-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    flex: none;
-    gap: calc(var(--notebook-row) / 4) 0.25rem;
-    margin-bottom: var(--notebook-row);
-  }
-
-  .speaker-notes-tab {
-    display: inline-flex;
-    gap: 0.375rem;
-    align-items: baseline;
-    min-height: var(--notebook-row);
-    color: var(--sea-ink-soft);
-    font: 0.75rem / var(--notebook-row) var(--font-logo);
-  }
-
-  .speaker-notes-tab[aria-selected='true'] {
-    box-shadow: inset 0 0 0 1px var(--sea-ink);
-    background: var(--ink-scrim);
-    color: var(--sea-ink);
-  }
-
-  .speaker-notes-tab:focus-visible {
-    outline: 1px solid var(--sea-ink);
-    outline-offset: 2px;
-  }
-
-  /* Numbered pointers, set in the mono face of the margin labels. */
-  .speaker-notes-points {
-    display: grid;
-    gap: var(--notebook-row);
-    min-height: 0;
-    margin: 0;
-    /* Room for the checkbox focus outline, which overflow would clip. */
-    padding: calc(var(--notebook-row) / 8);
-    overflow: auto;
-    overscroll-behavior: contain;
-    list-style: none;
-    font-family: var(--font-logo);
-    font-size: 0.9375rem;
-    line-height: var(--notebook-row);
-  }
-
-  .speaker-notes-point {
-    display: grid;
-    grid-template-columns: auto 2ch 1fr;
-    gap: 0.75rem;
-    cursor: pointer;
-    align-items: baseline;
-  }
-
-  .speaker-notes-number {
-    color: var(--stage-red);
-  }
-
-  /* A square ink box, like the overview cards; ticked, it fills with a red
-     square inset from the frame. */
-  .speaker-notes-check {
-    appearance: none;
-    flex: none;
-    width: 0.875rem;
-    height: 0.875rem;
-    /* Sits on the first line beside the number, however far the point wraps. */
-    align-self: start;
-    margin: calc((var(--notebook-row) - 0.875rem) / 2) 0 0;
-    border: 0;
-    border-radius: 0;
-    box-shadow: inset 0 0 0 1px var(--sea-ink);
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .speaker-notes-check:hover {
-    background: var(--link-bg-hover);
-  }
-
-  .speaker-notes-check:checked {
-    box-shadow:
-      inset 0 0 0 1px var(--sea-ink),
-      inset 0 0 0 3px var(--bg-base);
-    background: var(--stage-red);
-  }
-
-  .speaker-notes-check:focus-visible {
-    outline: 1px solid var(--sea-ink);
-    outline-offset: 2px;
-  }
-
-  @media (forced-colors: active) {
-    .speaker-notes-check {
-      appearance: auto;
-    }
-  }
-
-  /* A spoken point fades back so the next one stands out. */
-  .speaker-notes-point:has(.speaker-notes-check:checked)
-    > :not(.speaker-notes-check) {
-    color: var(--sea-ink-soft);
-    text-decoration: line-through;
-    text-decoration-thickness: 1px;
-  }
-
-  .speaker-notes-points.is-placeholder {
-    color: var(--sea-ink-soft);
-  }
-
-  /* Asset placeholders: framed, paper-tear-styled boxes at the slot's ratio. */
   .slide-asset {
     display: grid;
     gap: calc(var(--notebook-row) / 2);
@@ -681,7 +312,6 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Screen-reader-only text. */
   .slide-sr {
     position: absolute;
     width: 1px;
@@ -694,14 +324,15 @@
   }
 }
 
-/* Embedded home-page components: the deck hosts them inside a bounded stage,
-   so their viewport-scale sections relax to slide scale. Shared component
-   files are untouched; these overrides are presentation-context only. They
-   live outside @layer because WorkshopMethod.css itself is unlayered. */
 .presentation-embed {
   display: grid;
   gap: var(--notebook-row);
   min-width: 0;
+}
+
+.presentation-method .method-dialog:popover-open {
+  bottom: var(--player-height, 0px);
+  height: auto;
 }
 
 .presentation-manual-book {
@@ -709,8 +340,6 @@
   min-width: 0;
 }
 
-/* The book is driven by the presenter's turn controls below it, so the
-   engine's own click-to-flip is switched off to keep both in agreement. */
 .presentation-manual .manual-book-frame {
   pointer-events: none;
 }
@@ -731,7 +360,6 @@
   gap: var(--notebook-row);
 }
 
-/* Worksheet previews (07) */
 .presentation-tables {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -742,10 +370,6 @@
   max-height: none;
 }
 
-/* Tablet video (02): the tablet alone, as large as the stage allows. The
-   frame stretches to the stage's height so the body can measure both axes. */
-/* Raised, so the tablet crosses over the neighbouring slide as it travels
-   instead of under it. */
 .slide-frame:has(.slide--fill) {
   z-index: 1;
   align-self: stretch;
@@ -762,16 +386,22 @@
   align-content: center;
 }
 
+.tablet-swing {
+  perspective: 1400px;
+}
+
+.slide-fit-measuring .tablet-swing-motion {
+  transform: none !important;
+}
+
 .presentation-video {
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  perspective: 1400px;
 }
 
-/* 16:9 screen plus the bezel and camera, about 2.5rem of height. */
-.presentation-video-motion {
+.presentation-video > .tablet-swing-motion {
   width: min(100cqw, calc((100cqh - 2.5rem) * 16 / 9));
 }
 
@@ -780,9 +410,6 @@
   min-height: 0;
 }
 
-/* The tablet travels in and out past the viewport's side edges, so
-   the deck stops clipping at its own edges while a fill slide is on stage.
-   The page under the site header still clips, so nothing scrolls. */
 .presentation-deck:has(.slide--fill),
 .slide-stage:has(.slide--fill) {
   overflow: visible;
@@ -806,12 +433,6 @@
     grid-row: auto;
   }
 
-  .slide-index-chip {
-    min-width: 2.25rem;
-    min-height: 2.25rem;
-    font-size: 0.6875rem;
-  }
-
   .presentation-tables {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -833,10 +454,251 @@
   }
 }
 
-/* Unlayered on purpose: it must outrank the utilities layer that sizes the
-   DodLogo wordmark (text-[min(10cqi,8rem)]). The title slide wears the
-   wordmark one notch below the home hero's scale; cqi resolves against the
-   .slide-stage container. */
 .slide-title-heading .font-logo {
   font-size: min(7cqi, 5.5rem);
+}
+
+@layer components {
+  .presentation-deck {
+    padding-bottom: calc(var(--player-height, calc(var(--spacing-control) + --spacing(2))) + var(--notebook-row) / 2);
+  }
+
+  .slide-nav.slide-nav {
+    --slide-progress-inset: 2px;
+    --slide-line-width: 1px;
+    z-index: calc(var(--layer-site-foreground) - 1);
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+  }
+
+  .slide-nav .slide-progress {
+    --tear-at: calc(6px - var(--slide-progress-inset));
+    position: absolute;
+    inset-inline: 0;
+    top: -6px;
+    height: 12px;
+    border-radius: 0;
+    background: transparent;
+    transform: scaleY(-1);
+    pointer-events: none;
+    mask-image: url('/paper-tear.svg'), url('/paper-tear.svg');
+    mask-size: 768px 6px;
+    mask-repeat: repeat-x;
+    mask-position:
+      left 0 top var(--tear-at),
+      left 0 top calc(var(--tear-at) - var(--slide-line-width));
+    mask-composite: subtract;
+  }
+
+  .slide-nav .slide-progress-fill {
+    border-radius: 0;
+  }
+
+  .caption-time {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: var(--slide-line-width);
+    pointer-events: none;
+  }
+
+  .caption-time-fill {
+    height: 100%;
+    transform-origin: left center;
+    background: color-mix(in srgb, var(--sea-ink) 55%, transparent);
+  }
+
+  .slide-progress-fill--points {
+    transition: none;
+  }
+
+  .slide-nav-controls {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'change caption extras';
+    align-items: center;
+    gap: --spacing(1);
+    padding: --spacing(1);
+    padding-top: calc(--spacing(1) + var(--slide-progress-inset, 0px));
+  }
+
+  .slide-nav-change {
+    grid-area: change;
+    display: flex;
+    align-items: center;
+    gap: --spacing(1);
+  }
+
+  .slide-transport,
+  .slide-nav-extras {
+    display: flex;
+    align-items: center;
+    gap: --spacing(1);
+  }
+
+  .slide-nav-extras {
+    grid-area: extras;
+    justify-content: flex-end;
+  }
+
+  .slide-nav-extras:empty {
+    display: none;
+  }
+
+  .slide-nav .mark-button {
+    width: var(--spacing-control);
+    padding: 0;
+  }
+
+  .slide-transport .slide-play {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .slide-nav-controls .mark-button,
+  .slide-nav-controls .slide-index-chip {
+    transition:
+      background-color 120ms ease,
+      color 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  .slide-nav-controls .mark-button:not([aria-disabled='true'], .slide-play, [aria-pressed='true']):hover,
+  .slide-nav-controls .slide-index-chip:not(.slide-index-gap, [aria-current='true']):hover {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .slide-nav-controls .slide-play:not([aria-disabled='true']):hover,
+  .slide-nav-controls .mark-button[aria-pressed='true']:not([aria-disabled='true']):hover,
+  .slide-nav-controls .slide-index-chip[aria-current='true']:hover {
+    background: var(--bg-base);
+    color: var(--sea-ink);
+    box-shadow: inset 0 0 0 2px var(--hl-bg);
+  }
+
+  .slide-index-strip {
+    grid-area: caption;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: --spacing(1);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .slide-index-chip {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--spacing-control);
+    height: var(--spacing-control);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: transparent;
+    color: var(--sea-ink);
+    cursor: pointer;
+    font: 0.75rem / 1 var(--font-logo);
+    letter-spacing: 0.04em;
+  }
+
+  .slide-index-chip[aria-current='true'] {
+    background: var(--hl-bg);
+    color: var(--hl-text);
+  }
+
+  .slide-index-gap {
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .slide-nav-captioned {
+    grid-area: caption;
+    display: flex;
+    align-items: center;
+    gap: --spacing(1);
+    min-width: 0;
+  }
+
+  .slide-nav-captioned .deck-captions {
+    flex: 1 1 auto;
+  }
+
+  .deck-captions {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    min-width: 0;
+    min-height: var(--spacing-control);
+    padding: 0 --spacing(3);
+    border-radius: var(--radius-control);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .deck-caption {
+    top: 0;
+    max-width: 100ch;
+    margin: 0;
+    color: var(--sea-ink);
+    font-size: inherit;
+    line-height: inherit;
+    text-align: center;
+    text-wrap: pretty;
+  }
+
+  .deck-caption[data-kind='quiet'] {
+    color: var(--sea-ink-soft);
+    font-style: italic;
+  }
+
+  @variant max-md {
+    .slide-nav-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .slide-nav-captioned {
+      display: contents;
+    }
+
+    .slide-index-strip,
+    .slide-nav-captioned .deck-captions {
+      order: -1;
+      flex: 1 0 100%;
+    }
+
+    .slide-nav-change,
+    .slide-nav-extras {
+      flex: 1 1 0;
+    }
+
+    .deck-captions {
+      min-height: calc(3lh + --spacing(2));
+      padding-block: --spacing(1);
+      font-size: 0.9375rem;
+    }
+  }
+
+  @variant max-xs {
+    .slide-nav-controls {
+      justify-content: center;
+    }
+
+    .slide-nav-change {
+      flex: none;
+    }
+
+    .slide-nav-extras {
+      flex: 1 0 100%;
+      justify-content: center;
+    }
+  }
 }

@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
 import '../ActivityOverlays.css'
 import { twoDigit } from '#/lib/format'
+import { useLatest } from '#/lib/use-latest'
 import type { WorkshopActivity } from '../content/workshopActivities'
 import { ActivityDrawing } from '../content/activityDrawings'
 import { resolveOverlay } from '../content/sheetOverlay'
+import type { OverlayTarget } from '../content/sheetOverlay'
 import { useSheetOverlay } from '../hooks/useSheetOverlay'
 import { WorksheetStickers, ManualStickers } from './ActivityStickers'
 import { ActivityStepList } from './ActivityStepList'
@@ -12,41 +14,47 @@ import { SheetOverlay } from './SheetOverlay'
 interface ActivityDialogProps {
   activities: WorkshopActivity[]
   active: number | null
+  shown: OverlayTarget | null
+  onShow: (target: OverlayTarget | null) => void
   onSelect: (index: number) => void
   onClose: () => void
+  modeless?: boolean
 }
 
 export const activityDialogId = 'workshop-activity-dialog'
 const overlayId = 'workshop-activity-overlay'
 
-/**
- * The open facilitation sheet, as a modal over the viewport. `showModal()`
- * puts it in the top layer, so it escapes every host's transforms, clipping
- * and stacking (the home section, the /approach slide stage) and sits above
- * the site header. The page behind is inert, so the sheet carries its own
- * previous/next controls. Its stickers lay manual pages or photographs over
- * it; while they are out, Escape and the backdrop put them away first.
- */
-export function ActivityDialog({ activities, active, onSelect, onClose }: ActivityDialogProps) {
+export function ActivityDialog({ activities, active, shown, onShow, onSelect, onClose, modeless = false }: ActivityDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const open = active !== null
   const activity = active === null ? null : activities[active]
-  const overlay = useSheetOverlay(active, overlayId)
-  const overlayContent = activity ? resolveOverlay(activity, overlay.shown) : null
+  const overlay = useSheetOverlay(shown, onShow, overlayId)
+  const overlayContent = activity ? resolveOverlay(activity, shown) : null
   const overlayOpen = overlayContent !== null
 
   useEffect(() => {
     const element = dialog.current
     if (!element || !open) return
+    if (modeless) return showModeless(element)
     if (!element.open) element.showModal()
     return () => {
-      // close() restores focus to whatever opened the sheet.
       if (element.open) element.close()
     }
-  }, [open])
+  }, [open, modeless])
 
-  // A new act starts at its top.
+  const dismiss = useLatest(() => (overlayOpen ? overlay.close() : onClose()))
+  useEffect(() => {
+    if (!open || !modeless) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      event.preventDefault()
+      dismiss.current()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open, modeless, dismiss])
+
   useEffect(() => {
     content.current?.scrollTo({ top: 0 })
   }, [active])
@@ -63,19 +71,20 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
       aria-labelledby={activity ? 'method-dialog-title' : undefined}
       data-lenis-prevent=""
       onClose={onClose}
+      popover={modeless ? 'manual' : undefined}
       onCancel={(event) => {
         if (!overlayOpen) return
         event.preventDefault()
         overlay.close()
       }}
       onClick={(event) => {
-        // The dialog box is the padded backdrop area around the sheet.
         if (event.target !== event.currentTarget) return
         if (overlayOpen) overlay.close()
         else onClose()
       }}
-      // Keep keys here: the /approach deck turns slides on arrow keys.
-      onKeyDown={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        if (!modeless) event.stopPropagation()
+      }}
     >
       {activity && active !== null && (
         <article className="method-dialog-sheet" key={active} inert={overlayOpen}>
@@ -137,4 +146,15 @@ export function ActivityDialog({ activities, active, onSelect, onClose }: Activi
       {activity && <SheetOverlay id={overlayId} content={overlayContent} onClose={overlay.close} />}
     </dialog>
   )
+}
+
+function showModeless(element: HTMLDialogElement) {
+  const from = document.activeElement
+  if (!element.matches(':popover-open')) element.showPopover()
+  if (from instanceof HTMLElement && !element.parentElement?.contains(from)) from.focus({ preventScroll: true })
+  return () => {
+    const hadFocus = element.contains(document.activeElement)
+    if (element.matches(':popover-open')) element.hidePopover()
+    if (hadFocus && from instanceof HTMLElement && from.isConnected) from.focus({ preventScroll: true })
+  }
 }

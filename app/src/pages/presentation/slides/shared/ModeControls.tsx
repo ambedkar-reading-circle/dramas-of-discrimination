@@ -1,11 +1,24 @@
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
 import { members } from './content/actorMap'
+import { useCueTarget } from '../../playback/targets'
 import './modes.css'
 
 export type Mode = 'local' | 'cloud'
 
-/** The mode switch's thumb snaps across quickly. */
+declare module '../../playback/cues' {
+  interface CueTargets {
+    mode: Mode
+  }
+}
+
+export function useCuedMode(initial: Mode) {
+  const [mode, setMode] = useState<Mode>(initial)
+  useCueTarget('mode', setMode, { value: mode })
+  return [mode, setMode] as const
+}
+
 const thumbSpring: Transition = { type: 'spring', stiffness: 380, damping: 32 }
 
 const status: Record<Mode, string> = {
@@ -13,7 +26,6 @@ const status: Record<Mode, string> = {
   cloud: 'Shared with the platform · live',
 }
 
-/** Local or Cloud, in the guide's top bar. */
 function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
   const options: ReadonlyArray<{ value: Mode; label: string; icon: string }> = [
     { value: 'local', label: 'Local', icon: 'M3 5h18v11H3zM8 20h8M12 16v4' },
@@ -34,7 +46,6 @@ function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => 
   )
 }
 
-/** Where the data lives, at the end of the top bar. */
 function ModeChip({ mode }: { mode: Mode }) {
   return (
     <span className="modes-chip" data-mode={mode}>
@@ -44,7 +55,6 @@ function ModeChip({ mode }: { mode: Mode }) {
   )
 }
 
-/** Every Member in the document, by face. */
 function Presence() {
   return (
     <span className="modes-presence" aria-label={`${members.length} Members editing: ${members.map((member) => member.name).join(', ')}`}>
@@ -59,7 +69,6 @@ function Presence() {
   )
 }
 
-/** The guide's top bar past its title: the mode switch, who is present in Cloud mode, and where the data lives. */
 export function ModeBar({ mode, onChange }: { mode: Mode; onChange: (mode: Mode) => void }) {
   return (
     <>

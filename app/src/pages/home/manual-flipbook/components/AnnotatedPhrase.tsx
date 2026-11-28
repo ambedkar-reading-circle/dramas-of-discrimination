@@ -20,8 +20,6 @@ function AnnotatedPhrase({ text, type, active }: { text: string; type: RoughAnno
     if (!active) return
     let cancelled = false
     let frame = 0
-    // Measure only a settled face, after fonts load. Keep the resulting SVG
-    // attached while the leaf turns, rather than measuring transformed text.
     void document.fonts.ready.then(() => {
       if (cancelled) return
       frame = requestAnimationFrame(() => {

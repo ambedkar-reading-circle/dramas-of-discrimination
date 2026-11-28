@@ -1,11 +1,6 @@
 import { useLayoutEffect } from 'react'
+import { observeResize } from '#/lib/observe-resize'
 
-/**
- * Re-runs `align` once on mount, whenever any collected element resizes, and
- * when web fonts finish loading (`loadingdone` changes text metrics). Elements
- * are collected once per effect run; pass stable callbacks so the observation
- * set is not rebuilt on every render.
- */
 export function useNotebookRuleAlign(
   getElements: () => Array<Element | null | undefined>,
   align: () => void,
@@ -15,12 +10,10 @@ export function useNotebookRuleAlign(
       (element): element is Element => element instanceof Element,
     )
     if (elements.length === 0) return
-    align()
-    const observer = new ResizeObserver(() => align())
-    for (const element of elements) observer.observe(element)
+    const stop = observeResize(elements, align)
     document.fonts.addEventListener('loadingdone', align)
     return () => {
-      observer.disconnect()
+      stop()
       document.fonts.removeEventListener('loadingdone', align)
     }
   }, [getElements, align])

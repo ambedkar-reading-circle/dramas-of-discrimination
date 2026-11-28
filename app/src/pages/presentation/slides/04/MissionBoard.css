@@ -22,10 +22,9 @@
     width: 100%;
   }
 
-  /* Taped like the title slide's cards, but read, not pressed. */
   .mission-card {
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto 1fr;
     gap: calc(var(--notebook-row) / 4);
     padding: calc(0.6 * var(--notebook-row)) 1.25rem
       calc(0.5 * var(--notebook-row));
@@ -74,57 +73,6 @@
     color: var(--sea-ink-soft);
   }
 
-  /* A pencilled spectrum with illustrative marks on it. */
-  .mission-scale {
-    display: grid;
-    align-self: end;
-    gap: calc(var(--notebook-row) / 8);
-    margin-top: calc(var(--notebook-row) / 2);
-  }
-
-  .mission-track {
-    position: relative;
-    height: calc(var(--notebook-row) * 0.5);
-    background: linear-gradient(var(--line), var(--line)) center / 100% 1px
-      no-repeat;
-  }
-
-  .mission-track::before,
-  .mission-track::after {
-    content: '';
-    position: absolute;
-    top: 25%;
-    width: 1px;
-    height: 50%;
-    background: var(--line);
-  }
-
-  .mission-track::before {
-    left: 0;
-  }
-
-  .mission-track::after {
-    right: 0;
-  }
-
-  .mission-reading {
-    position: absolute;
-    top: 50%;
-    width: 0.6rem;
-    height: 0.6rem;
-    margin: -0.3rem 0 0 -0.3rem;
-    border-radius: 50%;
-    background: var(--stage-red);
-    box-shadow: 0 0 0 2px var(--surface-warm);
-  }
-
-  .mission-ends {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: var(--sea-ink-soft);
-  }
-
   .mission-merge {
     display: grid;
     color: var(--sea-ink-soft);
@@ -162,14 +110,52 @@
   }
 
   .mission-source {
-    max-width: 40rem;
+    max-width: 64rem;
     margin-top: calc(var(--notebook-row) / 4);
+    display: grid;
+    gap: 0.3em;
     font-size: 0.75rem;
     color: var(--sea-ink-soft);
   }
 
   .mission-source a {
     color: inherit;
+  }
+
+  .mission-source-clip {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+  }
+
+  .mission-source-clip:hover,
+  .mission-source-clip[aria-pressed='true'] {
+    color: var(--sea-ink);
+  }
+
+  .mission-source-excerpt {
+    display: inline-block;
+    margin-right: 0.3em;
+    padding: 0 0.25em;
+    border: 1px dotted currentColor;
+    line-height: 1.35;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mission-source-excerpt-number {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mission-source-excerpt:hover,
+  .mission-source-excerpt[aria-pressed='true'] {
+    color: var(--sea-ink);
+    border-style: solid;
+  }
+
+  .mission-source-excerpt[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--sea-ink) 8%, transparent);
   }
 
   @media (max-width: 700px) {

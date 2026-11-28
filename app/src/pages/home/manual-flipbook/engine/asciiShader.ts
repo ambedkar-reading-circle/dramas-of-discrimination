@@ -1,5 +1,3 @@
-// Original GLSL: a procedural two-color field quantized into a Handlee glyph
-// atlas. Inspired by the public Paper Shaders dithering preview, not its code.
 export const asciiVertexShader = `#version 300 es
 void main() {
   vec2 position = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));

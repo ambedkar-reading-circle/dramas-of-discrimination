@@ -6,6 +6,7 @@ export interface InstantPhotoData {
   src: string
   alt: string
   caption?: string
+  href?: string
   direction: Direction
   tilt?: number
 }

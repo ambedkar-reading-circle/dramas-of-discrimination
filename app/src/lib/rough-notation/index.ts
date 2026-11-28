@@ -1,6 +1,3 @@
-// Adapted from rough-notation — © Preet Shihn / rough-stuff (MIT)
-// https://github.com/rough-stuff/rough-notation
-
 export { annotate } from './annotate'
 export { useRoughAnnotation } from './useRoughAnnotation'
 export type {

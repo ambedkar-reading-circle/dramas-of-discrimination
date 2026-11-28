@@ -2,8 +2,9 @@ import type { InstantPhotoData } from '#/components/InstantPhoto'
 
 export type MissionKey = 'motivation' | 'gathers'
 
-/** Each card, and the result card, opens a photo of the Workshop. */
-export type MissionPhotoKey = MissionKey | 'result'
+export type MissionQuoteKey = 'thomas-title' | 'thomas-business' | 'thomas-fuel' | 'thomas-reality' | 'dobbin-title' | 'dobbin-rules' | 'dobbin-champions'
+
+export type MissionPhotoKey = MissionKey | 'result' | MissionQuoteKey
 
 export interface MissionRow {
   label: string
@@ -15,11 +16,6 @@ export interface MissionCard {
   name: string
   lead: string
   rows: ReadonlyArray<MissionRow>
-  /** The two ends of the card's spectrum. */
-  from: string
-  to: string
-  /** Where each mark sits on the spectrum, 0 to 1. Illustrative only. */
-  readings: ReadonlyArray<number>
 }
 
 export const missionLabel =
@@ -40,9 +36,6 @@ export const cards: ReadonlyArray<MissionCard> = [
         text: 'proactive understanding and engagement with caste-based discrimination in Indian workplaces',
       },
     ],
-    from: 'spectator',
-    to: 'spect-actor',
-    readings: [0.14, 0.38, 0.57, 0.72, 0.88],
   },
   {
     key: 'gathers',
@@ -58,9 +51,6 @@ export const cards: ReadonlyArray<MissionCard> = [
         text: 'in discriminatory situations: the many ways people confront, negotiate, or quietly shift a scene',
       },
     ],
-    from: 'direct',
-    to: 'subversive',
-    readings: [0.1, 0.32, 0.47, 0.63, 0.86],
   },
 ]
 
@@ -68,19 +58,117 @@ export const missionResult = 'Collective caste consciousness'
 
 export const missionResultNote = 'gauged and gathered from a diverse community'
 
-/** A short, verbatim-quoting form of the finding the speaker notes give in full. */
 export const missionResultFinding = {
   lead: 'Rules can provoke resistance. Those who help build inclusion',
   quote: 'begin to think of themselves as diversity champions.',
 }
 
-export const missionSource = {
-  text: 'Dobbin, F., & Kalev, A. (2016). Why diversity programs fail.',
-  journal: 'Harvard Business Review, 94(7), 52–60.',
-  href: 'https://hbr.org/2016/07/why-diversity-programs-fail',
+const thomasHref = 'https://hbr.org/1990/03/from-affirmative-action-to-affirming-diversity'
+const dobbinHref = 'https://hbr.org/2016/07/why-diversity-programs-fail'
+
+export interface MissionExcerpt {
+  key: MissionQuoteKey
+  label: string
+}
+
+export interface MissionSource {
+  mark?: string
+  text: string
+  journal: string
+  href: string
+  clip: MissionQuoteKey
+  excerpts: ReadonlyArray<MissionExcerpt>
+}
+
+export const missionSources: ReadonlyArray<MissionSource> = [
+  {
+    mark: '*',
+    text: 'Dobbin, F., & Kalev, A. (2016). Why diversity programs fail.',
+    journal: 'Harvard Business Review, 94(7), 52–60.',
+    href: dobbinHref,
+    clip: 'dobbin-title',
+    excerpts: [
+      { key: 'dobbin-rules', label: 'force-feeding' },
+      { key: 'dobbin-champions', label: 'diversity champions' },
+    ],
+  },
+  {
+    text: 'Thomas, R. R., Jr. (1990). From affirmative action to affirming diversity.',
+    journal: 'Harvard Business Review, 68(2), 107–117.',
+    href: thomasHref,
+    clip: 'thomas-title',
+    excerpts: [
+      { key: 'thomas-business', label: 'in business terms' },
+      { key: 'thomas-fuel', label: 'new fuel' },
+      { key: 'thomas-reality', label: 'our reality' },
+    ],
+  },
+]
+
+const thomas = 'R. Roosevelt Thomas Jr., “From Affirmative Action to Affirming Diversity,” Harvard Business Review, 1990'
+const dobbin = 'Dobbin & Kalev, “Why Diversity Programs Fail,” HBR, 2016'
+
+const quotePhotos: Record<MissionQuoteKey, InstantPhotoData> = {
+  'thomas-title': {
+    src: '/slides/04-thomas-title.webp',
+    href: thomasHref,
+    alt: 'The article’s heading on hbr.org: From Affirmative Action to Affirming Diversity, by R. Roosevelt Thomas, Jr., from the March–April 1990 issue.',
+    caption: 'R. Roosevelt Thomas Jr., often called the father of diversity management, in Harvard Business Review, 1990.',
+    tilt: -1.2,
+    direction: 'bottom',
+  },
+  'thomas-business': {
+    src: '/slides/04-thomas-business.webp',
+    href: thomasHref,
+    alt: 'A passage of the article, highlighted: “In business terms, a diverse work force is not something your company ought to have; it’s something your company does have, or soon will have.”',
+    caption: thomas,
+    tilt: 1.2,
+    direction: 'left',
+  },
+  'thomas-fuel': {
+    src: '/slides/04-thomas-fuel.webp',
+    href: thomasHref,
+    alt: 'A passage of the article, highlighted: “Affirmative action gets the new fuel into the tank, the new people through the front door. Something else will have to get them into the driver’s seat.”',
+    caption: thomas,
+    tilt: -1,
+    direction: 'right',
+  },
+  'thomas-reality': {
+    src: '/slides/04-thomas-reality.webp',
+    href: thomasHref,
+    alt: 'The article’s last line, highlighted: “It’s our reality. We need to make it our strength.” Below it: A version of this article appeared in the March–April 1990 issue of Harvard Business Review.',
+    caption: thomas,
+    tilt: 1,
+    direction: 'bottom',
+  },
+  'dobbin-title': {
+    src: '/slides/04-dobbin-title.webp',
+    href: dobbinHref,
+    alt: 'The article’s opening spread: Why Diversity Programs Fail, and what works better, by Frank Dobbin and Alexandra Kalev.',
+    caption: 'Frank Dobbin and Alexandra Kalev, in Harvard Business Review, July–August 2016.',
+    tilt: 1.2,
+    direction: 'bottom',
+  },
+  'dobbin-rules': {
+    src: '/slides/04-dobbin-rules.webp',
+    href: dobbinHref,
+    alt: 'A column of the article, highlighted: “laboratory studies show that this kind of force-feeding can activate bias rather than stamp it out,” and “people often rebel against rules to assert their autonomy.”',
+    caption: dobbin,
+    tilt: -1.5,
+    direction: 'left',
+  },
+  'dobbin-champions': {
+    src: '/slides/04-dobbin-champions.webp',
+    href: dobbinHref,
+    alt: 'A column of the article, highlighted: “When managers actively help boost diversity in their companies, something similar happens: They begin to think of themselves as diversity champions.”',
+    caption: dobbin,
+    tilt: 1.5,
+    direction: 'right',
+  },
 }
 
 export const missionPhotos: Record<MissionPhotoKey, InstantPhotoData> = {
+  ...quotePhotos,
   motivation: {
     src: '/slides/04a.jpg',
     alt: 'A circle of empty black chairs in a sunlit room, a framed portrait of Ambedkar resting on one of them.',

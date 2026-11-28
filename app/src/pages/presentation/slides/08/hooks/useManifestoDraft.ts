@@ -5,23 +5,13 @@ import type { CursorAt } from '../../shared/WriterCursors'
 import { draft, editors } from '../content/manifesto'
 import type { BlockId, DraftEdit } from '../content/manifesto'
 
-/** Characters of the draft the platform writes per beat while it generates. */
 const streamSpeed = 7
-/** Beats a cursor takes to reach the words it will change. */
 const travelBeats = 14
-/** Characters a selection grows by per beat. */
 const selectSpeed = 2.4
-/** Beats a Member holds their selection before typing over it. */
 const pauseBeats = 8
-/** Keystrokes per beat. */
 const typeSpeed = 1.1
-/** Beats a Member lingers on a finished edit. */
 const restBeats = 10
 
-/**
- * Waiting for the Facilitator to press Generate; generating; generated,
- * waiting for Edit; Members editing; edited.
- */
 type Stage = 'idle' | 'generate' | 'generated' | 'edit' | 'done'
 type EditPhase = 'travel' | 'select' | 'pause' | 'type' | 'rest'
 
@@ -33,20 +23,17 @@ type EditorProgress = Readonly<{
   typed: number
 }>
 
-/** An edit already made: the words that went in, and who wrote them. */
 type Mark = Readonly<{ start: number; length: number; writer: Writer }>
 
 type DraftState = Readonly<{
   beat: number
   stage: Stage
-  /** Characters of the draft generated so far. */
   streamed: number
   texts: Readonly<Record<string, string>>
   marks: Readonly<Partial<Record<string, Mark>>>
   editors: ReadonlyArray<EditorProgress>
 }>
 
-/** The draft's words and who wrote which: what each committed edit changes. */
 type Edited = Pick<DraftState, 'texts' | 'marks'>
 
 const draftLength = draft.reduce((sum, block) => sum + block.text.length, 0)
@@ -54,7 +41,6 @@ const generatedTexts = Object.fromEntries(
   draft.map((block) => [block.id, block.text]),
 )
 
-/** Where an edit begins in its paragraph. */
 function startOf(edit: DraftEdit, texts: Readonly<Record<string, string>>) {
   const text = texts[edit.block] ?? ''
   if (!edit.find) return text.length
@@ -63,7 +49,6 @@ function startOf(edit: DraftEdit, texts: Readonly<Record<string, string>>) {
   return at
 }
 
-/** Puts an edit into the text, and marks it as its writer's. */
 function commit(state: Edited, edit: DraftEdit, writer: Writer): Edited {
   const text = state.texts[edit.block]
   const start = startOf(edit, state.texts)
@@ -82,7 +67,6 @@ function commit(state: Edited, edit: DraftEdit, writer: Writer): Edited {
   }
 }
 
-/** Every Member waits at the door; they come in one after another once the draft is out. */
 const arriving = (): ReadonlyArray<EditorProgress> =>
   editors.map((_, i) => ({
     index: 0,
@@ -92,7 +76,6 @@ const arriving = (): ReadonlyArray<EditorProgress> =>
     typed: 0,
   }))
 
-/** Nothing generated yet. */
 function blankDraft(stage: Stage = 'idle'): DraftState {
   return {
     beat: 0,
@@ -104,7 +87,6 @@ function blankDraft(stage: Stage = 'idle'): DraftState {
   }
 }
 
-/** The draft once every Member has had their say. */
 function finishedDraft(): DraftState {
   let edited: Edited = { texts: generatedTexts, marks: {} }
   for (const { writer, edits } of editors)
@@ -124,7 +106,6 @@ function finishedDraft(): DraftState {
   }
 }
 
-/** Generating or editing: a run is on screen and the beat is ticking. */
 const isPlaying = (stage: Stage) => stage === 'generate' || stage === 'edit'
 
 function advance(state: DraftState): DraftState {
@@ -191,7 +172,6 @@ function advance(state: DraftState): DraftState {
   }
 }
 
-/** A run of a paragraph as it renders: plain, someone's earlier edit, a live selection or insertion, or a caret. */
 export type Segment = Readonly<
   | { kind: 'text'; text: string }
   | { kind: 'mark' | 'select' | 'typing'; text: string; writer: Writer }
@@ -201,18 +181,11 @@ export type Segment = Readonly<
 
 type Action = 'tick' | 'generate' | 'edit'
 
-/** The draft as the platform wrote it, untouched. */
 const generatedDraft = (stage: Stage): DraftState => ({
   ...blankDraft(stage),
   streamed: draftLength,
 })
 
-/**
- * Waits for Generate, then plays the platform writing the Manifesto draft.
- * Edit then plays every Member reworking it at once, from the draft as
- * generated. Either can be pressed again to replay. With `reducedMotion`,
- * each goes straight to its end.
- */
 export function useManifestoDraft(reducedMotion: boolean) {
   const [state, dispatch] = useReducer(
     (current: DraftState, action: Action) => {
@@ -234,7 +207,6 @@ export function useManifestoDraft(reducedMotion: boolean) {
     return () => clearInterval(timer)
   }, [playing])
 
-  /** Each Member, where their caret sits now: on the edit they are making, or on their last one. */
   const carets = state.editors.map((progress, i) => {
     const { writer, edits } = editors[i]
     const working = progress.index < edits.length
@@ -262,7 +234,6 @@ export function useManifestoDraft(reducedMotion: boolean) {
 
     const text = state.texts[id] ?? ''
     if (state.stage === 'generated') return [{ kind: 'text', text }]
-    // Waiting at the door: a Member's caret appears only once the draft is out.
     const caretHere = carets.find(
       (at) =>
         at.edit.block === id &&
@@ -327,10 +298,8 @@ export function useManifestoDraft(reducedMotion: boolean) {
 
   return {
     stage: state.stage,
-    /** A run is on screen: the Facilitator's or the Members'. */
     playing,
     segmentsOf,
-    /** Members with a cursor in the draft; none until it is out. */
     editors:
       state.stage === 'edit' || state.stage === 'done'
         ? carets.map(({ writer, phase }): CursorAt<EditPhase> => ({
@@ -338,9 +307,7 @@ export function useManifestoDraft(reducedMotion: boolean) {
             phase,
           }))
         : [],
-    /** The Facilitator's trigger: generate the draft, afresh if there is one. */
     generate: () => dispatch('generate'),
-    /** Play the Members editing the generated draft. */
     edit: () => dispatch('edit'),
   }
 }

@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import ApproachDiagram from './ApproachDiagram'
 import ApproachTrigger from './ApproachTrigger'
+import { useCueTarget } from '../../../../playback/targets'
 
 function focusNextFrame(target: RefObject<HTMLElement | null>) {
   requestAnimationFrame(() => target.current?.focus({ preventScroll: true }))
@@ -12,6 +13,8 @@ export default function ApproachReveal() {
   const diagramId = useId()
   const diagram = useRef<HTMLElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
+
+  useCueTarget('approach', (side) => setOpen(side !== null), { rest: null })
 
   const show = () => {
     setOpen(true)
