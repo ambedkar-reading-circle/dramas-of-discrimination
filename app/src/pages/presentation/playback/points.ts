@@ -49,7 +49,7 @@ export type SlideCues = SlidePoints &
 /** A cue's point holds the caption before it this long while the slide acts. */
 const cueMs = 1200
 
-/** A caption longer than this is split, as film subtitles are, so two lines hold it in the player. */
+/** A caption longer than this is split, so two lines hold it in the player. */
 const chunkChars = 140
 
 /** Pieces merged back up to the limit; short pieces (and stray initials like "R.") join a neighbour so each chunk reads whole. */

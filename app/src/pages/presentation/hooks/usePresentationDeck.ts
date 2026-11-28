@@ -22,34 +22,41 @@ function clamp(value: number, max: number): number {
 
 const pointsIn = (slide: number) => deckPoints[slide - 1].length
 
+/** Whether the deck plays itself, and whether it reads its captions aloud. */
+export type PlaybackSwitches = Readonly<{ play: boolean; voice: boolean }>
+
+/** The switches a URL asks for: each is on unless the URL turns it off. */
+const switchesOf = (search: Readonly<{ play?: boolean; voice?: boolean }>): PlaybackSwitches => ({ play: search.play ?? true, voice: search.voice ?? true })
+
 /**
  * Owns the deck's position: the slide, and the point of its speaker notes
  * (`?slide=4&point=3`, both 1-based, shown as 4.3). The URL is the single
  * source of truth: every change is written back with `replace` so the
  * history stack never grows, and out-of-range values are clamped on read.
- * Moving keeps the other params, so `?play=1` survives it.
+ * Moving keeps the other params, so `?play` and `?voice` survive it.
  *
- * It owns `?play` too: whether the deck opened playing, and
- * `rememberPlaying` to write it back, so a refresh mid-playback carries on,
- * and one after pausing stays paused.
+ * It owns `?play` and `?voice` too: whether the deck plays itself and reads
+ * its captions aloud. Both are on unless the URL says otherwise, and both are
+ * written into the URL on arrival. `rememberPlayback` writes them back, so a
+ * refresh carries on as the visitor left it: playing or paused, voiced or muted.
  *
  * The arrows, their keys and a swipe step one point, crossing into the next
  * slide's first point or the previous slide's last. Shift with one of them,
  * Home and End, and the slide strip jump whole slides, to their first point.
  */
 export function usePresentationDeck() {
-  const { slide: requestedSlide, point: requestedPoint = 1, play } = useSearch({ from: '/approach' })
-  const playOnOpen = play === true
+  const { slide: requestedSlide, point: requestedPoint = 1, play, voice } = useSearch({ from: '/approach' })
+  const opened = switchesOf({ play, voice })
   const navigate = useNavigate({ from: '/approach' })
   const slide = clamp(requestedSlide, TOTAL_SLIDES)
   const point = clamp(requestedPoint, pointsIn(slide))
 
-  // Normalize a stale or out-of-range URL (deep links like ?slide=99) in place.
+  // Normalize a stale or out-of-range URL (deep links like ?slide=99) in place, and spell out the switches it leaves out.
   useEffect(() => {
-    if (requestedSlide !== slide || requestedPoint !== point) {
-      void navigate({ search: (search) => ({ ...search, slide, point }), replace: true })
+    if (requestedSlide !== slide || requestedPoint !== point || play === undefined || voice === undefined) {
+      void navigate({ search: (search) => ({ ...search, slide, point, ...switchesOf(search) }), replace: true })
     }
-  }, [requestedSlide, requestedPoint, slide, point, navigate])
+  }, [requestedSlide, requestedPoint, slide, point, play, voice, navigate])
 
   const goTo = useCallback(
     (target: number, targetPoint = 1) => {
@@ -61,12 +68,12 @@ export function usePresentationDeck() {
     [slide, point, navigate],
   )
 
-  const rememberPlaying = useCallback(
-    (playing: boolean) => {
-      if (playOnOpen === playing) return
-      void navigate({ search: (search) => ({ slide: search.slide, point: search.point, ...(playing ? { play: true as const } : {}) }), replace: true })
+  const rememberPlayback = useCallback(
+    (now: PlaybackSwitches) => {
+      if (play === now.play && voice === now.voice) return
+      void navigate({ search: (search) => ({ ...search, ...now }), replace: true })
     },
-    [playOnOpen, navigate],
+    [play, voice, navigate],
   )
 
   const atStart = slide === 1 && point === 1
@@ -134,8 +141,8 @@ export function usePresentationDeck() {
     slide,
     point,
     total: TOTAL_SLIDES,
-    playOnOpen,
-    rememberPlaying,
+    opened,
+    rememberPlayback,
     atStart,
     atEnd,
     goTo,

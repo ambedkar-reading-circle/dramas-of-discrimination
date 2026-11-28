@@ -32,7 +32,7 @@ try {
     return at()
   }
   const open = async (slide) => {
-    await page.goto(`${base}/approach?slide=${slide}&point=1`)
+    await page.goto(`${base}/approach?slide=${slide}&point=1&play=false`)
     await page.locator('.slide-stage').waitFor()
     await page.waitForTimeout(300)
   }
@@ -77,7 +77,7 @@ try {
   await open(1)
   const next = page.getByRole('button', { name: 'Next point' })
   await next.focus()
-  for (let step = 0; step < 400 && (await next.getAttribute('aria-disabled')) !== 'true'; step++) {
+  for (let press = 0; press < 400 && (await next.getAttribute('aria-disabled')) !== 'true'; press++) {
     const from = at()
     await page.keyboard.press('Enter')
     await waitMove(from)

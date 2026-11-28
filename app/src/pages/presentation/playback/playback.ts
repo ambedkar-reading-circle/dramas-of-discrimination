@@ -1,6 +1,6 @@
 import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLatest } from '#/lib/use-latest'
-import type { DeckPosition } from '../hooks/usePresentationDeck'
+import type { DeckPosition, PlaybackSwitches } from '../hooks/usePresentationDeck'
 import { knownMs, paceOf, runPace } from './pace'
 import type { Pace } from './pace'
 import type { Caption, Point, SlideCues, SlidePoints } from './points'
@@ -62,10 +62,10 @@ type PlaybackInput = Pick<DeckPosition, 'slide' | 'point' | 'atEnd' | 'next' | '
  * pace (see `pace.ts`) that moves it on, through the same `next` the arrows
  * use.
  */
-export function usePlaybackState({ slide, point, slideId, points, atEnd, next, goTo }: PlaybackInput, initialPlay: boolean): Playback {
-  const [playing, setPlaying] = useState(initialPlay)
-  const [narrating, setNarrating] = useState(!initialPlay)
-  const [voice, setVoiceState] = useState(false)
+export function usePlaybackState({ slide, point, slideId, points, atEnd, next, goTo }: PlaybackInput, opened: PlaybackSwitches): Playback {
+  const [playing, setPlaying] = useState(opened.play)
+  const [narrating, setNarrating] = useState(!opened.play)
+  const [voice, setVoiceState] = useState(opened.voice)
   const [captions, setCaptions] = useState(true)
   const [progress, setProgress] = useState({ slide, point, caption: 0, captionsApplied: 1, cuesApplied: 1 })
   // A new point, from anywhere (arrows, keys, swipe, strip, playback), starts at its first caption and shows its cues.
@@ -146,6 +146,25 @@ export function usePlaybackState({ slide, point, slideId, points, atEnd, next, g
     return runPace(pace, () => latestAdvance.current())
     // A caption applied again (on play, or the voice turned on) runs its pace afresh.
   }, [running, pace, progress.captionsApplied])
+
+  // A browser lets a page speak only once its visitor has pressed something on it, so a deck opened
+  // straight from a link starts with its voice refused, and its captions run on reading time. At the
+  // first press, the caption on screen is read again, aloud now, and the voice carries on from there.
+  const readingAloud = useLatest(voice && running)
+  useEffect(() => {
+    const activation = typeof navigator !== 'undefined' ? navigator.userActivation : undefined
+    if (!activation || activation.hasBeenActive) return
+    const onPress = () => {
+      // Not every key counts as a press (Escape does not): wait for one that does.
+      if (!activation.hasBeenActive) return
+      stop()
+      if (readingAloud.current) setProgress((p) => ({ ...p, captionsApplied: p.captionsApplied + 1 }))
+    }
+    const events = ['pointerup', 'keyup'] as const
+    const stop = () => events.forEach((type) => document.removeEventListener(type, onPress, true))
+    events.forEach((type) => document.addEventListener(type, onPress, true))
+    return stop
+  }, [readingAloud])
 
   // Leaving the deck silences the voice.
   useEffect(() => () => speech()?.cancel(), [])

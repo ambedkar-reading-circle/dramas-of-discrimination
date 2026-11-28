@@ -74,12 +74,17 @@ export function runPace(pace: Pace, onEnd: () => void): () => void {
       const utterance = new SpeechSynthesisUtterance(pace.text)
       utterance.lang = 'en-IN'
       utterance.onend = () => later(afterReadingMs)
+      // A voice the browser refuses (it may, before the visitor has pressed anything on the page) falls back to the reading time.
+      utterance.onerror = (event) => {
+        if (event.error !== 'interrupted' && event.error !== 'canceled') later(pace.holdMs)
+      }
       synth.speak(utterance)
       // A voice that never reports its end must not stall the deck.
       later(pace.holdMs * 3)
       return () => {
         clearTimers()
         utterance.onend = null
+        utterance.onerror = null
         synth.cancel()
       }
     }
