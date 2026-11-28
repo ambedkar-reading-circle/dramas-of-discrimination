@@ -31,37 +31,10 @@
     animation: fac-breathe 2.4s ease-in-out infinite;
   }
 
-  .fac-pace {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-inline-start: auto;
-    font-size: 11px;
-    opacity: 0.7;
-  }
-
-  .fac-pace .method-clock {
-    width: 11px;
-    height: 11px;
-    border: 1px solid;
-    border-radius: 50%;
-    position: relative;
-  }
-
-  .fac-pace .method-clock::after {
-    content: '';
-    position: absolute;
-    top: 1px;
-    left: 4px;
-    width: 3px;
-    height: 4px;
-    border-left: 1px solid;
-    border-bottom: 1px solid;
-  }
-
   .fac-nav {
     display: flex;
     flex: none;
+    margin-inline-start: auto;
     gap: 0.375rem;
   }
 
@@ -461,13 +434,8 @@
       margin-top: 0.5rem;
     }
 
-    .fac-bar-room,
-    .fac-pace {
+    .fac-bar-room {
       display: none;
-    }
-
-    .fac-nav {
-      margin-inline-start: auto;
     }
   }
 }
