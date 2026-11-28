@@ -58,8 +58,10 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     const measure = () => {
       const availableH = stageEl.clientHeight
       const availableW = stageEl.clientWidth
+      fitEl.classList.add('slide-fit-measuring')
       const neededH = fitEl.scrollHeight
       const neededW = fitEl.scrollWidth
+      fitEl.classList.remove('slide-fit-measuring')
       if (availableH <= 0 || availableW <= 0 || neededH <= 0 || neededW <= 0) return
       const fitted = Math.min(1, availableH / neededH, availableW / neededW)
       const next = availableW < 700 ? 1 : fitted
