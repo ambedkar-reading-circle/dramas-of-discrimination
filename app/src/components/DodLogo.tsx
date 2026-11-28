@@ -84,9 +84,21 @@ function TitleWord({ word, printed = false }: { word: string; printed?: boolean 
   )
 }
 
-function useTitleCycle() {
-  const [cycling, setCycling] = useState(false)
+/**
+ * Cycles the title word while the logo is pointed at. When `held` is given,
+ * the logo's owner decides instead, and the logo's own pointer is ignored.
+ */
+function useTitleCycle(held: boolean | undefined) {
+  const [hovered, setHovered] = useState(false)
+  const cycling = held ?? hovered
   const [wordIndex, setWordIndex] = useState(0)
+
+  // Starting jumps straight to the first alternate; stopping returns to the printed word.
+  const [wasCycling, setWasCycling] = useState(cycling)
+  if (cycling !== wasCycling) {
+    setWasCycling(cycling)
+    setWordIndex(cycling ? 1 : 0)
+  }
 
   useEffect(() => {
     if (!cycling) return
@@ -97,20 +109,22 @@ function useTitleCycle() {
   }, [cycling])
 
   const startCycling = (event: PointerEvent) => {
-    if (event.pointerType === 'touch') return
-    setCycling(true)
-    setWordIndex(1)
+    if (held === undefined && event.pointerType !== 'touch') setHovered(true)
   }
-  const stopCycling = () => {
-    setCycling(false)
-    setWordIndex(0)
-  }
+  const stopCycling = () => setHovered(false)
 
   return { word: titleWords[wordIndex], showsAlternate: wordIndex !== 0, cycling, startCycling, stopCycling }
 }
 
-export default function DodLogo({ variant = 'hero', ref }: { variant?: 'hero' | 'inline'; ref?: Ref<HTMLSpanElement> }) {
-  const { word, showsAlternate, cycling, startCycling, stopCycling } = useTitleCycle()
+type DodLogoProps = {
+  variant?: 'hero' | 'inline'
+  ref?: Ref<HTMLSpanElement>
+  /** Hands the hover to the logo's owner: the words cycle for as long as it is true. */
+  held?: boolean
+}
+
+export default function DodLogo({ variant = 'hero', ref, held }: DodLogoProps) {
+  const { word, showsAlternate, cycling, startCycling, stopCycling } = useTitleCycle(held)
 
   const inkClasses = `transition-[filter] duration-200 ease-out ${cycling ? '[filter:drop-shadow(0_0_max(0.02em,0.5px)_currentColor)_drop-shadow(0_0_max(0.12em,4px)_color-mix(in_srgb,currentColor_40%,transparent))]' : ''}`
 
