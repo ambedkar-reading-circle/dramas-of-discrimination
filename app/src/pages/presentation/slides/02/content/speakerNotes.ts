@@ -1,6 +1,5 @@
 import type { SpeakerNote } from '../../../types'
 
-/** What to say over slide 02, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'To make this less abstract, let us show you a short clip from the workshop.',
   'It also shows who we are. The Ambedkar Reading Circle is an informal collective.',

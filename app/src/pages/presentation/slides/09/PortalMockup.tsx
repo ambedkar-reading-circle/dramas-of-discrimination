@@ -11,7 +11,6 @@ type View = 'explore' | 'common'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 09: the portal's view. */
     portal: View
   }
 }
@@ -23,14 +22,8 @@ const views: ReadonlyArray<{ value: View; label: string }> = [
 
 const count = new Intl.NumberFormat('en-IN')
 
-/**
- * Mockup: the Manifesto portal. Communities explore and share the Manifestos
- * of Inclusion they adopted; read together, the collection shows the rules
- * they hold in common.
- */
 export function PortalMockup() {
   const [view, setView] = useState<View>('explore')
-  // Each tab of notes plays over its view.
   useCueTarget('portal', setView, { value: view })
   const tabsId = useId()
 
@@ -68,14 +61,12 @@ export function PortalMockup() {
 
 const kinds = Object.keys(kindLabels) as Array<CommunityKind>
 
-/** Whether a Manifesto is of the chosen kind and holds the search word anywhere in its text. */
 function matches(item: PortalManifesto, kind: CommunityKind | 'all', needle: string) {
   if (kind !== 'all' && item.kind !== kind) return false
   if (!needle) return true
   return [item.community, item.place, item.opening, ...item.rules].join(' ').toLowerCase().includes(needle)
 }
 
-/** Every shared Manifesto, by the Community that adopted it; one open to read whole. */
 function Explore() {
   const [kind, setKind] = useState<CommunityKind | 'all'>('all')
   const [query, setQuery] = useState('')
@@ -130,7 +121,6 @@ function Explore() {
   )
 }
 
-/** One Manifesto, whole, as its Community adopted it. */
 function Reader({ manifesto }: { manifesto: PortalManifesto }) {
   return (
     <section className="portal-reader" aria-label={`Manifesto of Inclusion: ${manifesto.community}, ${manifesto.place}`}>
@@ -154,7 +144,6 @@ function Reader({ manifesto }: { manifesto: PortalManifesto }) {
   )
 }
 
-/** The rules the whole collection holds in common. */
 function CommonGround() {
   const ranked = [...(Object.keys(sharedRules) as Array<RuleId>)].sort((a, b) => collection.shares[b] - collection.shares[a])
 

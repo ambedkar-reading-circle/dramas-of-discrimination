@@ -1,10 +1,3 @@
-/* The Manifesto of Inclusion. The facilitation guide (shared/guide.css) and
-   its mode switch (shared/modes.css), once the workshop is done. Local mode shows the
-   Group's worksheets as a prompt to copy; Cloud mode waits for the
-   Facilitator's Generate, streams in the draft, then every Member's named
-   cursor reworks it, each edit left in its writer's colour. The draft is laid
-   out as an illuminated charter: parchment, a blackletter title, fern fronds
-   at the corners. Fixed colours in either theme, like the guide itself. */
 @layer components {
   .mani-body {
     position: relative;
@@ -27,7 +20,6 @@
     font: 15px/1.4 var(--font-body);
   }
 
-  /* The guide's primary button, in navy on the cream sheet */
   .mani .mani-btn {
     display: inline-flex;
     flex: none;
@@ -57,7 +49,6 @@
     cursor: default;
   }
 
-  /* The button whose run is playing stays legible and pulses. */
   .mani .mani-btn[aria-busy='true'] {
     opacity: 0.75;
     cursor: progress;
@@ -101,7 +92,6 @@
     outline-offset: 2px;
   }
 
-  /* Cloud mode's actions sit at the far end of the tab row. */
   .mani .modes-tabs {
     flex-wrap: wrap-reverse;
     align-items: end;
@@ -113,7 +103,6 @@
     padding: 0 0.875rem;
   }
 
-  /* The charter: parchment inside a gold double rule, ferns at each corner */
   .mani-charter {
     position: relative;
     min-height: 0;
@@ -128,7 +117,6 @@
       var(--charter-paper);
     color: var(--charter-ink);
     box-shadow: var(--activity-lift-raised);
-    /* Cursors over words scrolled out of the page stay out of sight. */
     overflow: hidden;
   }
 
@@ -216,17 +204,14 @@
     scale: 1 -1;
   }
 
-  /* Normal flow, so a wrapped line always pushes the next one down. */
   .mani-page {
     position: relative;
     height: 100%;
-    /* The scrollbar sits well inside the gilt border, clear of the ferns' stems. */
     margin-inline-end: 1.5rem;
     padding: 1.25rem 2.75rem 1.25rem 4.25rem;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
-    /* The site's inherited scrollbar colour would switch Chrome off the charter's scrollbar below. */
     scrollbar-color: auto;
     font:
       17px/1.42 'IM Fell English',
@@ -239,9 +224,6 @@
     outline-offset: -0.375rem;
   }
 
-  /* The scrollbar: a sunken ink channel with a solid red thumb, so it reads
-     as a control and never as one more gilt rule. Firefox takes the colours
-     alone. */
   @supports not selector(::-webkit-scrollbar) {
     .mani-page {
       scrollbar-color: var(--charter-red)
@@ -272,8 +254,6 @@
     border-width: 1px;
   }
 
-  /* Paper fades over the page's edge on any side that has more to scroll,
-     with a hairline shadow so the cut reads as a fold, not a margin. */
   .mani-more-fade {
     position: absolute;
     inset-inline: 1.5rem 3.25rem;
@@ -309,7 +289,6 @@
     opacity: 1;
   }
 
-  /* A labelled nudge sits on the bottom fade while there is more below. */
   .mani .mani-more {
     position: absolute;
     bottom: 1.25rem;
@@ -370,7 +349,6 @@
     }
   }
 
-  /* The charter keeps its own leading, off the notebook's ruled rows. */
   .mani-page :is(p, h3, h4) {
     line-height: 1.42;
   }
@@ -422,7 +400,6 @@
     margin-bottom: 0.25rem;
   }
 
-  /* An illuminated initial, in red blackletter */
   .mani-opening::first-letter {
     float: left;
     margin: 0.125rem 0.375rem 0 0;
@@ -470,7 +447,6 @@
     text-align: center;
   }
 
-  /* While generating, a block caret leads the stream. */
   .mani-stream {
     display: inline-block;
     width: 0.45em;
@@ -481,13 +457,11 @@
     opacity: 0.6;
   }
 
-  /* A Member selecting the words they are about to change */
   .mani-select {
     background: color-mix(in srgb, var(--who) 24%, transparent);
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--who) 24%, transparent);
   }
 
-  /* Words a Member is typing, and words they have put in: underlined in their colour */
   .mani-typing,
   .mani-mark {
     background: color-mix(in srgb, var(--who) 10%, transparent);
@@ -500,7 +474,6 @@
       flex-wrap: wrap;
     }
 
-    /* Only the open tab, so the actions keep their row. */
     .mani .modes-tab:not([data-active]) {
       display: none;
     }

@@ -62,7 +62,6 @@ function Action({ action }: { action: ClosingAction }) {
   }
 }
 
-// The way we ask for most is set in inverse ink.
 function Way({ way, order, reduce, tilt }: { way: ClosingWay; order: number; reduce: boolean; tilt: number }) {
   const lead = way.lead === true
   const tone = lead ? 'bg-hl-bg text-hl-text' : 'bg-surface-warm text-ink shadow-[inset_0_0_0_1px_var(--sheet-edge)]'
@@ -80,12 +79,9 @@ function Way({ way, order, reduce, tilt }: { way: ClosingWay; order: number; red
   )
 }
 
-// The top padding and photo together fill two rows, and the name tag a third.
 const portrait = 'block size-[calc(2*var(--notebook-row)-0.3rem)] object-cover bg-line'
 const footLink = 'inline-flex items-center gap-1.5 text-ink no-underline hover:underline focus-visible:underline underline-offset-4'
 
-// Who made it: a centred row of instant portraits, each pinned at its own
-// tilt, then the credit and where to find us.
 function Makers({ order, reduce }: { order: number; reduce: boolean }) {
   return (
     <motion.footer className="grid w-full justify-items-center gap-row pt-row text-center shadow-[inset_0_1px_0_var(--ink-faint)]" custom={order} variants={riseVariants(reduce)}>

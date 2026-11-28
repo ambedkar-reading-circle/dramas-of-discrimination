@@ -9,12 +9,9 @@ import type { PlaybackSwitches } from '../playback/switches'
 
 export const TOTAL_SLIDES = slides.length
 
-/** Every slide's points, worked out once: the notes do not change while the deck runs. */
 export const deckPoints = slides.map(pointsOf)
 
-/** Swipe must travel further than this many pixels to change the point. */
 const SWIPE_DISTANCE = 48
-/** And complete within this window, mirroring usePointerTrace's stroke budget. */
 const SWIPE_WINDOW_MS = 400
 
 function clamp(value: number, max: number): number {
@@ -24,22 +21,6 @@ function clamp(value: number, max: number): number {
 
 const pointsIn = (slide: number) => deckPoints[slide - 1].length
 
-/**
- * Owns the deck's position: the slide, and the point of its speaker notes
- * (`?slide=4&point=3`, both 1-based, shown as 4.3). The URL is the single
- * source of truth: every change is written back with `replace` so the
- * history stack never grows, and out-of-range values are clamped on read.
- * Moving keeps the other params, so `?play` and `?voice` survive it.
- *
- * It owns `?play` and `?voice` too: whether the deck plays itself and reads
- * its captions aloud. Both are on unless the URL says otherwise, and both are
- * written into the URL on arrival. `rememberPlayback` writes them back, so a
- * refresh carries on as the visitor left it: playing or paused, voiced or muted.
- *
- * The arrows, their keys and a swipe step one point, crossing into the next
- * slide's first point or the previous slide's last. Shift with one of them,
- * Home and End, and the slide strip jump whole slides, to their first point.
- */
 export function usePresentationDeck() {
   const { slide: requestedSlide, point: requestedPoint = 1, play, voice } = useSearch({ from: '/approach' })
   const initialSwitches = switchesOf({ play, voice })
@@ -47,7 +28,6 @@ export function usePresentationDeck() {
   const slide = clamp(requestedSlide, TOTAL_SLIDES)
   const point = clamp(requestedPoint, pointsIn(slide))
 
-  // Normalize a stale or out-of-range URL (deep links like ?slide=99) in place, and spell out the switches it leaves out.
   useEffect(() => {
     if (requestedSlide !== slide || requestedPoint !== point || play === undefined || voice === undefined) {
       void navigate({ search: (search) => ({ ...search, slide, point, ...switchesOf(search) }), replace: true })
@@ -84,11 +64,6 @@ export function usePresentationDeck() {
     else if (slide > 1) goTo(slide - 1, pointsIn(slide - 1))
   }, [goTo, slide, point])
 
-  /**
-   * The deck's keys, for a listener on the document, so they work wherever
-   * focus sits, even on the page itself. A key typed into a field (slide 9's
-   * search) stays with the field.
-   */
   const onDeckKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!plainKey(event) || pressedOn(event, typingSelector)) return
@@ -111,8 +86,6 @@ export function usePresentationDeck() {
     [slide, next, prev, goTo],
   )
 
-  // Touch advance/retreat via pointer events, after usePointerTrace's pattern:
-  // record the contact point, judge the gesture only on release.
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null)
   const onStagePointerDown = useCallback((event: ReactPointerEvent<HTMLElement>) => {
     if (event.pointerType !== 'touch') return

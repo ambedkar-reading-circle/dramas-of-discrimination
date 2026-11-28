@@ -1,13 +1,3 @@
-/**
- * Slide 08 carries on from slide 07's workshop: the same Scenario and Actor
- * map. Local mode exports the Group's worksheets as a prompt for the
- * Community's own LLM; Cloud mode generates the Manifesto of Inclusion and
- * lets the Group's Members edit it together.
- *
- * The Manifesto is the Community's own policy on discrimination, rooted in
- * the Scenario its Groups acted out: each rule answers a Failure on the
- * Actor map, and names who acts. It names no individual.
- */
 import {
   actorRows,
   columns,
@@ -21,7 +11,6 @@ const filledRows = actorRows.filter(
   (row) => row.ideal.text || row.failures.text,
 )
 
-/** Local mode's Prompt export: the Group's worksheets, as a prompt to paste into any LLM. */
 export const prompt = [
   'You are helping a Community write its Manifesto of Inclusion after a Dramas of Discrimination workshop. In the workshop, a Group acted out a real situation of discrimination and mapped who was involved, what was expected of each of them, and how they failed. Their worksheets are below.',
   '',
@@ -50,12 +39,10 @@ export const prompt = [
 
 export type DraftBlock = Readonly<{
   id: string
-  /** `opening` says what the Manifesto covers; `heading` starts a section of `policy` lines; `closing` adopts it. */
   kind: 'opening' | 'heading' | 'policy' | 'closing'
   text: string
 }>
 
-/** The draft the platform generates in Cloud mode, before any Member touches it. */
 export const draft = [
   {
     id: 'opening',
@@ -101,14 +88,8 @@ export const draft = [
   },
 ] as const satisfies ReadonlyArray<DraftBlock>
 
-/** A paragraph of the draft, by its id. */
 export type BlockId = (typeof draft)[number]['id']
 
-/**
- * One Member's change to the draft: `find` is replaced by `replace`; an empty
- * `find` adds `replace` to the end. Each block takes one edit at most, so
- * concurrent edits never shift each other's place.
- */
 export type DraftEdit = Readonly<{
   block: BlockId
   find: string
@@ -120,7 +101,6 @@ export type Editor = Readonly<{
   edits: ReadonlyArray<DraftEdit>
 }>
 
-/** The same four Members as slide 07, each reworking the draft in their own words. */
 export const editors: ReadonlyArray<Editor> = [
   {
     writer: memberById.asha,

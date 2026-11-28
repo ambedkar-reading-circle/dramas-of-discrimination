@@ -3,7 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const mode = cuesOf('mode')
 
-/** What to say over slide 07, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   mode('local'),
   'The guide we are building will run in two modes. 1. Local and 2. Cloud. Both run the same facilitation guide. What changes is where the data lives, and that is for the Community to decide.',

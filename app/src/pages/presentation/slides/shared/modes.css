@@ -1,20 +1,13 @@
-/* The facilitation guide in Local and Cloud mode, shared by every slide that
-   shows the mode switch: the switch, the Members present and where the data
-   lives in the top bar; the sheet's tabs; and each writer's caret and named
-   cursor. Builds on the guide's shell (guide.css). */
 @layer components {
-  /* The footer carries only the two marks, one at each end. */
   .modes .fac-logo {
     margin-inline-start: auto;
   }
 
-  /* The top bar wraps rather than squeezing the switch or the chip. */
   .modes .fac-bar:not(.fac-bar--foot) {
     flex-wrap: wrap;
     row-gap: 0.5rem;
   }
 
-  /* Mode switch: a cream thumb slides under the chosen mode */
   .modes-switch {
     display: inline-flex;
     flex: none;
@@ -55,7 +48,6 @@
     background: var(--fac-cream);
   }
 
-  /* Who is in the sheet */
   .modes-presence {
     display: inline-flex;
   }
@@ -103,7 +95,6 @@
     animation: fac-breathe 2.4s ease-in-out infinite;
   }
 
-  /* The sheet: the guide's tabs, then the scenario and the Actor map */
   .modes-sheet {
     grid-template-rows: auto minmax(0, 1fr);
     gap: 1rem;
@@ -118,7 +109,6 @@
     border-bottom: 1px solid var(--activity-line);
   }
 
-  /* Under .fac, so a tab that is a button outranks the guide's button reset. */
   .fac .modes-tab {
     padding: 0.5rem 1rem;
     margin-bottom: -1px;
@@ -131,7 +121,6 @@
     opacity: 0.45;
   }
 
-  /* A tab that can be chosen answers the pointer. */
   .fac button.modes-tab {
     transition: opacity 180ms ease;
   }
@@ -146,7 +135,6 @@
     opacity: 1;
   }
 
-  /* Actions at the far end of the tab row */
   .modes-tab-actions {
     display: flex;
     flex-wrap: wrap;
@@ -157,7 +145,6 @@
     align-self: center;
   }
 
-  /* A writer's caret: solid while typing, blinking while they pause */
   .modes-caret {
     display: inline-block;
     width: 1.5px;
@@ -176,7 +163,6 @@
     visibility: hidden;
   }
 
-  /* Cursors ride over the sheet, each to its writer's caret */
   .modes-cursors {
     position: absolute;
     inset: 0;
@@ -188,7 +174,6 @@
     top: 0;
     left: 0;
     display: block;
-    /* Tip just under the caret, so it never covers the letters going in. */
     margin: 1rem 0 0 -0.1875rem;
     filter: drop-shadow(0 1px 1.5px rgb(19 24 87 / 0.35));
   }
@@ -215,7 +200,6 @@
     }
   }
 
-  /* Small screens: the bar and the sheet's actions centre on their rows. */
   @media (max-width: 760px) {
     .modes .fac-bar-title {
       display: none;

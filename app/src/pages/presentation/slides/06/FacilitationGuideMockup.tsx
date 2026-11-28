@@ -13,32 +13,24 @@ import { warnCue } from '../../playback/cues'
 import { useCueTarget } from '../../playback/targets'
 import './FacilitationGuideMockup.css'
 
-/** One stop of the journey: an act of the workshop, and a step of it (both 0-based). */
 export type GuideStop = Readonly<{ act: number; step: number }>
 
-/** Every step of the workshop in order, so Back and Next walk the whole journey. */
 const journey: ReadonlyArray<GuideStop> = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 06: the step of the journey the guide is on. */
     guide: GuideStop
   }
 }
 
-/** Where the guide opens, and what the points before the first `guide` cue show. */
 const opening = journey[journey.findIndex((stop) => stop.act === 1)]
 
-/** Where a stop sits in the journey, or -1 for a step the workshop does not have. */
 const positionOf = ({ act, step }: GuideStop) => journey.findIndex((stop) => stop.act === act && stop.step === step)
 
-/** Stand-in clip lengths for the recorded examples, one per step slot. */
 const clipLengths = ['2:10', '1:45', '2:30']
 
-/** Fixed leans, so stickers sit the same way on every render. */
 const stickerTilts = [-1.8, 1.4, -0.9, 2.1]
 
-/** The workshop has been running this long when the mockup opens. */
 const startElapsed = 47 * 60 + 12
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -49,7 +41,6 @@ function clock(seconds: number) {
   return `${twoDigit(h)}:${twoDigit(m)}:${twoDigit(seconds % 60)}`
 }
 
-/** A clock that ticks on from where the workshop already is. */
 function useElapsed() {
   const [seconds, setSeconds] = useState(startElapsed)
   useEffect(() => {
@@ -59,12 +50,6 @@ function useElapsed() {
   return seconds
 }
 
-/**
- * Mockup: the facilitation guide a room follows by itself. The whole workshop
- * runs across the top, the current act lies open as a facilitation sheet,
- * a recorded example plays beside its steps, and the room moves on when it
- * says it is ready.
- */
 export function FacilitationGuideMockup() {
   const reducedMotion = usePrefersReducedMotion()
   const elapsed = useElapsed()
@@ -80,8 +65,6 @@ export function FacilitationGuideMockup() {
   }
   const goTo = (target: GuideStop) => moveToStop(positionOf(target))
 
-  // A cue on `guide` walks the room on, as if it had pressed We're ready; a
-  // step chosen by hand moves the deck to the point that shows it.
   useCueTarget(
     'guide',
     (stop) => {
@@ -92,7 +75,6 @@ export function FacilitationGuideMockup() {
     { rest: opening, value: journey[position], followRest: true },
   )
 
-  // `towards` is the direction of travel: 1 forward, -1 back.
   const fadeVariants: Variants = { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } }
   const sheetVariants: Variants = reducedMotion
     ? fadeVariants
@@ -108,7 +90,6 @@ export function FacilitationGuideMockup() {
         center: { opacity: 1, y: 0, rotate: step % 2 ? 0.8 : -0.9, scale: 1 },
         exit: (towards: number) => ({ opacity: 0, y: -10, rotate: -2 * towards, scale: 0.98 }),
       }
-  /** Shared by the sheet and the print: enter from the side we travel towards, leave by the other. */
   const swapMotion = { custom: direction, initial: 'enter', animate: 'center', exit: 'exit', transition: { duration: reducedMotion ? 0.2 : 0.55, ease } }
 
   const stickers = [...activity.manual.map((excerpt) => ({ label: excerpt.part ? `Manual · ${excerpt.part}` : 'Manual', detail: `p. ${excerpt.pages.join('–')}` })), ...(activity.worksheets ?? []).map((sheet) => ({ label: sheet.label, detail: sheet.kind === 'photo' ? 'example' : 'to print' }))]

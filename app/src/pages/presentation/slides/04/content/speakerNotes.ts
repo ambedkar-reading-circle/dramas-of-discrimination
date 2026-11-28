@@ -3,7 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const mission = cuesOf('mission')
 
-/** What to say over slide 04, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'Back to Dramas of Discrimination, the tool itself. What it is for, and what it can hold.',
   'It sets out to make the work environment more just and more inclusive, through interactive and participatory methods.',

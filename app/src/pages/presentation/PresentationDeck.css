@@ -29,16 +29,7 @@
   }
 }
 
-/*
- * Presentation deck layout: stage sizing between the site header and the deck
- * controls, chip strip, overview grid, asset placeholders, presenter tools,
- * fullscreen state, and contextual overrides for the embedded home-page
- * components (WorkshopMethod, ManualBook). Colors and spacing come from the
- * theme custom properties; nothing is hardcoded.
- */
 @layer components {
-  /* The deck is the page: it fills the viewport under the site header, and
-     the fullscreen surface, so the window itself never scrolls. */
   .site-shell:has(.presentation-deck) {
     height: 100dvh;
     max-height: 100dvh;
@@ -58,7 +49,6 @@
   }
 
   .presentation-deck {
-    /* The resting outline of the deck's small boxed controls. */
     --control-line: color-mix(in srgb, var(--sea-ink) 30%, transparent);
     display: flex;
     flex: 1 1 auto;
@@ -83,8 +73,6 @@
     min-height: 0;
   }
 
-  /* One line at every width: the running head gives way to the tools and
-     truncates, rather than wrapping them onto a row of their own. */
   .presentation-meta {
     display: flex;
     align-items: center;
@@ -92,7 +80,6 @@
     gap: var(--notebook-gutter);
   }
 
-  /* Centred on the tools rather than offset onto the ruled baseline. */
   .presentation-meta .eyebrow {
     flex: 1 1 auto;
     min-width: 0;
@@ -102,14 +89,6 @@
     text-overflow: ellipsis;
   }
 
-  /* The stage fills the space between the meta bar and the deck controls.
-     It is also the inline-size container the title slide's DodLogo wordmark
-     resolves its 10cqi against — it must be an element of definite width,
-     never the shrink-wrapped title slide body itself (containment would collapse
-     it to nothing). Slides that outgrow the stage are scaled down to fit, so
-     the stage does not grow a vertical scrollbar. */
-  /* Holds the scrolling stage and, over it, the layer slide overlays portal
-     into. The layer stays put while the stage scrolls under it. */
   .slide-stage-shell {
     position: relative;
     display: grid;
@@ -137,8 +116,6 @@
     border-radius: 0.125rem;
   }
 
-  /* A scaled slide's layout box is taller than what is painted. Clipping it
-     avoids a scrollbar for space the reader cannot see. */
   .slide-stage:has(.slide-frame--scaled) {
     overflow: clip;
     overflow-clip-margin: 0.5rem;
@@ -217,9 +194,6 @@
     gap: var(--notebook-gutter);
   }
 
-  /* Fixed-position children place before auto-placed ones, so the header
-     spans explicitly and the body and interactive claim row 2. Direct children
-     only: .slide-asset also appears inside embeds. */
   .slide--split > .slide-heading {
     grid-column: 1 / -1;
   }
@@ -236,8 +210,6 @@
     align-self: start;
   }
 
-  /* Title slide: the approach trigger and diagram cells are cards taped to
-     the page. Layout and type live as utilities in the JSX. */
   .slide-title-taped {
     position: relative;
     cursor: pointer;
@@ -272,7 +244,6 @@
     outline: none;
   }
 
-  /* The highlighted result card: inverse ink, no visible edge. */
   .slide-title-taped--inverse,
   .slide-title-taped--inverse:hover,
   .slide-title-taped--inverse:focus-visible {
@@ -296,7 +267,6 @@
     transition: inline-size 250ms ease;
   }
 
-  /* Asset placeholders: framed, paper-tear-styled boxes at the slot's ratio. */
   .slide-asset {
     display: grid;
     gap: calc(var(--notebook-row) / 2);
@@ -342,7 +312,6 @@
     color: var(--sea-ink-soft);
   }
 
-  /* Screen-reader-only text. */
   .slide-sr {
     position: absolute;
     width: 1px;
@@ -355,18 +324,12 @@
   }
 }
 
-/* Embedded home-page components: the deck hosts them inside a bounded stage,
-   so their viewport-scale sections relax to slide scale. Shared component
-   files are untouched; these overrides are presentation-context only. They
-   live outside @layer because WorkshopMethod.css itself is unlayered. */
 .presentation-embed {
   display: grid;
   gap: var(--notebook-row);
   min-width: 0;
 }
 
-/* Slide 05's notes open each act's sheet, so the sheet stops above the
-   player: its captions stay in view while the sheet is up. */
 .presentation-method .method-dialog:popover-open {
   bottom: var(--player-height, 0px);
   height: auto;
@@ -377,8 +340,6 @@
   min-width: 0;
 }
 
-/* The book is driven by the presenter's turn controls below it, so the
-   engine's own click-to-flip is switched off to keep both in agreement. */
 .presentation-manual .manual-book-frame {
   pointer-events: none;
 }
@@ -399,7 +360,6 @@
   gap: var(--notebook-row);
 }
 
-/* Worksheet previews (07) */
 .presentation-tables {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -410,10 +370,6 @@
   max-height: none;
 }
 
-/* Tablet video (02): the tablet alone, as large as the stage allows. The
-   frame stretches to the stage's height so the body can measure both axes. */
-/* Raised, so the tablet crosses over the neighbouring slide as it travels
-   instead of under it. */
 .slide-frame:has(.slide--fill) {
   z-index: 1;
   align-self: stretch;
@@ -438,7 +394,6 @@
   perspective: 1400px;
 }
 
-/* 16:9 screen plus the bezel and camera, about 2.5rem of height. */
 .presentation-video-motion {
   width: min(100cqw, calc((100cqh - 2.5rem) * 16 / 9));
 }
@@ -448,9 +403,6 @@
   min-height: 0;
 }
 
-/* The tablet travels in and out past the viewport's side edges, so
-   the deck stops clipping at its own edges while a fill slide is on stage.
-   The page under the site header still clips, so nothing scrolls. */
 .presentation-deck:has(.slide--fill),
 .slide-stage:has(.slide--fill) {
   overflow: visible;
@@ -495,29 +447,17 @@
   }
 }
 
-/* Unlayered on purpose: it must outrank the utilities layer that sizes the
-   DodLogo wordmark (text-[min(10cqi,8rem)]). The title slide wears the
-   wordmark one notch below the home hero's scale; cqi resolves against the
-   .slide-stage container. */
 .slide-title-heading .font-logo {
   font-size: min(7cqi, 5.5rem);
 }
 
-/* The player: docked across the bottom of the window like a music player's,
-   edge to edge, on its own paper with a ruled top edge that doubles as the
-   progress line. The deck keeps room for it (--player-height, measured by
-   SlideNav). The caption takes most of its width. */
 @layer components {
   .presentation-deck {
     padding-bottom: calc(var(--player-height, calc(var(--spacing-control) + --spacing(2))) + var(--notebook-row) / 2);
   }
 
-  /* A torn sheet, like the footer: .paper-tear gives the paper and its shadow.
-     Doubled class so fixed outranks .paper-tear's relative whatever the load order. */
   .slide-nav.slide-nav {
-    /* How far the progress line sits below the torn edge. */
     --slide-progress-inset: 2px;
-    /* Both lines, as thin as the squares' rings below them. */
     --slide-line-width: 1px;
     z-index: calc(var(--layer-site-foreground) - 1);
     position: fixed;
@@ -525,11 +465,6 @@
     bottom: 0;
   }
 
-  /* The line follows the tear, a hair inside the paper. It is cut from the
-     same paper-tear.svg the edge is, twice, with the second copy shifted by
-     the line's width and subtracted, leaving a band the shape of the edge.
-     The tear above is the strip flipped over the bar's top (-6px to 0), so
-     the band is flipped the same way across a box centred on that top. */
   .slide-nav .slide-progress {
     --tear-at: calc(6px - var(--slide-progress-inset));
     position: absolute;
@@ -553,7 +488,6 @@
     border-radius: 0;
   }
 
-  /* Each caption's own time, mirroring the slide line along the top edge. */
   .caption-time {
     position: absolute;
     inset-inline: 0;
@@ -568,7 +502,6 @@
     background: color-mix(in srgb, var(--sea-ink) 55%, transparent);
   }
 
-  /* Framer Motion runs the line across each caption; no CSS easing on top. */
   .slide-progress-fill--points {
     transition: none;
   }
@@ -578,12 +511,8 @@
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: 'change caption extras';
     align-items: center;
-    /* As compact as the controls: one button high, a hair from each edge,
-       and the same hair between every square and the caption. */
     gap: --spacing(1);
     padding: --spacing(1);
-    /* The top line sits inset below the tear; push the squares down by the
-       same amount, so they clear it as far as they clear the bottom line. */
     padding-top: calc(--spacing(1) + var(--slide-progress-inset, 0px));
   }
 
@@ -610,21 +539,16 @@
     display: none;
   }
 
-  /* Every control is the same square. */
   .slide-nav .mark-button {
     width: var(--spacing-control);
     padding: 0;
   }
 
-  /* The main control, set solid so it reads first. */
   .slide-transport .slide-play {
     background: var(--hl-bg);
     color: var(--hl-text);
   }
 
-  /* One hover for every square in the bar: it inverts. An outlined square
-     fills solid; a solid one (play, a switch that is on, the current slide)
-     turns to paper with a heavier ring. Full contrast either way, in both themes. */
   .slide-nav-controls .mark-button,
   .slide-nav-controls .slide-index-chip {
     transition:
@@ -647,8 +571,6 @@
     box-shadow: inset 0 0 0 2px var(--hl-bg);
   }
 
-  /* Every slide's number, in the caption's place while captions are off:
-     squares like the buttons, the current one filled like play. */
   .slide-index-strip {
     grid-area: caption;
     display: flex;
@@ -688,7 +610,6 @@
     cursor: default;
   }
 
-  /* While captions play: the current slide's square, then the caption. */
   .slide-nav-captioned {
     grid-area: caption;
     display: flex;
@@ -701,9 +622,6 @@
     flex: 1 1 auto;
   }
 
-  /* Framed like the buttons and one button high, so it reads as part of the
-     bar. Two lines of caption fit; long notes are already split into short
-     captions, so the bar never changes height on desktop. */
   .deck-captions {
     display: grid;
     align-items: center;
@@ -713,12 +631,10 @@
     padding: 0 --spacing(3);
     border-radius: var(--radius-control);
     box-shadow: inset 0 0 0 1px var(--line);
-    /* Set on the frame, not the caption, so the frame's lh is a caption line. */
     font-size: 1rem;
     line-height: 1.35;
   }
 
-  /* Centred in its frame, not offset onto the notebook's ruled baseline. */
   .deck-caption {
     top: 0;
     max-width: 100ch;
@@ -735,11 +651,6 @@
     font-style: italic;
   }
 
-  /* Narrow: the bar flows instead of holding fixed columns. The caption (or
-     the strip of slide numbers) takes the whole top row; below it sit the
-     transport, the current slide's number and the switches, and the switches
-     wrap onto a row of their own when the three do not fit side by side.
-     Nothing is ever squeezed into a column narrower than its buttons. */
   @variant max-md {
     .slide-nav-controls {
       display: flex;
@@ -747,8 +658,6 @@
       align-items: center;
     }
 
-    /* The caption's wrapper steps aside so its two children join the flow:
-       the caption moves up to the top row, the number stays with the buttons. */
     .slide-nav-captioned {
       display: contents;
     }
@@ -759,15 +668,11 @@
       flex: 1 0 100%;
     }
 
-    /* The two button sets grow equally from either side, so the slide's
-       number between them sits in the true centre of the bar. Each still
-       keeps its buttons' width, so the switches wrap below when crowded. */
     .slide-nav-change,
     .slide-nav-extras {
       flex: 1 1 0;
     }
 
-    /* Three caption lines tall, whatever the type size. */
     .deck-captions {
       min-height: calc(3lh + --spacing(2));
       padding-block: --spacing(1);
@@ -775,11 +680,6 @@
     }
   }
 
-  /* Narrower than one row of controls (three squares, the number, three
-     squares, with their gaps: about 340px, under the xs stop): stop sharing
-     the row and centre each set on its own, the transport with the number,
-     the switches below. CSS cannot tell when a flex item has wrapped, so the
-     width is named. */
   @variant max-xs {
     .slide-nav-controls {
       justify-content: center;

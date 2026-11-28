@@ -3,7 +3,6 @@ import type { SpeakerNote } from '../../../types'
 
 const circles = cuesOf('circles')
 
-/** What to say over slide 03, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'The Ambedkar Reading Circle started in Cubbon Park, Bangalore, in 2023.',
   circles('bangalore'),

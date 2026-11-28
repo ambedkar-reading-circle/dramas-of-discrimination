@@ -1,13 +1,8 @@
-/* The facilitation guide's shell, shared by every slide that shows it: navy
-   chrome around a cream screen, as the real app has it, with the workshop's
-   journey across the top and a fixed desk the sheets lie on. Fixed colours in
-   either theme: it stands for a screen the room will see. */
 @layer components {
   .fac {
     --fac-navy: var(--primary-blue);
     --fac-cream: var(--primary-white);
     --fac-red: #9d2f2f;
-    /* The charter a Manifesto of Inclusion is laid out as, wherever it is read. */
     --charter-paper: #f6ebcf;
     --charter-ink: #2e2114;
     --charter-gold: #a8823a;
@@ -28,7 +23,6 @@
       0 24px 48px -16px rgb(19 24 87 / 0.4);
   }
 
-  /* The app sets its own type, off the notebook's ruled rows. */
   .fac :where(p, h3, h4, figure, figcaption) {
     top: 0;
     margin: 0;
@@ -57,7 +51,6 @@
     opacity: 0.75;
   }
 
-  /* Navy bars, top and foot */
   .fac-bar {
     display: flex;
     align-items: center;
@@ -81,7 +74,6 @@
     flex: none;
   }
 
-  /* The guide is not built yet: a dashed tag, like a sketch's label. */
   .fac-proposed {
     flex: none;
     padding: 0.25rem 0.5rem;
@@ -100,7 +92,6 @@
     background: var(--fac-cream);
   }
 
-  /* The cream screen between the bars */
   .fac-screen {
     display: grid;
     gap: 0.75rem;
@@ -110,7 +101,6 @@
     color: var(--fac-navy);
   }
 
-  /* Journey: five acts, each as wide as its share of the day */
   .fac-journey ol {
     display: flex;
     gap: 0.625rem;
@@ -216,9 +206,6 @@
     animation: fac-ripple 2.4s ease-out infinite;
   }
 
-  /* The desk: a fixed stage the sheets slide on and off. One size for every
-     slide that shows the guide, so the deck scales them all alike and the
-     mockups match from slide to slide. A sheet fits itself to the desk. */
   .fac-desk {
     position: relative;
     height: 34rem;
@@ -271,7 +258,6 @@
     }
   }
 
-  /* Narrow screens: the sheet stacks and grows to its content. */
   @media (max-width: 760px) {
     .fac-desk {
       height: auto;
@@ -287,7 +273,6 @@
       gap: 0.25rem;
     }
 
-    /* Too narrow to size acts by length: each takes an equal share. */
     .fac-journey li {
       flex-grow: 1 !important;
       min-width: 0;

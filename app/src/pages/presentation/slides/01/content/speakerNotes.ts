@@ -4,7 +4,6 @@ import type { SpeakerNote } from '../../../types'
 const approach = cuesOf('approach')
 const wordmark = cuesOf('wordmark')
 
-/** What to say over slide 01, line by line, with the cues that change the slide between them. */
 export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'Dramas of Discrimination is a workshop we made at the Ambedkar Reading Circle.',
   wordmark(true),

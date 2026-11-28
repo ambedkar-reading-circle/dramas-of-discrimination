@@ -5,7 +5,6 @@ import { useWordmarkBracket } from '../hooks/useWordmarkBracket'
 
 declare module '../../../playback/cues' {
   interface CueTargets {
-    /** Slide 01: whether the wordmark plays its hover, bracketed with its title word cycling. */
     wordmark: boolean
   }
 }
@@ -13,8 +12,6 @@ declare module '../../../playback/cues' {
 export default function TitleWordmark() {
   const wordmark = useRef<HTMLSpanElement>(null)
   const { show, hide } = useWordmarkBracket(wordmark)
-  // The wordmark owns its hover. A mouse or a caption's cue brackets it and cycles its title word;
-  // keyboard focus only brackets it.
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [cued, setCued] = useState(false)

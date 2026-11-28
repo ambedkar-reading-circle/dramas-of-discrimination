@@ -11,7 +11,6 @@ import type { ApproachSide } from './types'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 01: the side of the approach diagram whose photo is open. */
     approach: ApproachSide | null
   }
 }

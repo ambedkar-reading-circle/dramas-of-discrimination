@@ -24,11 +24,7 @@ interface SlideStageProps {
 export default function SlideStage({ slide, index, total }: SlideStageProps) {
   const reducedMotion = usePrefersReducedMotion()
   const stage = useRef<HTMLDivElement>(null)
-  // The overlay host sits over the stage but outside its scroll, so a photo
-  // flies to the centre of what is in view, not of the slide's first screenful.
-  // State, not a ref, so slide bodies re-render once it mounts.
   const [host, setHost] = useState<HTMLDivElement | null>(null)
-  // Read by the focus effect below without re-running it when the host mounts.
   const latestHost = useLatest(host)
   const fit = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement | null>(null)
@@ -41,8 +37,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     target?.focus({ preventScroll: true })
   }, [])
 
-  // Direction of travel for the slide transition, derived during render so the
-  // entering variant sees the correct side on its first frame.
   const lastIndex = useRef(index)
   const [direction, setDirection] = useState<1 | -1>(1)
   if (index !== lastIndex.current) {
@@ -50,10 +44,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     lastIndex.current = index
   }
 
-  // Shrink a slide that is taller or wider than the stage. Scaling up would
-  // leave the notebook's type size, so extra room stays empty.
-  // A fill slide sizes itself to the stage, and its entrance travels outside
-  // it on purpose, so it is never measured or scaled.
   const fills = slide.layout === 'fill'
   useLayoutEffect(() => {
     const stageEl = stage.current
@@ -71,7 +61,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
       const neededH = fitEl.scrollHeight
       const neededW = fitEl.scrollWidth
       if (availableH <= 0 || availableW <= 0 || neededH <= 0 || neededW <= 0) return
-      // Narrow stages reflow and scroll. Scaling them to fit makes the type unreadably small.
       const fitted = Math.min(1, availableH / neededH, availableW / neededW)
       const next = availableW < 700 ? 1 : fitted
       setScale((current) => (Math.abs(current - next) < 0.005 ? current : next))
@@ -88,11 +77,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     }
   }, [index, slide.id, fills])
 
-  // Move focus to the new slide's heading so keyboard users are never stranded
-  // inside the previous slide's embed; reset the stage scroll for each slide.
-  // Only focus that was in the slide, its open photo, or nowhere (the page, its <main>) moves.
-  // Focus on the player stays there, so Next can be pressed again, and
-  // playback crossing a slide does not take a control from under the room.
   useEffect(() => {
     const active = document.activeElement
     const inSlide = stage.current?.contains(active) === true || latestHost.current?.contains(active) === true
@@ -102,8 +86,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
     stage.current?.scrollTo({ top: 0, behavior: 'instant' })
   }, [focusHeading, index])
 
-  // A fill slide's frame holds still: its content brings its own entrance
-  // and exit (the same variant names), and a frame fade would wash it out.
   const variants =
     fills && !reducedMotion
       ? { enter: { opacity: 1, x: '0%' }, center: { opacity: 1, x: '0%' }, exit: { opacity: 1, x: '0%', transition: { when: 'afterChildren' } } }
@@ -115,9 +97,6 @@ export default function SlideStage({ slide, index, total }: SlideStageProps) {
 
   const ownsHeading = slide.ownsHeading === true
 
-  // Reaching into the slide while it plays pauses playback, so the room can
-  // explore; play picks up on the same caption. Keys only count when they
-  // work a control, so arrows and Space on the stage still drive the deck.
   const playback = usePlayback()
   const playing = playback?.playing === true
   const pause = playback?.pause

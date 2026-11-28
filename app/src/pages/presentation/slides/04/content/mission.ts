@@ -2,14 +2,8 @@ import type { InstantPhotoData } from '#/components/InstantPhoto'
 
 export type MissionKey = 'motivation' | 'gathers'
 
-/**
- * A clipping of a source the speaker notes quote, cut from the article with
- * the quoted words highlighted. The `-title` clippings show the article's own
- * title and byline, and open from its citation on the slide.
- */
 export type MissionQuoteKey = 'thomas-title' | 'thomas-business' | 'thomas-fuel' | 'thomas-reality' | 'dobbin-title' | 'dobbin-rules' | 'dobbin-champions'
 
-/** Each card, and the result card, opens a photo of the Workshop; each source, a clipping of it. */
 export type MissionPhotoKey = MissionKey | 'result' | MissionQuoteKey
 
 export interface MissionRow {
@@ -64,7 +58,6 @@ export const missionResult = 'Collective caste consciousness'
 
 export const missionResultNote = 'gauged and gathered from a diverse community'
 
-/** A short, verbatim-quoting form of the finding the speaker notes give in full. */
 export const missionResultFinding = {
   lead: 'Rules can provoke resistance. Those who help build inclusion',
   quote: 'begin to think of themselves as diversity champions.',
@@ -74,25 +67,19 @@ const thomasHref = 'https://hbr.org/1990/03/from-affirmative-action-to-affirming
 const dobbinHref = 'https://hbr.org/2016/07/why-diversity-programs-fail'
 
 export interface MissionExcerpt {
-  /** The clipping it opens. */
   key: MissionQuoteKey
-  /** A few words of the quote, enough to tell it from the others. */
   label: string
 }
 
 export interface MissionSource {
-  /** The footnote mark it carries on the slide, if the slide quotes it. */
   mark?: string
   text: string
   journal: string
   href: string
-  /** The clipping of its title and byline. */
   clip: MissionQuoteKey
-  /** The passages the speaker notes quote, in the order they are read. */
   excerpts: ReadonlyArray<MissionExcerpt>
 }
 
-/** The sources the slide and its speaker notes quote. */
 export const missionSources: ReadonlyArray<MissionSource> = [
   {
     mark: '*',
@@ -119,10 +106,8 @@ export const missionSources: ReadonlyArray<MissionSource> = [
 ]
 
 const thomas = 'R. Roosevelt Thomas Jr., “From Affirmative Action to Affirming Diversity,” Harvard Business Review, 1990'
-// Short: the magazine's column is narrow, and a longer caption would widen the frame past it.
 const dobbin = 'Dobbin & Kalev, “Why Diversity Programs Fail,” HBR, 2016'
 
-/** Clippings of the sources, each from the article as published, the quoted words highlighted. */
 const quotePhotos: Record<MissionQuoteKey, InstantPhotoData> = {
   'thomas-title': {
     src: '/slides/04-thomas-title.webp',

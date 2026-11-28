@@ -21,12 +21,10 @@ import './ManifestoMockup.css'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 08: the Facilitator's two presses on the Manifesto draft. */
     manifesto: 'generate' | 'edit'
   }
 }
 
-/** The journey's position past its last act: the workshop is done, and the Manifesto comes next. */
 const afterLastAct = workshopActivities.length
 
 const tabs: Record<Mode, ReadonlyArray<string>> = {
@@ -34,18 +32,10 @@ const tabs: Record<Mode, ReadonlyArray<string>> = {
   cloud: ['Worksheets', 'Manifesto', 'Portal'],
 }
 
-/**
- * Mockup: the facilitation guide once the workshop is done, in either mode.
- * Local mode hands the room a prompt to carry to its own LLM; Cloud mode
- * generates the Manifesto of Inclusion and every Member edits it at once.
- */
 export function ManifestoMockup() {
   const [mode, setMode] = useCuedMode('cloud')
-  // The draft lives here, above the mode switch, so a trip to Local mode and back keeps it.
   const reducedMotion = usePrefersReducedMotion()
   const manifesto = useManifestoDraft(reducedMotion)
-  // The Facilitator's two presses, played on their points. A press runs once
-  // when the deck reaches it, not again at each point it stays in effect.
   const pressed = useRef<'generate' | 'edit' | null>(null)
   useCueTarget('manifesto', (press) => {
     if (pressed.current === press) return
@@ -53,7 +43,6 @@ export function ManifestoMockup() {
     if (press === 'generate') manifesto.generate()
     else manifesto.edit()
   })
-  // A press by hand counts as the latest press, so replaying the point's cue applies it to the draft as it now stands.
   const byHand = {
     ...manifesto,
     generate: () => {
@@ -75,7 +64,6 @@ export function ManifestoMockup() {
   )
 }
 
-/** Local mode: the Group's worksheets as a prompt, ready to copy. */
 function PromptExport() {
   const { copied, copy } = useCopyText(prompt)
 
@@ -112,7 +100,6 @@ const generateLabel = {
   generate: 'Generating…',
 } as const
 
-/** Cloud mode: the Facilitator generates the draft, then the Group's Members rework it together. */
 function ManifestoDraft({ manifesto }: { manifesto: ReturnType<typeof useManifestoDraft> }) {
   const { stage, playing, segmentsOf, editors, generate, edit } = manifesto
   const charter = useRef<HTMLDivElement>(null)
@@ -146,11 +133,6 @@ function ManifestoDraft({ manifesto }: { manifesto: ReturnType<typeof useManifes
   )
 }
 
-/**
- * The Manifesto as an illuminated charter: fern fronds at the corners, a
- * blackletter title. The page scrolls inside the frame; while the draft
- * generates, it follows the stream down.
- */
 function Charter({ ref, blank, follow, overlay, children }: { ref: RefObject<HTMLDivElement | null>; blank: boolean; follow: boolean; overlay: ReactNode; children: ReactNode }) {
   const { page, overflow, onScroll, scrollOn } = useCharterScroll(follow)
 
