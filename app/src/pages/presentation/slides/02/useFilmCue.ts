@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 import { videoOrigin } from '#/components/TabletVideoFrame'
+import { createTimers } from '#/lib/timers'
 import { useLatest } from '#/lib/use-latest'
 import { usePlayback } from '../../playback/playback'
 import { useCueTarget } from '../../playback/targets'
@@ -40,7 +41,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const wanted = useRef(false)
   const confirmed = useRef(false)
   const abandoned = useRef(false)
-  const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
+  const timers = useRef(createTimers())
   const resolve = useLatest(playback?.resolveWait)
 
   const player = () => frame.current?.contentWindow ?? null
@@ -49,10 +50,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
     post({ event: 'listening' })
     post({ event: 'command', func, args: [] })
   }
-  const clearTimers = () => {
-    timers.current.forEach(clearTimeout)
-    timers.current = []
-  }
+  const clearTimers = () => timers.current.clear()
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -86,19 +84,17 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
       confirmed.current = false
       abandoned.current = false
       command('playVideo')
-      timers.current.push(
-        setTimeout(() => {
-          command('mute')
-          command('playVideo')
-        }, unmuteGraceMs),
-        setTimeout(() => {
-          if (confirmed.current || !wanted.current) return
-          wanted.current = false
-          abandoned.current = true
-          command('pauseVideo')
-          resolve.current?.()
-        }, silentPlayerMs),
-      )
+      timers.current.after(unmuteGraceMs, () => {
+        command('mute')
+        command('playVideo')
+      })
+      timers.current.after(silentPlayerMs, () => {
+        if (confirmed.current || !wanted.current) return
+        wanted.current = false
+        abandoned.current = true
+        command('pauseVideo')
+        resolve.current?.()
+      })
     } else if (wanted.current) {
       wanted.current = false
       command('pauseVideo')

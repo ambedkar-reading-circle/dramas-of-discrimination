@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+import { observeResize } from '#/lib/observe-resize'
 
 export function useNotebookRuleAlign(
   getElements: () => Array<Element | null | undefined>,
@@ -9,12 +10,10 @@ export function useNotebookRuleAlign(
       (element): element is Element => element instanceof Element,
     )
     if (elements.length === 0) return
-    align()
-    const observer = new ResizeObserver(() => align())
-    for (const element of elements) observer.observe(element)
+    const stop = observeResize(elements, align)
     document.fonts.addEventListener('loadingdone', align)
     return () => {
-      observer.disconnect()
+      stop()
       document.fonts.removeEventListener('loadingdone', align)
     }
   }, [getElements, align])

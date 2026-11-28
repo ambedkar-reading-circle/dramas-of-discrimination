@@ -12,6 +12,7 @@ export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'Once every Group is in, the Facilitator presses Generate Manifesto.',
   manifesto('generate'),
   'The platform reads every Group’s worksheets together and writes a single draft.',
+  'An LLM writes that draft on purpose. Turning a brainstorm into policy is slow, specialised labour, and its jargon keeps most people out of it. The LLM takes on that labour, while every rule stays true to what the Groups worked out themselves, so the Community drafts its own policy document without jargon or access standing in its way, and can still edit every word.',
   'It reads as policy, not as a statement of values. It opens with the Scenario it came from, the girl and her beauty parlour, and every rule after that answers one of the Failures her Group found.',
   'The building owner’s bias becomes a rule on renting. The bank’s collateral becomes a guarantor. The customers’ taboos of purity and pollution, the leaders who would not act, the police under pressure: each gets a rule that names who acts and when.',
   manifesto('edit'),

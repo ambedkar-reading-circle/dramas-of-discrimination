@@ -23,6 +23,54 @@
       0 24px 48px -16px rgb(19 24 87 / 0.4);
   }
 
+  .fac-swing,
+  .fac-swing > .tablet-swing-motion {
+    width: 100%;
+  }
+
+  .fac-tablet {
+    --tablet-frame-padding: 0.3rem;
+    --tablet-frame-radius: clamp(0.75rem, 1.6vw, 1.25rem);
+    width: 100%;
+    max-width: calc(66rem + 2 * var(--tablet-frame-padding));
+    margin-inline: auto;
+  }
+
+  .fac-tablet .tablet-frame-camera {
+    position: absolute;
+    top: calc(var(--tablet-frame-padding) / 2);
+    left: 50%;
+    width: 0.2rem;
+    height: 0.2rem;
+    margin: 0;
+    translate: -50% -50%;
+  }
+
+  .fac-tablet .tablet-frame-button {
+    width: 3px;
+  }
+
+  .fac-tablet .tablet-frame-button--volume-one,
+  .fac-tablet .tablet-frame-button--volume-two {
+    left: -3px;
+  }
+
+  .fac-tablet .tablet-frame-button--power {
+    right: -3px;
+  }
+
+  .fac-tablet.tablet-frame--landscape .tablet-frame-screen {
+    min-height: 0;
+    aspect-ratio: auto;
+    background: var(--primary-blue);
+  }
+
+  .fac-tablet .fac {
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   .fac :where(p, h3, h4, figure, figcaption) {
     top: 0;
     margin: 0;
