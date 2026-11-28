@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
 import MarkButton, { Mark, MarkGlyph } from '#/components/MarkButton'
 import { revealKeep } from '#/components/Reveal'
-import { observeResize } from '#/lib/observe-resize'
+import { bindHeightVariable } from '#/lib/observe-resize'
 import { usePlayback } from '../playback/playback'
 import { canSpeak } from '../playback/speech'
 import Captions from './Captions'
@@ -31,11 +31,7 @@ export default function SlideNav({ slides, deck, onSelect, tools }: SlideNavProp
     const element = bar.current
     const shell = element?.closest<HTMLElement>('.presentation-deck')
     if (!element || !shell) return
-    const stop = observeResize([element], () => shell.style.setProperty('--player-height', `${element.offsetHeight}px`))
-    return () => {
-      stop()
-      shell.style.removeProperty('--player-height')
-    }
+    return bindHeightVariable(element, shell, '--player-height')
   }, [])
 
   const captioning = playback?.captions === true

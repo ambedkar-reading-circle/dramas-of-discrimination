@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
+import { observeResize } from '#/lib/observe-resize'
 
 export interface DeckFitTarget {
   surface: RefObject<HTMLElement | null>
@@ -33,13 +34,11 @@ export function useDeckFit(
         setAvailable((current) => (current === next ? current : next))
       })
     }
-    measure()
-    const observer = new ResizeObserver(measure)
-    for (const element of section.querySelectorAll('.section-lede, .method-index, .method-deck-hint')) observer.observe(element)
+    const stop = observeResize([...section.querySelectorAll('.section-lede, .method-index, .method-deck-hint')], measure)
     window.addEventListener('resize', measure)
     return () => {
       cancelAnimationFrame(frame)
-      observer.disconnect()
+      stop()
       window.removeEventListener('resize', measure)
     }
   }, [surface, content, deck])
