@@ -1,7 +1,5 @@
 @reference '../../styles.css';
 
-/* Shared look for MarkButton: a small square, mark-only control on the
-   notebook line. Placement belongs to the feature that uses it. */
 @layer components {
   .mark-button {
     display: inline-flex;

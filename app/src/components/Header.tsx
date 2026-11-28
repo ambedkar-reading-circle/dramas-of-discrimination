@@ -30,7 +30,6 @@ function NavLink({ link }: { link: NavEntry }) {
   const labelRef = useRef<HTMLSpanElement>(null)
   const { show, hide } = useRoughAnnotation(labelRef, annotationConfig)
 
-  // The active route keeps its brackets drawn; routes losing active retract.
   useEffect(() => {
     if (active) {
       show()

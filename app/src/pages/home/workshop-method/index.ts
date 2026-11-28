@@ -1,4 +1,3 @@
-// Taped stickers and sheet overlays, for any surface that carries .activity-surface.
 import './ActivityOverlays.css'
 
 export { default } from './WorkshopMethod'

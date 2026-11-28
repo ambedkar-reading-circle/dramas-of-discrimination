@@ -13,7 +13,6 @@
   .pencil-toggle:hover {
     background: var(--link-bg-hover);
   }
-  /* One glyph shows through the opening; the pair slides aside, like the theme discs. */
   .pencil-toggle-window {
     display: block;
     width: 16px;

@@ -9,7 +9,6 @@ import {
   turnTarget,
 } from '../engine/spreadPlan'
 
-/** A single desired page survives rapid scroll reversals; turns never queue up. */
 export function useManualFlipbook(
   progress: MotionValue<number>,
   desktop: boolean,
@@ -21,8 +20,6 @@ export function useManualFlipbook(
   const paused = useRef(false)
   const [page, setPage] = useState(0)
   const [busy, setBusy] = useState(false)
-  // 0 = front cover, 1 = open spread, 2 = back cover. Motion values keep
-  // per-frame geometry out of React and follow the engine's actual turn.
   const shape = useMotionValue(0)
   const turnShape = useRef({ from: 0, to: 0 })
 
@@ -33,8 +30,6 @@ export function useManualFlipbook(
       current.current === desired.current
     )
       return
-    // Turn the adjacent spread so geometry always describes the leaf that
-    // is actually moving. Re-read the latest destination after each turn.
     const target = turnTarget(current.current, desired.current, desktop)
     turnShape.current = {
       from: shape.get(),
@@ -73,9 +68,6 @@ export function useManualFlipbook(
 
   function turnProgress({ data: { progress: value } }: TurnProgressEvent) {
     const { from, to } = turnShape.current
-    // A hard cover crosses the spine halfway through a turn. Opening only
-    // grows the footprint after that point; closing shrinks it beforehand.
-    // This also keeps the visible paper centered while the cover is upright.
     const amount =
       from === 1 ? Math.min(1, value * 2) : Math.max(0, value * 2 - 1)
     shape.set(from + (to - from) * amount)
@@ -84,7 +76,6 @@ export function useManualFlipbook(
   function loaded({ data }: { data: { page: number } }) {
     sync({ data: data.page })
     setBusy(false)
-    // A restored scroll position should open at the right spread immediately.
     desired.current = restoredHead(progress.get(), desktop)
     if (desired.current !== data.page) driver.jumpTo(desired.current)
   }

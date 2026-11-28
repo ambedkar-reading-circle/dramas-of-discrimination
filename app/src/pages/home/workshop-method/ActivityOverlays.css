@@ -1,8 +1,3 @@
-/*
- * What lies on and over an open facilitation sheet: taped stickers, and the
- * manual pages or photographic prints they lay over it. The tokens live on
- * .activity-surface: the method collection, or any page that lays a sheet out.
- */
 .activity-surface {
   --activity-paper: #f8f3e7;
   --activity-ink: #2b448e;
@@ -21,7 +16,6 @@
       color-mix(in srgb, var(--activity-shadow-ink) 35%, transparent);
 }
 
-/* A slip of paper taped to the sheet. Each one sets its own lean. */
 .method-taped {
   --tape-width: 44px;
   position: relative;
@@ -59,7 +53,6 @@
   outline-offset: 3px;
 }
 
-/* The manual's pages, taped by the sheet's header. */
 .method-manual-stickers {
   position: absolute;
   top: calc(var(--method-dialog-pad) + 56px);
@@ -86,7 +79,6 @@
   opacity: 0.7;
 }
 
-/* The worksheet, blank and filled, taped under the drawing. */
 .method-worksheets {
   margin-top: 22px;
 }
@@ -97,7 +89,6 @@
   margin-top: 18px;
 }
 
-/* A step with photographs is a sticker itself: tap the step to lay its prints over the sheet. */
 .method-instructions li.method-instructions-sticker {
   display: block;
   margin-block: 6px 2px;
@@ -122,7 +113,6 @@
   font: 17px/1.5 var(--font-body);
 }
 
-/* The backdrop both overlays share: tap anywhere to put them away. */
 .method-manual {
   position: absolute;
   inset: 0;
@@ -135,7 +125,6 @@
   overflow: hidden;
 }
 
-/* Manual pages, side by side as a spread, with torn inner edges. */
 .method-manual-spread {
   --page-scale: 0.76;
   --page-gap: 1px;
@@ -205,7 +194,6 @@
   color: var(--activity-ink);
 }
 
-/* Photographs as bordered prints, each in an even share of the screen. */
 .method-step-photo-spread {
   --print-gap: clamp(16px, 3vmin, 36px);
   --print-scale: 0.86;
@@ -227,7 +215,6 @@
     0 18px 36px -12px
       color-mix(in srgb, var(--activity-shadow-ink) 40%, transparent);
 }
-/* Each print keeps its own shape, inside an even share of the screen. */
 .method-step-photo-print img {
   display: block;
   width: auto;
@@ -258,7 +245,6 @@
   opacity: 0.7;
 }
 
-/* Phones held upright: one page or print at a time, swiped sideways. */
 @media (orientation: portrait) and (max-width: 600px) {
   .method-manual {
     background: color-mix(in srgb, var(--activity-shadow-ink) 28%, transparent);

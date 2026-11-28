@@ -7,8 +7,6 @@
     height: 100svh;
     max-height: 100%;
     pointer-events: none;
-    /* Same slot as the margin guides: above the ruled background, under the sheet content.
-       The renderer sizes this to the visible part of the sheet so the bitmap stays on screen. */
     z-index: -1;
   }
 }

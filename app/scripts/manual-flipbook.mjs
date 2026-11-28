@@ -31,13 +31,10 @@ async function scrollToProgress(progress) {
         value * (el.clientHeight - window.innerHeight),
       progress,
     )
-  // Wheel input exercises ordinary scrolling rather than calling app internals.
   const current = await page.evaluate(() => window.scrollY)
   await page.mouse.move(20, 400)
   await page.mouse.wheel(0, target - current)
   await page.waitForFunction((y) => Math.abs(window.scrollY - y) < 3, target)
-  // Let the last fraction of Lenis inertia finish before measuring transforms
-  // or computing the next wheel delta from the current browser position.
   await page.waitForFunction(
     () => !document.documentElement.classList.contains('lenis-smooth'),
   )
@@ -53,7 +50,6 @@ async function expectPage(number) {
         'false',
     number,
   )
-  // Page/state events fire before the engine paints the final flat leaf.
   await page.evaluate(
     () =>
       new Promise((resolve) =>
@@ -70,7 +66,6 @@ async function expectMirroredTravel() {
   const arrivals = []
   for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
     await scrollToProgress(((fraction - 1) * viewport.height) / runway)
-    // Let Motion consume the wheel event and paint its derived transforms.
     await page.evaluate(
       () =>
         new Promise((resolve) =>
@@ -145,7 +140,6 @@ try {
     0,
     'No MAP support panel',
   )
-  // The stage is already mostly visible, but has not reached its pinned position.
   await scrollToProgress(-0.04)
   await expectPage(0)
   await page.waitForFunction(
@@ -273,13 +267,11 @@ try {
   )
   await scrollToProgress(0.06)
   await expectPage(0)
-  // Reverse while the first turn is still running. Latest position must win.
   await scrollToProgress(0.2)
   await scrollToProgress(0.06)
   await expectPage(0)
   await page.waitForTimeout(1000)
   await expectPage(0)
-  // Skipping both scroll thresholds must still settle into a centered cover.
   await scrollToProgress(0.79)
   await expectPage(manualBackCover)
   await expectBookShape('.manual-art-page')
@@ -393,14 +385,11 @@ try {
   await page.getByRole('link', { name: 'Home', exact: true }).click()
   await page.locator('.stf__parent').waitFor()
   assert.equal(await page.locator('.stf__parent').count(), 1)
-  // A reload restores scroll without waiting through every preceding spread.
   await page.setViewportSize({ width: 1440, height: 1000 })
   await scrollToProgress(0.44)
   await expectPage(5)
   await page.reload()
   await expectPage(5)
-  // Resize within desktop while turning: the keyed engine must restore the
-  // current scroll destination rather than leave a detached/busy instance.
   await scrollToProgress(0.58)
   await page.setViewportSize({ width: 1360, height: 1000 })
   await expectPage(7)
@@ -409,8 +398,6 @@ try {
   await scrollToProgress(0.36)
   await expectPage(5)
   assert.equal(await page.locator('.stf__parent').count(), 1)
-  // Printed pages retain their colors in the site's dark theme. Print uses
-  // the reflowing transcript, with the animated surface removed from layout.
   await page.evaluate(() =>
     document.documentElement.setAttribute('data-theme', 'dark'),
   )

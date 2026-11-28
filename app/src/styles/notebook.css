@@ -1,4 +1,3 @@
-/* One row is shared by typography, layout, media frames and the paper ruling. */
 :root {
   --notebook-row: 2rem;
   --notebook-baseline: calc(var(--notebook-row) / 2);
@@ -7,7 +6,6 @@
   --notebook-gutter: var(--notebook-row);
   --notebook-section-space: calc(3 * var(--notebook-row));
   --site-header-height: calc(3 * var(--notebook-row));
-  /* Half the ascent minus descent for each current font, in em. */
   --notebook-font-body: 0.27em;
   --notebook-font-title: 0.36em;
   --notebook-font-mono: 0.34375em;
@@ -38,8 +36,6 @@
     line-height: var(--notebook-row);
   }
 
-  /* Half the ascent-minus-descent, calibrated with the site's rendered fonts.
-     Relative positioning changes the ink position, never its row allocation. */
   :where(p, h1, h2, h3, h4, .notebook-text, .eyebrow, .step-number) {
     --font-baseline: var(--notebook-font-body);
     --notebook-text-offset: calc(
@@ -63,7 +59,6 @@
 }
 
 @layer components {
-  /* Shared layout vocabulary. Keep geometry here, visual treatment in features. */
   :where(.notebook-section) {
     display: flow-root;
   }
@@ -83,8 +78,6 @@
     margin-block: 0;
     min-width: 0;
   }
-  /* A frame's content height must be a known length, e.g. width / aspect ratio.
-     Never force text into a fixed frame: let its line boxes grow naturally. */
   .notebook-frame {
     display: block;
     height: round(
@@ -102,7 +95,6 @@
   .content-page {
     display: flow-root;
     flex: none;
-    /* Enlarged text must be able to shrink grid tracks and wrap long words. */
     overflow-wrap: anywhere;
   }
   .site-footer {

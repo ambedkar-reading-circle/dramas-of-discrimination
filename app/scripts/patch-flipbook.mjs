@@ -1,6 +1,3 @@
-// Small, version-checked patches to the published upstream builds. Keeping the
-// replacements here avoids committing entire minified bundles. Run on install;
-// an unexpected upstream build fails closed instead of silently skipping a fix.
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
@@ -33,13 +30,10 @@ await patch(
   '2.0.7',
   ['dist/js/page-flip.browser.js', 'dist/js/page-flip.module.js'],
   () => [
-    // Stop the recursive render loop without committing a half-finished turn.
     [
       'start(){this.update();const t=e=>{this.render(e),requestAnimationFrame(t)};requestAnimationFrame(t)}',
       'start(){this.stopped=false;this.update();const t=e=>{if(this.stopped)return;this.render(e);if(!this.stopped)this.frame=requestAnimationFrame(t)};this.frame=requestAnimationFrame(t)}stop(){this.stopped=true;cancelAnimationFrame(this.frame);this.animation=null}',
     ],
-    // React owns the host and original leaves; restore them before removing the
-    // engine wrappers. Default destroy() still removes the host for vanilla users.
     [
       'destroy(){this.ui.destroy(),this.block.remove()}',
       'destroy(preserveHost=false){if(this.destroyed)return;this.destroyed=true;clearTimeout(this.initTimer);this.render?.stop();this.events.clear();if(this.pages)for(const page of this.pages.getPages())page.hideTemporaryCopy();if(preserveHost)this.ui?.clear?.();this.ui?.destroy();if(!preserveHost)this.block.remove()}',
@@ -49,12 +43,10 @@ await patch(
       'this.pages.show(this.setting.startPage),this.initTimer=setTimeout(()=>{if(this.destroyed)return;this.ui.update();this.trigger("init",this,{page:this.pages.getCurrentPageIndex(),mode:this.render.getOrientation()})},1)',
       2,
     ],
-    // Resize is subscribed even when pointer input is disabled.
     [
       'destroy(){this.app.getSettings().useMouseEvents&&this.removeHandlers(),this.distElement.remove(),this.wrapper.remove()}',
       'destroy(){this.touchPoint=null;this.removeHandlers();this.distElement.remove();this.wrapper.remove()}',
     ],
-    // Progress comes from the fold calculation, not elapsed wall-clock time.
     [
       'this.render.setShadowData(this.calc.getShadowStartPoint(),this.calc.getShadowAngle(),t,this.calc.getDirection())',
       'this.render.setShadowData(this.calc.getShadowStartPoint(),this.calc.getShadowAngle(),t,this.calc.getDirection()),this.app.trigger("turnProgress",this.app,{progress:t/100,direction:this.calc.getDirection()})',
@@ -74,7 +66,6 @@ await patch(
         `const htmlElementRef = ${hook}useRef(null);`,
         `const propsRef = ${hook}useRef(props);\n    propsRef.current = props;\n    const htmlElementRef = ${hook}useRef(null);`,
       ],
-      // Keep callbacks fresh when the scroll destination changes during a turn.
       ...[
         'onFlip',
         'onChangeOrientation',
@@ -90,7 +81,6 @@ await patch(
         'if (props.onUpdate) {',
         "flip.on('turnProgress', (e) => propsRef.current.onTurnProgress?.(e));\n                if (props.onUpdate) {",
       ],
-      // Subscribe before load/update so synchronous page changes cannot be lost.
       [
         `if (!${engine}.current.getFlipController()) {`,
         `setHandlers();\n            if (!${engine}.current.getFlipController()) {`,

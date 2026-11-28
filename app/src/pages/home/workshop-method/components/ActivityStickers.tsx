@@ -11,12 +11,10 @@ import type { OverlayTriggerProps, TriggerFor } from '../hooks/useSheetOverlay'
 interface TapedButtonProps extends OverlayTriggerProps {
   className: string
   ariaLabel: string
-  /** How far the paper leans; each button picks its own tilt once. */
   tilt: TiltRange
   children: ReactNode
 }
 
-/** A slip of paper taped to the sheet, that lays something over it. */
 export function TapedButton({ className, ariaLabel, tilt, open, controlsId, onToggle, ref, children }: TapedButtonProps) {
   const [lean] = useState(() => ({ sticker: randomTilt(tilt), tape: randomTilt(tilts.tape) }))
   return (
@@ -26,7 +24,6 @@ export function TapedButton({ className, ariaLabel, tilt, open, controlsId, onTo
   )
 }
 
-/** A small label: what it opens, and where that comes from. */
 function PaperSticker({ labels, ...trigger }: OverlayTriggerProps & { labels: StickerLabels }) {
   return (
     <TapedButton className="method-manual-sticker" ariaLabel={labels.ariaLabel} tilt={tilts.sticker} {...trigger}>
@@ -36,7 +33,6 @@ function PaperSticker({ labels, ...trigger }: OverlayTriggerProps & { labels: St
   )
 }
 
-/** The act's pages in the manual, taped by the sheet's header. */
 export function ManualStickers({ activity, triggerFor }: { activity: WorkshopActivity; triggerFor: TriggerFor }) {
   return (
     <div className="method-manual-stickers">
@@ -47,7 +43,6 @@ export function ManualStickers({ activity, triggerFor }: { activity: WorkshopAct
   )
 }
 
-/** The act's worksheet, blank and filled, taped under the drawing. */
 export function WorksheetStickers({ activity, triggerFor }: { activity: WorkshopActivity; triggerFor: TriggerFor }) {
   if (!activity.worksheets) return null
   return (

@@ -17,8 +17,6 @@ export const initialAsciiInput: AsciiInput = {
   phase: 0,
 }
 
-// Original procedural field, shared by the static/fallback presentation.
-// The WebGL shader evaluates the same five fields on the GPU.
 export function asciiDensity(
   x: number,
   y: number,
