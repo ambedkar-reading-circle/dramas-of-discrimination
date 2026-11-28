@@ -9,7 +9,7 @@ type FilmState = 'playing' | 'stopped'
 
 declare module '../../playback/cues' {
   interface CueTargets {
-    /** Slide 02: the film. Set it with `wait: 'video'` so the deck waits for its end. */
+    /** Slide 02: the film. Set it with `wait: 'film'` so the deck waits for its end. */
     film: FilmState
   }
 }
@@ -55,7 +55,9 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([])
   const resolve = useLatest(playback?.resolveWait)
 
-  const post = (message: object) => frame.current?.contentWindow?.postMessage(JSON.stringify({ ...message, id: 1, channel: 'widget' }), videoOrigin)
+  /** The player inside the iframe, once it has loaded. */
+  const player = () => frame.current?.contentWindow ?? null
+  const post = (message: object) => player()?.postMessage(JSON.stringify({ ...message, id: 1, channel: 'widget' }), videoOrigin)
   const command = (func: string) => {
     // Asking to listen each time is harmless, and covers a player that loaded late.
     post({ event: 'listening' })
@@ -68,7 +70,7 @@ export function useFilmCue(frame: RefObject<HTMLIFrameElement | null>) {
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
-      if (event.origin !== videoOrigin || event.source !== frame.current?.contentWindow) return
+      if (event.origin !== videoOrigin || event.source !== player()) return
       const state = stateOf(event.data)
       if (state === null) return
       if (state === playingState) {

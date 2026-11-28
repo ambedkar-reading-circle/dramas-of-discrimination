@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import type { Transition } from 'motion/react'
 import { members } from './content/actorMap'
+import { useCueTarget } from '../../playback/targets'
 import './modes.css'
 
 export type Mode = 'local' | 'cloud'
@@ -10,6 +12,16 @@ declare module '../../playback/cues' {
     /** Slides 07 and 08: Local or Cloud mode, set by each tab of notes. */
     mode: Mode
   }
+}
+
+/**
+ * The mode a slide shows, opening on `initial`: the notes' `mode` cues set it,
+ * and a switch by hand moves the deck to the point that shows that mode.
+ */
+export function useCuedMode(initial: Mode) {
+  const [mode, setMode] = useState<Mode>(initial)
+  useCueTarget('mode', setMode, { value: mode })
+  return [mode, setMode] as const
 }
 
 /** The mode switch's thumb snaps across quickly. */

@@ -4,6 +4,8 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { slides } from '../slides'
 import { pointsOf } from '../playback/points'
 import { keyName, plainKey, pressedOn, typingSelector } from '../keyTargets'
+import { switchesOf } from '../playback/switches'
+import type { PlaybackSwitches } from '../playback/switches'
 
 export const TOTAL_SLIDES = slides.length
 
@@ -21,12 +23,6 @@ function clamp(value: number, max: number): number {
 }
 
 const pointsIn = (slide: number) => deckPoints[slide - 1].length
-
-/** Whether the deck plays itself, and whether it reads its captions aloud. */
-export type PlaybackSwitches = Readonly<{ play: boolean; voice: boolean }>
-
-/** The switches a URL asks for: each is on unless the URL turns it off. */
-const switchesOf = (search: Readonly<{ play?: boolean; voice?: boolean }>): PlaybackSwitches => ({ play: search.play ?? true, voice: search.voice ?? true })
 
 /**
  * Owns the deck's position: the slide, and the point of its speaker notes
@@ -46,7 +42,7 @@ const switchesOf = (search: Readonly<{ play?: boolean; voice?: boolean }>): Play
  */
 export function usePresentationDeck() {
   const { slide: requestedSlide, point: requestedPoint = 1, play, voice } = useSearch({ from: '/approach' })
-  const opened = switchesOf({ play, voice })
+  const initialSwitches = switchesOf({ play, voice })
   const navigate = useNavigate({ from: '/approach' })
   const slide = clamp(requestedSlide, TOTAL_SLIDES)
   const point = clamp(requestedPoint, pointsIn(slide))
@@ -141,7 +137,7 @@ export function usePresentationDeck() {
     slide,
     point,
     total: TOTAL_SLIDES,
-    opened,
+    initialSwitches,
     rememberPlayback,
     atStart,
     atEnd,

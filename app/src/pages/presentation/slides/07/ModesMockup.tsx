@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useRef } from 'react'
 import type { CSSProperties } from 'react'
 import { twoDigit } from '#/lib/format'
 import { usePrefersReducedMotion } from '#/lib/use-media-query'
@@ -6,8 +6,7 @@ import { workshopActivities } from '#/pages/home/workshop-method'
 import { actorRows, columns, constitutionalValues, members, scenarioCell, scribe, valuesInstruction } from '../shared/content/actorMap'
 import type { SheetCell, Writer } from '../shared/content/actorMap'
 import { GuideFrame } from '../shared/GuideFrame'
-import { ModeBar } from '../shared/ModeControls'
-import { useCueTarget } from '../../playback/targets'
+import { ModeBar, useCuedMode } from '../shared/ModeControls'
 import type { Mode } from '../shared/ModeControls'
 import { SheetTabs } from '../shared/SheetTabs'
 import { WriterCaret, WriterCursors } from '../shared/WriterCursors'
@@ -30,8 +29,7 @@ const sheetTabs = ['Steps', 'Example', 'Actor map']
  * own name.
  */
 export function ModesMockup() {
-  const [mode, setMode] = useState<Mode>('local')
-  useCueTarget('mode', setMode, { value: mode })
+  const [mode, setMode] = useCuedMode('local')
 
   return (
     <GuideFrame label="Mockup: in Local mode the Actor map is filled on one device and its data stays there; in Cloud mode the data is shared with the platform and several Members fill it at once" className="modes actor-fill" mode={mode} act={act} step={step} bar={<ModeBar mode={mode} onChange={setMode} />}>

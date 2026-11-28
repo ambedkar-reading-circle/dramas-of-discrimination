@@ -15,8 +15,11 @@ export type AssetSlot = Readonly<{
  */
 export type SpeakerNote = string | Cue
 
+/** A slide's two-digit number, which names its folder under `slides/`. */
+export type SlideId = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10'
+
 export type Slide = Readonly<{
-  id: string
+  id: SlideId
   kicker: string
   heading: string
   body?: ReactNode

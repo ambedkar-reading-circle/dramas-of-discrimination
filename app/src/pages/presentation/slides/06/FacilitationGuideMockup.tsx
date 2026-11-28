@@ -13,21 +13,24 @@ import { warnCue } from '../../playback/cues'
 import { useCueTarget } from '../../playback/targets'
 import './FacilitationGuideMockup.css'
 
+/** One stop of the journey: an act of the workshop, and a step of it (both 0-based). */
+export type GuideStop = Readonly<{ act: number; step: number }>
+
 /** Every step of the workshop in order, so Back and Next walk the whole journey. */
-const journey = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
+const journey: ReadonlyArray<GuideStop> = workshopActivities.flatMap((activity, act) => activity.steps.map((_, step) => ({ act, step })))
 
 declare module '../../playback/cues' {
   interface CueTargets {
     /** Slide 06: the step of the journey the guide is on. */
-    guide: Readonly<{ act: number; step: number }>
+    guide: GuideStop
   }
 }
 
 /** Where the guide opens, and what the points before the first `guide` cue show. */
 const opening = journey[journey.findIndex((stop) => stop.act === 1)]
 
-/** Where a step sits in the journey, or -1 for a step the workshop does not have. */
-const positionOf = (act: number, step: number) => journey.findIndex((stop) => stop.act === act && stop.step === step)
+/** Where a stop sits in the journey, or -1 for a step the workshop does not have. */
+const positionOf = ({ act, step }: GuideStop) => journey.findIndex((stop) => stop.act === act && stop.step === step)
 
 /** Stand-in clip lengths for the recorded examples, one per step slot. */
 const clipLengths = ['2:10', '1:45', '2:30']
@@ -75,14 +78,14 @@ export function FacilitationGuideMockup() {
   const moveToStop = (target: number) => {
     if (target >= 0 && target !== position) moveTo(target)
   }
-  const goTo = (targetAct: number, targetStep: number) => moveToStop(positionOf(targetAct, targetStep))
+  const goTo = (target: GuideStop) => moveToStop(positionOf(target))
 
   // A cue on `guide` walks the room on, as if it had pressed We're ready; a
   // step chosen by hand moves the deck to the point that shows it.
   useCueTarget(
     'guide',
     (stop) => {
-      const target = positionOf(stop.act, stop.step)
+      const target = positionOf(stop)
       if (target < 0) return warnCue({ set: 'guide', to: stop }, 'no such step in the journey')
       moveToStop(target)
     },
@@ -115,7 +118,7 @@ export function FacilitationGuideMockup() {
       label="Mockup: the facilitation guide, walking the room through the workshop"
       act={act}
       step={step}
-      onSelectAct={(index) => goTo(index, 0)}
+      onSelectAct={(index) => goTo({ act: index, step: 0 })}
       bar={
         <>
           <span className="fac-bar-room">
@@ -182,7 +185,7 @@ export function FacilitationGuideMockup() {
                           <span className="fac-step-tape" />
                         </motion.span>
                       )}
-                      <button type="button" onClick={() => goTo(act, index)} aria-current={state === 'now' ? 'step' : undefined}>
+                      <button type="button" onClick={() => goTo({ act, step: index })} aria-current={state === 'now' ? 'step' : undefined}>
                         <span className="fac-step-num">{state === 'done' ? '✓' : twoDigit(index + 1)}</span>
                         <span className="fac-step-text">{item.text}</span>
                       </button>
