@@ -525,14 +525,28 @@
     bottom: 0;
   }
 
-  /* Below the deepest notch of the tear, so the line rides on solid paper. */
+  /* The line follows the tear, a hair inside the paper. It is cut from the
+     same paper-tear.svg the edge is, twice, with the second copy shifted by
+     the line's width and subtracted, leaving a band the shape of the edge.
+     The tear above is the strip flipped over the bar's top (-6px to 0), so
+     the band is flipped the same way across a box centred on that top. */
   .slide-nav .slide-progress {
+    --tear-at: calc(6px - var(--slide-progress-inset));
     position: absolute;
     inset-inline: 0;
-    top: var(--slide-progress-inset);
-    height: var(--slide-line-width);
+    top: -6px;
+    height: 12px;
     border-radius: 0;
     background: transparent;
+    transform: scaleY(-1);
+    pointer-events: none;
+    mask-image: url('/paper-tear.svg'), url('/paper-tear.svg');
+    mask-size: 768px 6px;
+    mask-repeat: repeat-x;
+    mask-position:
+      left 0 top var(--tear-at),
+      left 0 top calc(var(--tear-at) - var(--slide-line-width));
+    mask-composite: subtract;
   }
 
   .slide-nav .slide-progress-fill {
