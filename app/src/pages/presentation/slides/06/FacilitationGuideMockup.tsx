@@ -113,10 +113,6 @@ export function FacilitationGuideMockup() {
       }
       foot={
         <>
-          <span className="fac-pace">
-            <span className="method-clock" aria-hidden="true" />
-            about {activity.duration} min · take the time you need
-          </span>
           <span className="fac-nav">
             <button type="button" className="fac-btn" onClick={() => moveTo(position - 1)} disabled={position === 0}>
               <span aria-hidden="true">←</span> Back
