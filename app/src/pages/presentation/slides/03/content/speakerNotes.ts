@@ -15,7 +15,7 @@ export const speakerNotes: ReadonlyArray<SpeakerNote> = [
   'And to invite others to sit with this literature and these images, and to talk back to them.',
   circles('organize'),
   'For Dalits who have migrated to the city, we wanted the circle to feel like belonging. Like home.',
-  'It is open to other liberals too, who come looking for solidarity and allyship.',
+  'It is open to all liberals too, who come looking for solidarity and allyship.',
   circles('educate'),
   'Since then we have met about once a month. A circle usually draws twenty to forty people.',
   'Roughly half are coming back, and half are there for the first time. We see that split almost every time.',
