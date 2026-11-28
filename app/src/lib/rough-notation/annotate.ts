@@ -1,9 +1,3 @@
-// Adapted from rough-notation — © Preet Shihn / rough-stuff (MIT)
-// https://github.com/rough-stuff/rough-notation
-// Clean-room re-implementation of its annotation controller. Deviations from
-// the original: hide() is an animated retract (the original clears the svg
-// instantly) driven by WAAPI, with an explicit reduced-motion gate.
-
 import {
   DEFAULT_ANIMATION_DURATION,
   DEFAULT_HIDE_DURATION_RATIO,
@@ -131,7 +125,6 @@ class RoughAnnotationImpl implements RoughAnnotation {
       this._e.insertAdjacentElement(prepend ? 'beforebegin' : 'afterend', svg)
       this._state = 'not-showing'
 
-      // ensure e is positioned
       if (prepend) {
         const computedPos = window.getComputedStyle(this._e).position
         const unpositioned = !computedPos || computedPos === 'static'
@@ -203,7 +196,6 @@ class RoughAnnotationImpl implements RoughAnnotation {
     if (this._state === 'unattached') {
       return
     }
-    // Cancel any in-flight draw or retract and start over from zero.
     this.redraw(this._config.animate !== false)
   }
 
@@ -216,13 +208,10 @@ class RoughAnnotationImpl implements RoughAnnotation {
       (this._config.animationDuration || DEFAULT_ANIMATION_DURATION) *
         DEFAULT_HIDE_DURATION_RATIO
     if (!this._animations.length) {
-      // Nothing was animated (instant show, or reduced motion): clear now.
       this.clear()
       return
     }
     const token = ++this._hideToken
-    // Read the visual state before canceling the show animations, since
-    // canceling reverts each path to its (hidden) base dash offset.
     const currents = this._renderedPaths.map(({ path }) => {
       const value = parseFloat(getComputedStyle(path).strokeDashoffset)
       return Number.isFinite(value) ? value : 0
@@ -370,10 +359,6 @@ class RoughAnnotationImpl implements RoughAnnotation {
     return ret
   }
 
-  // Converts a viewport-space rect into the svg's own user space. Going
-  // through the inverse screen CTM undoes any CSS transform on an ancestor
-  // (e.g. a scale-to-fit slide); a plain client-rect subtraction would be in
-  // screen pixels and get scaled a second time when drawn.
   private svgRect(svg: SVGSVGElement, bounds: DOMRect | DOMRectReadOnly): Rect {
     const ctm = svg.getScreenCTM()
     if (ctm) {

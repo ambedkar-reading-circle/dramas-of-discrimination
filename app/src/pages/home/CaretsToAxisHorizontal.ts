@@ -1,8 +1,5 @@
 import { createLucideIcon } from 'lucide-react'
 
-// Lucide's carets-to-axis-horizontal, copied from lucide-react v1.75.0 (ISC).
-// It first shipped in 1.74.0; the installed release predates it. Once the
-// dependency is upgraded, delete this file and import it from 'lucide-react'.
 const CaretsToAxisHorizontal = createLucideIcon({
   name: 'carets-to-axis-horizontal',
   size: 24,

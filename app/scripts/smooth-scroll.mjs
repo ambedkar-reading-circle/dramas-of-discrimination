@@ -29,7 +29,6 @@ try {
   )
   await page.waitForFunction(() => Math.abs(scrollY - 800) < 3)
 
-  // A route change during inertia must cancel the old animation.
   await page.mouse.wheel(0, 1200)
   await page.getByRole('link', { name: 'About', exact: true }).click()
   await page.waitForURL('**/about')

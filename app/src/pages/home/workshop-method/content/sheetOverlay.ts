@@ -7,30 +7,17 @@ import type {
   WorkshopActivity,
 } from './workshopActivities.ts'
 
-/**
- * What lies over an open facilitation sheet, and the words its stickers carry.
- * Kept free of React so the naming and the overlay choice can be tested alone.
- */
-
-/** The three kinds of sticker that lay something over the sheet. */
 export type OverlayKind = 'manual' | 'photo' | 'worksheet'
 
-/** Which sticker is open: its kind and its position among its own kind. */
 export interface OverlayTarget {
   kind: OverlayKind
   index: number
 }
 
-/** Identifies one sticker among all the stickers on a sheet. */
 export function targetKey({ kind, index }: OverlayTarget) {
   return `${kind}:${index}`
 }
 
-/**
- * What the overlay lays out: manual pages, or photographs as prints. `key`
- * tells two overlays apart, so switching between them replays the motion;
- * `ariaLabel` names the laid-out region for a screen reader.
- */
 export type OverlayContent =
   | {
       type: 'pages'
@@ -48,7 +35,6 @@ export type OverlayContent =
       photos: Photo[]
     }
 
-/** The text a sticker shows, and the name it carries for a screen reader. */
 export interface StickerLabels {
   label: string
   detail: string
@@ -104,7 +90,6 @@ export function excerptLabels(
   }
 }
 
-/** A worksheet sticker's labels and the overlay it opens, decided together. */
 function worksheetView(activityName: string, worksheet: WorksheetSticker) {
   const name = `${activityName} worksheet`
   if (worksheet.kind === 'manual') {
@@ -142,7 +127,6 @@ export function stepLabel(index: number, step: ActivityStep) {
   return `${twoDigit(index + 1)}. ${step.text} (${count === 1 ? 'photograph' : `${count} photographs`} from a workshop)`
 }
 
-/** Resolves the open sticker to what the overlay should show, or null. */
 export function resolveOverlay(
   activity: WorkshopActivity,
   target: OverlayTarget | null,

@@ -8,7 +8,6 @@ import { viewportSection } from './FitSectionButton'
 import './ManualFlipbookSection.css'
 
 const ManualBook = lazy(() => import('#/pages/home/manual-flipbook/ManualBook'))
-// A landscape viewport fits two pages as large as one portrait page, so it gets the spread.
 const desktopQuery = '(min-width: 701px) and (orientation: landscape)'
 const reducedQuery = '(prefers-reduced-motion: reduce)'
 
@@ -30,14 +29,10 @@ export default function ManualFlipbookSection() {
   const desktop = useMediaQuery(desktopQuery)
   const [failed, setFailed] = useState(false)
   const textMode = reducedMotion || failed
-  // Switching between the runway and a reading surface replaces the host.
-  // A new ref makes Motion detach from the old host and track the new one.
   const section = useMemo(() => createRef<HTMLElement>(), [textMode])
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
-  // Arrive with the section; page turns still use only the pinned runway.
   const { scrollYProgress: entrance } = useScroll({ target: section, offset: ['start end', 'start start'] })
   const exit = useTransform(scrollYProgress, [0.8, 1], [0, 1])
-  // Mirror the exit's full offscreen travel on arrival, including its tilt.
   const travel = useTransform(() => entrance.get() - 1 + exit.get())
   const x = useTransform(() => `${110 * travel.get()}vw`)
   const rotate = useTransform(() => 6 * travel.get())

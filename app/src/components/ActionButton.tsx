@@ -8,7 +8,6 @@ type ActionButtonProps = {
   icon?: ReactNode
 } & ({ href: string; to?: never } | { to: NonNullable<LinkProps['to']>; href?: never })
 
-// These button-style actions navigate, so retain native link semantics.
 export default function ActionButton({ children, variant = 'primary', icon, ...destination }: ActionButtonProps) {
   const className = `action-link action-link-${variant}`
   const content = (

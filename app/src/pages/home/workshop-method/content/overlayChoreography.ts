@@ -1,20 +1,12 @@
 import type { TargetAndTransition, Transition } from 'motion/react'
 
-/** Motion for what lies over an open sheet: stickers, manual pages and prints. */
-
-/** A tilt in degrees, of a size between `min` and `max`, leaning either way. */
 export type TiltRange = readonly [min: number, max: number]
 
 export const tilts = {
-  /** Small labels taped to the sheet. */
   sticker: [0.8, 2.6],
-  /** A whole step, taped as one long sticker; wide, so it leans less. */
   stepSticker: [0.4, 1.2],
-  /** The tape strip across a sticker's top edge. */
   tape: [1.5, 6],
-  /** Manual pages, laid nearly square. */
   page: [0.3, 1.8],
-  /** Photographic prints, dropped more loosely. */
   print: [0.8, 2.4],
 } satisfies Record<string, TiltRange>
 

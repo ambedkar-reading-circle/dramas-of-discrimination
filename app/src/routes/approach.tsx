@@ -4,8 +4,6 @@ import PresentationDeck from '#/pages/presentation'
 import type { PlaybackSwitches } from '#/pages/presentation/playback/switches'
 
 export const Route = createFileRoute('/approach')({
-  // Keep the deck's place across refresh and deep links: /approach?slide=7&point=3
-  // ?play and ?voice: whether the deck plays itself and reads its captions aloud. Both open on; the deck writes them in on arrival.
   validateSearch: (search: Record<string, unknown>): { slide: number; point?: number } & Partial<PlaybackSwitches> => {
     const play = onOff(search.play)
     const voice = onOff(search.voice)
@@ -23,7 +21,6 @@ export const Route = createFileRoute('/approach')({
   component: Approach,
 })
 
-/** An on/off param, read from `true`/`false` or `1`/`0`; anything else is left out. */
 function onOff(value: unknown): boolean | undefined {
   if (value === true || value === 'true' || value === 1 || value === '1') return true
   if (value === false || value === 'false' || value === 0 || value === '0') return false

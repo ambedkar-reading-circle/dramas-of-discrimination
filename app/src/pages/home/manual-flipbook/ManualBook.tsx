@@ -9,8 +9,6 @@ import { manualBackCover } from './content/manualContent'
 import { ManualPageState } from './context/ManualPageState'
 import { progressForSpread } from './engine/spreadPlan'
 
-// page-flip 2.0.7 ships TS source but no declarations. Keep the small surface we
-// use typed without pulling its non-strict source into the application's build.
 interface FlipBookHandle {
   pageFlip: () =>
     | {
@@ -79,8 +77,6 @@ export default function ManualBook({ desktop, progress: externalProgress, spread
   useEffect(() => {
     const element = host.current
     if (!element) return
-    // Remounting the engine rebuilds every page and WebGL context, so resize
-    // measurements settle first; only the first measurement renders at once.
     let settle: ReturnType<typeof setTimeout> | undefined
     let lastWidth = 0
     const observer = new ResizeObserver(([entry]) => {
@@ -107,8 +103,6 @@ export default function ManualBook({ desktop, progress: externalProgress, spread
   useEffect(() => {
     const element = host.current
     if (!element) return
-    // Portrait curls clone a leaf's DOM. Those copies must remain decorative,
-    // even if copied just before React disables the outgoing canvas.
     const observer = new MutationObserver((records) => {
       for (const record of records)
         for (const node of record.addedNodes) {
@@ -122,8 +116,6 @@ export default function ManualBook({ desktop, progress: externalProgress, spread
             const source = original?.querySelector('canvas')
             const copy = canvas.querySelector('canvas')
             if (source && copy && source.dataset.asciiRenderer) {
-              // cloneNode doesn't copy canvas pixels. Preserve the last shader
-              // frame on the temporary portrait curl without another renderer.
               copy.getContext('2d')?.drawImage(source, 0, 0)
             }
           }

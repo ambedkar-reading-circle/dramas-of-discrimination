@@ -74,7 +74,6 @@
   }
 }
 
-/* A flat colour wash controls texture strength without covering any content. */
 @layer components {
   body,
   .paper-tear,

@@ -7,8 +7,6 @@ export const asciiVariants = [
 ] as const
 export type AsciiVariant = (typeof asciiVariants)[number]
 
-// Keep these fields in sync with asciiShader.ts so fallback and GPU renderers
-// preserve the same page identity, including when WebGL is unavailable.
 export function patternDensity(
   x: number,
   y: number,
@@ -54,7 +52,5 @@ export function patternDensity(
         ) * Math.cos(x * 7 - y * 9 + Math.sin(y * 4 + time))
       break
   }
-  // A full-field bias keeps most cells legible without losing pockets of blue.
-  // No radial envelope: texture continues through the edges of every page.
   return 0.58 + 0.5 * wave
 }

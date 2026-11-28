@@ -15,8 +15,6 @@ export function useAsciiCanvas(
   const renderer = useRef<AsciiRenderer | null>(null)
   const elapsed = useRef(0)
 
-  // The renderer survives page turns, preserving the printed face's last frame.
-  // React lifecycle cleanup: https://react.dev/reference/react/useEffect#usage
   useEffect(
     () => () => {
       renderer.current?.dispose()

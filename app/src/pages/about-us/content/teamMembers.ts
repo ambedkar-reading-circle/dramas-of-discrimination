@@ -57,7 +57,6 @@ export const teamMembers: ReadonlyArray<TeamMember> = [...members].sort(
   (a, b) => a.name.localeCompare(b.name),
 )
 
-/** The name a member goes by on a name tag: the first word of their full name. */
 export function firstName(member: TeamMember) {
   return member.name.split(' ')[0]
 }

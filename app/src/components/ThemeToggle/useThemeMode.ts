@@ -13,10 +13,8 @@ function getInitialMode(): ThemeMode {
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
     if (stored === 'light' || stored === 'dark') return stored
   } catch {
-    // Theme switching still works when browser storage is unavailable.
   }
 
-  // Resolve first visits and previously saved Auto preferences once.
   return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'
@@ -37,7 +35,6 @@ export function useThemeMode() {
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, mode)
     } catch {
-      // Keep the selected theme for this visit even without persistent storage.
     }
   }, [mode])
 
