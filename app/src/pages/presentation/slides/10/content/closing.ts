@@ -1,7 +1,7 @@
 import { manualEmail } from '#/pages/home/manual-flipbook'
 
 export const closingLede =
-  'The Preamble ends with its people adopting, enacting and giving the Constitution to themselves. The Workshop asks one change of every Community that takes it up: adapt it, before you enact it.'
+  'The Preamble ends with its people giving the Constitution to themselves. The Workshop asks the same of every Community that takes it up: adapt it, enact it, and give to it.'
 
 export type ClosingAction =
   | Readonly<{ kind: 'method'; label: string; hash: string }>
